@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="420" viewBox="0 0 1200 420" role="img" aria-labelledby="title description">
+  <title id="title">Lunch Loop</title>
+  <desc id="description">The fun lunch loop for two to six friends</desc>
+  <defs>
+    <linearGradient id="orange" x1="0" x2="1" y1="0" y2="1">
+      <stop stop-color="#f97316"/>
+      <stop offset="1" stop-color="#ea580c"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="12" stdDeviation="16" flood-color="#9a3412" flood-opacity=".22"/>
+    </filter>
+  </defs>
+  <rect width="1200" height="420" rx="42" fill="url(#orange)"/>
+  <circle cx="1080" cy="-6" r="180" fill="#fb923c" opacity=".45"/>
+  <circle cx="1165" cy="350" r="190" fill="#c2410c" opacity=".18"/>
+  <g filter="url(#shadow)">
+    <rect x="76" y="76" width="148" height="148" rx="38" fill="#fffaf3"/>
+    <circle cx="150" cy="150" r="48" fill="#fed7aa"/>
+    <circle cx="150" cy="150" r="34" fill="#fffaf3"/>
+    <path d="M125 111v27m10-27v27m-5-27v39c0 7 10 7 10 0v-39m35 0v76m0-76c-13 10-13 30 0 40" fill="none" stroke="#9a3412" stroke-linecap="round" stroke-linejoin="round" stroke-width="8"/>
+  </g>
+  <text x="268" y="135" fill="#fff7ed" font-family="Arial, Helvetica, sans-serif" font-size="25" font-weight="700" letter-spacing="5">IT’S LUNCH O’CLOCK</text>
+  <text x="268" y="205" fill="#ffffff" font-family="Arial, Helvetica, sans-serif" font-size="72" font-weight="800">Lunch Loop</text>
+  <text x="268" y="267" fill="#fff7ed" font-family="Arial, Helvetica, sans-serif" font-size="32">The fun lunch loop for 2–6 friends.</text>
+  <g transform="translate(268 307)">
+    <rect width="526" height="56" rx="28" fill="#fffaf3"/>
+    <text x="30" y="37" fill="#9a3412" font-family="Arial, Helvetica, sans-serif" font-size="24" font-weight="700">Turns · Vetoes · A shared list</text>
+  </g>
+  <text x="1036" y="218" fill="#fff7ed" font-family="Arial, Helvetica, sans-serif" font-size="92">🍟</text>
+</svg>

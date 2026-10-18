@@ -1,0 +1,196 @@
+@import "tailwindcss";
+
+:root {
+  --background: #fffaf3;
+  --foreground: #292524;
+}
+
+:root[data-theme="dark"] {
+  --background: #17120f;
+  --foreground: #f8f1eb;
+  color-scheme: dark;
+}
+
+:root[data-theme="dark"] body,
+:root[data-theme="dark"] [class~="bg-[#fffaf3]"],
+:root[data-theme="dark"] [class~="bg-[#fffaf3]/95"] {
+  background-color: #17120f !important;
+}
+
+/* App chrome is intentionally quiet in dark mode; orange remains reserved for
+   the same important actions and celebration panels used by the light theme. */
+:root[data-theme="dark"] header,
+:root[data-theme="dark"] footer,
+:root[data-theme="dark"] nav[aria-label="Primary"] {
+  background-color: #201914 !important;
+}
+
+:root[data-theme="dark"] .bg-white {
+  background-color: #2a231e !important;
+}
+
+:root[data-theme="dark"] .bg-stone-50 { background-color: #211b17 !important; }
+:root[data-theme="dark"] .bg-stone-100,
+:root[data-theme="dark"] .bg-stone-200 { background-color: #332922 !important; }
+:root[data-theme="dark"] .bg-orange-50 { background-color: #352518 !important; }
+:root[data-theme="dark"] .bg-orange-100 { background-color: #482e19 !important; }
+:root[data-theme="dark"] .bg-amber-50 { background-color: #332a17 !important; }
+:root[data-theme="dark"] .bg-amber-100 { background-color: #453718 !important; }
+:root[data-theme="dark"] .bg-emerald-50,
+:root[data-theme="dark"] .bg-emerald-50\/50 { background-color: #18342d !important; }
+:root[data-theme="dark"] .bg-emerald-100 { background-color: #1d4238 !important; }
+:root[data-theme="dark"] .bg-rose-50 { background-color: #3a2024 !important; }
+:root[data-theme="dark"] .bg-rose-100 { background-color: #4b252c !important; }
+:root[data-theme="dark"] .bg-violet-100 { background-color: #30273f !important; }
+:root[data-theme="dark"] .bg-indigo-50\/60 { background-color: #25283d !important; }
+
+:root[data-theme="dark"] .hover\:bg-orange-50:hover { background-color: #482e19 !important; }
+:root[data-theme="dark"] .hover\:bg-orange-100:hover { background-color: #5c391d !important; }
+:root[data-theme="dark"] .hover\:bg-stone-50:hover { background-color: #332922 !important; }
+
+:root[data-theme="dark"] .text-stone-900,
+:root[data-theme="dark"] .text-stone-800 { color: #f8f1eb !important; }
+:root[data-theme="dark"] .text-stone-700 { color: #e7dbd2 !important; }
+:root[data-theme="dark"] .text-stone-600 { color: #d0c1b6 !important; }
+:root[data-theme="dark"] .text-stone-500 { color: #baaba0 !important; }
+:root[data-theme="dark"] .text-stone-400 { color: #a5968c !important; }
+:root[data-theme="dark"] .text-stone-300 { color: #908179 !important; }
+
+:root[data-theme="dark"] .text-orange-950,
+:root[data-theme="dark"] .text-orange-900 { color: #ffe6d0 !important; }
+:root[data-theme="dark"] .text-orange-800 { color: #ffd0a3 !important; }
+:root[data-theme="dark"] .text-orange-700 { color: #ffc183 !important; }
+:root[data-theme="dark"] .text-orange-600 { color: #ffb36b !important; }
+
+:root[data-theme="dark"] .text-amber-950,
+:root[data-theme="dark"] .text-amber-900 { color: #ffe9a9 !important; }
+:root[data-theme="dark"] .text-amber-800,
+:root[data-theme="dark"] .text-amber-700 { color: #ffdb72 !important; }
+
+:root[data-theme="dark"] .text-emerald-950,
+:root[data-theme="dark"] .text-emerald-900 { color: #c8f5df !important; }
+:root[data-theme="dark"] .text-emerald-800,
+:root[data-theme="dark"] .text-emerald-700 { color: #9ce7c1 !important; }
+
+:root[data-theme="dark"] .text-rose-950,
+:root[data-theme="dark"] .text-rose-900 { color: #ffe2e5 !important; }
+:root[data-theme="dark"] .text-rose-800,
+:root[data-theme="dark"] .text-rose-700,
+:root[data-theme="dark"] .text-rose-600 { color: #ffb8c1 !important; }
+
+:root[data-theme="dark"] .text-indigo-800,
+:root[data-theme="dark"] .text-indigo-700,
+:root[data-theme="dark"] .text-violet-900 { color: #ddd2ff !important; }
+
+:root[data-theme="dark"] .border-stone-100,
+:root[data-theme="dark"] .border-stone-200,
+:root[data-theme="dark"] .border-stone-300,
+:root[data-theme="dark"] .border-orange-100,
+:root[data-theme="dark"] .border-orange-200,
+:root[data-theme="dark"] .border-orange-300,
+:root[data-theme="dark"] .border-amber-200,
+:root[data-theme="dark"] .border-emerald-200,
+:root[data-theme="dark"] .border-rose-100,
+:root[data-theme="dark"] .border-rose-200,
+:root[data-theme="dark"] .border-rose-300,
+:root[data-theme="dark"] .border-indigo-100,
+:root[data-theme="dark"] .border-indigo-200 {
+  border-color: #5c4838 !important;
+}
+
+:root[data-theme="dark"] input,
+:root[data-theme="dark"] select,
+:root[data-theme="dark"] textarea {
+  background-color: #211b17 !important;
+  color: #fff8f2 !important;
+  border-color: #72533b !important;
+}
+
+:root[data-theme="dark"] input::placeholder,
+:root[data-theme="dark"] textarea::placeholder {
+  color: #aa9b90 !important;
+}
+
+:root[data-theme="dark"] input:disabled,
+:root[data-theme="dark"] select:disabled,
+:root[data-theme="dark"] textarea:disabled {
+  background-color: #302720 !important;
+  color: #9d8e83 !important;
+}
+
+:root[data-theme="dark"] option {
+  background-color: #211b17;
+  color: #fff8f2;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+button,
+a,
+input {
+  -webkit-tap-highlight-color: transparent;
+}
+
+@keyframes install-pulse {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0deg);
+    box-shadow: 0 18px 32px rgb(251 146 60 / 0.25);
+  }
+  50% {
+    transform: translateY(-6px) rotate(2deg);
+    box-shadow: 0 26px 42px rgb(251 146 60 / 0.38);
+  }
+}
+
+@keyframes install-pointer {
+  0%,
+  100% {
+    transform: translateY(0) scale(1);
+  }
+  50% {
+    transform: translateY(-12px) scale(1.06);
+  }
+}
+
+.install-pulse {
+  animation: install-pulse 2.6s ease-in-out infinite;
+}
+
+.install-pointer {
+  animation: install-pointer 1.8s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .install-pulse,
+  .install-pointer {
+    animation: none;
+  }
+}
+
+/* Safari renders the editable portions of native date/time fields independently.
+   Give those internal controls the same vertical rhythm as the surrounding form. */
+.date-time-input {
+  line-height: 1;
+  padding-block: 0;
+}
+.date-time-input::-webkit-datetime-edit,
+.date-time-input::-webkit-datetime-edit-fields-wrapper,
+.date-time-input::-webkit-date-and-time-value {
+  display: flex;
+  align-items: center;
+  height: 100%;
+  padding: 0;
+}

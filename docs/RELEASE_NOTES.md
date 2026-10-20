@@ -1,5 +1,20 @@
 # Release Notes
 
+## 2026-10-19
+
+App build remains 2026.10.01.58. These notes describe work on the live
+database and the site’s front door.
+
+- Lunch Loop now keeps an index on the links between people, places,
+  invitations, feedback, and meal decisions, so those lookups stay quick as
+  a crew’s history grows.
+- Profile and site-admin permission checks look up the signed-in person once
+  per question. The same people can still see a profile or the admin list:
+  you see your own profile and people you share a loop with, and a site
+  admin still sees the admin list.
+- The live site allows 60 requests a minute from each internet address on
+  `/api/` paths.
+
 ## Build 2026.10.01.58
 
 - Selected restaurant cards now wrap long names, addresses, hours, and Lunch

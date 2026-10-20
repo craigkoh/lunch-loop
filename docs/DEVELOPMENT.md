@@ -97,6 +97,12 @@ The previous migration-history drift was repaired on September 7, 2026; do not
 manually alter migration history unless a future recovery procedure explicitly
 requires it.
 
+The 2026-10-19 foreign-key and policy changes are already recorded on the
+hosted project as versions `20261020003630` and `20261020003631`. The files
+in this repository use those versions. See
+[Operations](OPERATIONS.md#routine-checks) before treating them as pending
+work.
+
 ## Production deployment
 
 1. Confirm a verified backup and production environment variables.

@@ -1,7 +1,8 @@
 # Lunch Loop documentation
 
-Current release: version 0.1.0, build 2026.10.01.58. Production is
-[lunchloop.app](https://lunchloop.app).
+Current release: version 0.1.0, build 2026.10.19.59. Production is
+[lunchloop.app](https://lunchloop.app). This build reaches the live site when
+the documented production deploy runs.
 
 This is the starting point for a maintainer. Documentation describes intended
 operation; application code and versioned database migrations are the source of

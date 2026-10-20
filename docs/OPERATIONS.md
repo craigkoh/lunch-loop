@@ -73,7 +73,8 @@ requests, seven-day Places usage, provider errors, and Google Cloud budgets.
 - A dependency audit on 2026-10-20 found 10 warnings (1 critical, 9 high) in
   the previous lockfile. The critical warning and four high warnings are
   cleared by the package updates recorded in Development and Deployment.
-  Those updates are in source only until a reviewed production deploy. Five
+  Build 2026.10.19.59 is the release prepared to publish them. They reach
+  lunchloop.app when that production deploy runs. Five
   high warnings remain inside the developer linter’s file-matching libraries.
   They do not run in the browser or on the live server. Do not downgrade
   eslint-config-next to Next 14 to silence them.

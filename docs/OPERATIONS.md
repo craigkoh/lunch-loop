@@ -17,6 +17,27 @@ Before a production change:
 5. Confirm the active decision, restaurant search, and notification path
    affected by the change.
 
+On 2026-10-19 two database changes were applied directly to the hosted
+Supabase project, outside a repository change. No checksummed schema and
+data backup was taken beforehand. Hosted migration history already records
+them, using the versions below (00:36 UTC on 2026-10-20, the evening of
+2026-10-19 Central time):
+
+- `supabase/migrations/20261020003630_fk_covering_indexes.sql` adds 25
+  indexes on foreign-key columns.
+- `supabase/migrations/20261020003631_rls_initplan_and_site_admins_merge.sql`
+  rewrites the profile read and profile update policies so `auth.uid()` is
+  planned once per check, and merges the two site-admin read policies into
+  one policy with the same access.
+
+The repository files use those same version numbers, rather than a new
+`YYYYMMDD` sequence, so a migration list matches production and a later
+push treats them as already applied. The statements use `IF NOT EXISTS` and
+`IF EXISTS` so running the SQL again does not create a second index or a
+second policy. Take the checksummed backup in Backup and restore before any
+further database change. Do not repair migration history to different
+version numbers.
+
 At least monthly, review Global Admin feedback, suspended groups, invite
 requests, seven-day Places usage, provider errors, and Google Cloud budgets.
 
@@ -44,6 +65,11 @@ requests, seven-day Places usage, provider errors, and Google Cloud budgets.
   Signed-in client calls use only explicitly granted RPCs and RLS-scoped reads.
 - Durable per-person/per-loop Google Places limits are enforced before Google
   calls. Global Admin shows recent usage and can change limits.
+- The Vercel Firewall allows 60 requests per minute from each client IP on
+  paths under `/api/`. This custom rule was added on 2026-10-19. Before that
+  change the project firewall config was empty. The limit sits in front of
+  the app and does not replace sign-in, same-origin checks, row-level
+  security, or the Places limits.
 - Global Admin user lookup is a bounded private full-name/email search, not a
   browser-downloaded directory. Permanent loop deletion requires Global Admin
   authorization and the exact loop name; it is intended for test loops or a

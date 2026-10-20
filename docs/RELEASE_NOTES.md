@@ -1,5 +1,34 @@
 # Release Notes
 
+## 2026-10-20
+
+App build remains 2026.10.01.58. Nothing here has been published to
+lunchloop.app yet. These notes describe the maintenance change waiting for
+review.
+
+- The website framework and a few supporting packages were moved to the
+  smallest newer versions that close the known security warnings. Five
+  warnings remain, and they live only in the tool that checks the code while
+  someone is developing. They do not run on the live site. Closing them would
+  mean installing an older checker that does not match this version of the
+  site, so they were left as they are.
+- The practice test for permanently deleting a test Lunch Loop used a sample
+  Discord address the database correctly refuses. The sample now has the shape
+  of a Discord webhook address, and it is still a fake address, not a live
+  webhook.
+- If Google sign-in does not finish, Lunch Loop sends the person back to the
+  sign-in page with a short message, instead of opening the home page as if
+  the sign-in had worked.
+- Invitation links made from a temporary Vercel preview address now point at
+  lunchloop.app. Links made on a developer’s own computer still stay on that
+  computer.
+- Invitation, feedback, and “add a known friend” responses are marked so a
+  shared cache should not store them. Area-search errors get the same mark.
+- A database failure that was not written as a message for members now shows
+  “Something went wrong” in the browser. The technical detail stays in the
+  server log. Messages Lunch Loop wrote for members, such as a full crew or a
+  bad invitation, still show as before.
+
 ## 2026-10-19
 
 App build remains 2026.10.01.58. These notes describe work on the live

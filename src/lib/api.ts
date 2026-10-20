@@ -1,5 +1,24 @@
 import { NextResponse } from "next/server";
+import { ZodError } from "zod";
 import { RouteAccessError } from "@/lib/supabase/server";
+
+const noStore = { "Cache-Control": "private, no-store" };
+
+/**
+ * Origin used in emails and copied invite links. A Vercel preview or the old
+ * project alias must not leak into those links: sign-in only allowlists the
+ * canonical site, and a preview link would drop the recipient on the wrong host.
+ * Local development keeps its own origin so invite testing still works.
+ */
+export function appOrigin(request: Request) {
+  const url = new URL(request.url);
+  if (url.hostname.endsWith("vercel.app")) return "https://lunchloop.app";
+  return url.origin;
+}
+
+export function jsonNoStore(body: unknown, status = 200) {
+  return NextResponse.json(body, { status, headers: noStore });
+}
 
 export function requireSameOrigin(request: Request) {
   const expectedOrigin = new URL(request.url).origin;
@@ -29,11 +48,39 @@ export function requireSameOrigin(request: Request) {
   }
 }
 
+function isUserFacingDatabaseError(error: unknown): error is { message: string } {
+  return Boolean(
+    error &&
+      typeof error === "object" &&
+      "code" in error &&
+      (error as { code?: unknown }).code === "P0001" &&
+      "message" in error &&
+      typeof (error as { message?: unknown }).message === "string",
+  );
+}
+
 export function apiError(error: unknown) {
-  const headers = { "Cache-Control": "private, no-store" };
   if (error instanceof RouteAccessError) {
-    return NextResponse.json({ error: error.message }, { status: error.status, headers });
+    return NextResponse.json({ error: error.message }, { status: error.status, headers: noStore });
   }
-  const message = error instanceof Error ? error.message : "Something went wrong.";
-  return NextResponse.json({ error: message }, { status: 400, headers });
+  if (error instanceof ZodError) {
+    return NextResponse.json(
+      { error: error.issues[0]?.message ?? "Check what you entered and try again." },
+      { status: 400, headers: noStore },
+    );
+  }
+  if (error instanceof SyntaxError) {
+    return NextResponse.json({ error: "The request could not be read." }, { status: 400, headers: noStore });
+  }
+  // Lunch Loop's own thrown messages, and database exceptions written for
+  // members (SQLSTATE P0001), stay visible. Other database failures can name
+  // constraints or permissions, so those stay in the server log.
+  if (error instanceof Error && !("code" in error)) {
+    return NextResponse.json({ error: error.message }, { status: 400, headers: noStore });
+  }
+  if (isUserFacingDatabaseError(error)) {
+    return NextResponse.json({ error: error.message }, { status: 400, headers: noStore });
+  }
+  console.error("API request failed", error);
+  return NextResponse.json({ error: "Something went wrong." }, { status: 400, headers: noStore });
 }

@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { apiError, requireSameOrigin } from "@/lib/api";
+import { apiError, jsonNoStore, requireSameOrigin } from "@/lib/api";
 import { escapeHtml, sendLunchLoopEmail } from "@/lib/email";
 import { requireAuthenticatedSupabase } from "@/lib/supabase/server";
 
@@ -33,7 +33,7 @@ export async function POST(request: Request) {
           text: `You’ve been added to ${added.group_name}. Open your Lunch Loops: https://lunchloop.app/loops`,
         })
       : { sent: false };
-    return Response.json({
+    return jsonNoStore({
       displayName: added.display_name ?? "Lunch Loop friend",
       groupName: added.group_name,
       emailSent: delivery.sent,

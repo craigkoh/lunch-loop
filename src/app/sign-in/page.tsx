@@ -7,7 +7,11 @@ import { createClient, hasSupabaseEnv } from "@/lib/supabase/client";
 
 function SignInScreen() {
   const searchParams = useSearchParams();
-  const [message, setMessage] = useState("");
+  const [message, setMessage] = useState(
+    searchParams.get("error") === "signin"
+      ? "Google sign-in did not finish. Please try again."
+      : "",
+  );
   const [busy, setBusy] = useState(false);
   const next = searchParams.get("next");
   const nextPath =

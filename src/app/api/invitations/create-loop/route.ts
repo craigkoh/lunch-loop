@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { apiError, requireSameOrigin } from "@/lib/api";
+import { apiError, jsonNoStore, requireSameOrigin } from "@/lib/api";
 import { notifyCraig } from "@/lib/email";
 import { requireAuthenticatedSupabase } from "@/lib/supabase/server";
 
@@ -38,7 +38,7 @@ export async function POST(request: Request) {
       : await supabase.rpc("create_first_lunch_loop", rpcArgs);
     if (error) throw error;
     await notifyCraig("New Lunch Loop created", (user.email ?? "A Lunch Loop user") + " created the " + body.loopType + " loop “" + body.groupName + "”.");
-    return Response.json({ groupId });
+    return jsonNoStore({ groupId });
   } catch (error) {
     return apiError(error);
   }

@@ -70,6 +70,16 @@ requests, seven-day Places usage, provider errors, and Google Cloud budgets.
   change the project firewall config was empty. The limit sits in front of
   the app and does not replace sign-in, same-origin checks, row-level
   security, or the Places limits.
+- A dependency audit on 2026-10-20 found 10 warnings (1 critical, 9 high) in
+  the previous lockfile. The critical warning and four high warnings are
+  cleared by the package updates recorded in Development and Deployment.
+  Those updates are in source only until a reviewed production deploy. Five
+  high warnings remain inside the developer linter’s file-matching libraries.
+  They do not run in the browser or on the live server. Do not downgrade
+  eslint-config-next to Next 14 to silence them.
+- Re-run `npm audit` after the next dependency change. The in-memory helper
+  in src/lib/rate-limit.ts is still unused. The live limit for `/api/` is the
+  Vercel Firewall rule above, plus sign-in and the Places limits.
 - Global Admin user lookup is a bounded private full-name/email search, not a
   browser-downloaded directory. Permanent loop deletion requires Global Admin
   authorization and the exact loop name; it is intended for test loops or a

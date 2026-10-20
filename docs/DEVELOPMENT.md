@@ -77,6 +77,31 @@ own data:
       psql -v ON_ERROR_STOP=1 -U postgres -d postgres \
       < supabase/tests/account-lifecycle-fixture.sql
 
+The same command runs the Global Admin deletion fixture. Its sample Discord
+address must match the webhook format check. Use a fake
+`https://discord.com/api/webhooks/...` value. Do not put a live webhook in the
+fixture, and do not loosen the database check to make the sample pass:
+
+    PATH="/Applications/Docker.app/Contents/Resources/bin:$PATH" \
+      docker exec -i supabase_db_lunch-rotation \
+      psql -v ON_ERROR_STOP=1 -U postgres -d postgres \
+      < supabase/tests/global-admin-delete-fixture.sql
+
+Run all three fixtures after a local schema reset when a change touches
+invitations, deletion, Occasion loops, or account lifecycle. Each fixture
+rolls its own data back.
+
+Direct dependencies in package.json stay on exact versions, without a caret
+or tilde. After a dependency change, run `npm audit`. Prefer the smallest
+patch or minor upgrade that clears a warning. On 2026-10-20, Next.js,
+eslint-config-next, and @next/swc-wasm-nodejs moved from 16.3.1 to 16.3.8,
+and the lockfile picked up patched js-yaml, source-map-js, brace-expansion,
+and sharp. Five high warnings remain in the ESLint glob libraries (braces,
+micromatch, fast-glob, and the Next lint plugin that depends on them). There
+is no patched braces release. `npm audit fix --force` would downgrade
+eslint-config-next to 14.2.35, which does not match Next.js 16, so that
+downgrade was not applied.
+
 ## Database changes
 
 1. Add a timestamped SQL file in supabase/migrations/. Never edit a migration

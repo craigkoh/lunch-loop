@@ -25,12 +25,21 @@ export async function POST(request: Request) {
     );
   } catch (error) {
     if (error instanceof z.ZodError || error instanceof SyntaxError) {
-      return NextResponse.json({ error: "Enter at least two characters to search for a city or area." }, { status: 400 });
+      return NextResponse.json(
+        { error: "Enter at least two characters to search for a city or area." },
+        { status: 400, headers: { "Cache-Control": "private, no-store" } },
+      );
     }
     if (error instanceof RouteAccessError) {
-      return NextResponse.json({ error: error.message }, { status: error.status });
+      return NextResponse.json(
+        { error: error.message },
+        { status: error.status, headers: { "Cache-Control": "private, no-store" } },
+      );
     }
     console.error("Google Places area search failed", error);
-    return NextResponse.json({ error: "Area search is temporarily unavailable. Please try again." }, { status: 502 });
+    return NextResponse.json(
+      { error: "Area search is temporarily unavailable. Please try again." },
+      { status: 502, headers: { "Cache-Control": "private, no-store" } },
+    );
   }
 }

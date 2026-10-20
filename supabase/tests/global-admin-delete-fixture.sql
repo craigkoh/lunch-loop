@@ -26,8 +26,9 @@ insert into public.group_member_invitations(group_id, invited_by, recipient_emai
 values ('33333333-3333-3333-3333-333333333333', '11111111-1111-1111-1111-111111111111', 'fixture@example.com', 'fixture-member-token', 'fixture-member-code', now() + interval '1 day');
 insert into public.loop_creation_invitations(invited_by, source_group_id, recipient_email, token_hash, expires_at)
 values ('11111111-1111-1111-1111-111111111111', '33333333-3333-3333-3333-333333333333', 'fixture-new-loop@example.com', 'fixture-loop-token', now() + interval '1 day');
+-- Fake URL that only satisfies the Discord webhook format check. It is not a live webhook.
 insert into public.group_discord_notifications(group_id, webhook_url, enabled_events)
-values ('33333333-3333-3333-3333-333333333333', 'https://discord.example.invalid/webhooks/fixture-token', array['decision_made']);
+values ('33333333-3333-3333-3333-333333333333', 'https://discord.com/api/webhooks/fixture/not-a-real-webhook', array['decision_made']);
 insert into public.places_api_usage_events(action_name, user_id, group_id)
 values ('place_search', '11111111-1111-1111-1111-111111111111', '33333333-3333-3333-3333-333333333333');
 

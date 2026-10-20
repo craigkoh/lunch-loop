@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { apiError, requireSameOrigin } from "@/lib/api";
+import { apiError, appOrigin, jsonNoStore, requireSameOrigin } from "@/lib/api";
 import { requireAuthenticatedSupabase } from "@/lib/supabase/server";
 
 const bodySchema = z.object({
@@ -19,12 +19,13 @@ export async function POST(request: Request) {
     if (error) throw error;
     const invite = data?.[0];
     if (!invite) throw new Error("The shareable invitation could not be created.");
-    const inviteUrl = new URL("/join", request.url);
+    const inviteUrl = new URL("/join", appOrigin(request));
     inviteUrl.searchParams.set("code", invite.short_code);
-    return Response.json(
-      { inviteUrl: inviteUrl.toString(), shortCode: invite.short_code, expiresAt: invite.expires_at },
-      { headers: { "Cache-Control": "private, no-store" } },
-    );
+    return jsonNoStore({
+      inviteUrl: inviteUrl.toString(),
+      shortCode: invite.short_code,
+      expiresAt: invite.expires_at,
+    });
   } catch (error) {
     return apiError(error);
   }

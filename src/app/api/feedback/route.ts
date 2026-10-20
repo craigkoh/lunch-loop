@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { apiError, requireSameOrigin } from "@/lib/api";
+import { apiError, jsonNoStore, requireSameOrigin } from "@/lib/api";
 import { notifyCraig } from "@/lib/email";
 import { requireAuthenticatedSupabase } from "@/lib/supabase/server";
 
@@ -19,7 +19,7 @@ export async function POST(request: Request) {
     });
     if (error) throw error;
     await notifyCraig(`New ${body.kind} feedback`, `${user.email ?? "A Lunch Loop user"} submitted: ${body.title}\n\n${body.details}`);
-    return Response.json({ feedbackId });
+    return jsonNoStore({ feedbackId });
   } catch (error) {
     return apiError(error);
   }

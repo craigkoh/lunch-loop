@@ -8,6 +8,16 @@ export const metadata: Metadata = {
 
 const releases = [
   {
+    build: "2026.10.19.59",
+    changes: [
+      "Lookups between people, places, invitations, and meal decisions stay quick as a crew’s history grows.",
+      "If Google sign-in does not finish, Lunch Loop brings you back to the sign-in page with a short message instead of opening the home page as if you were signed in.",
+      "Invitation links created from a temporary preview address now open lunchloop.app.",
+      "When something unexpected goes wrong, Lunch Loop shows a plain message instead of technical wording. Notes written for you, such as a full crew or an invitation problem, still appear as before.",
+      "This build includes security updates for the site framework and its image tools.",
+    ],
+  },
+  {
     build: "2026.10.01.58",
     changes: [
       "Selected restaurant cards now wrap long names, addresses, hours, and Lunch Loop facts cleanly on narrow iPhone screens, so every detail stays readable while making picks.",

@@ -6,7 +6,7 @@
 
 <p align="center">
   <a href="https://lunchloop.app"><img alt="Live app" src="https://img.shields.io/badge/Live%20app-lunchloop.app-f97316?style=for-the-badge" /></a>
-  <a href="https://lunchloop.app/whats-new"><img alt="Current build" src="https://img.shields.io/badge/Build-2026.10.01.58-9a3412?style=for-the-badge" /></a>
+  <a href="https://lunchloop.app/whats-new"><img alt="Current build" src="https://img.shields.io/badge/Build-2026.10.19.59-9a3412?style=for-the-badge" /></a>
   <a href="https://lunchloop.app/privacy"><img alt="Invite only" src="https://img.shields.io/badge/Access-invite--only-fff7ed?style=for-the-badge&amp;labelColor=f97316" /></a>
 </p>
 
@@ -144,5 +144,5 @@ Created and maintained by [Craig Kohler](https://craigkohler.com).
 <p align="center">
   <a href="https://lunchloop.app"><strong>lunchloop.app</strong></a> ·
   <a href="https://craigkohler.com"><strong>craigkohler.com</strong></a> ·
-  <a href="https://lunchloop.app/whats-new"><strong>Build 2026.10.01.58</strong></a>
+  <a href="https://lunchloop.app/whats-new"><strong>Build 2026.10.19.59</strong></a>
 </p>

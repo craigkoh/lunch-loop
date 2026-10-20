@@ -1,11 +1,23 @@
 # Release Notes
 
-## 2026-10-20
+## Build 2026.10.19.59
 
-App build remains 2026.10.01.58. Nothing here has been published to
-lunchloop.app yet. These notes describe the maintenance change waiting for
-review.
+This is the build being published. It gathers the October 19 database and
+front-door work with the October 20 maintenance. It reaches
+[lunchloop.app](https://lunchloop.app) when the production deploy in
+[Development and Deployment](DEVELOPMENT.md#production-deployment) runs. The
+previous public build was 2026.10.01.58.
 
+- Lunch Loop now keeps an index on the links between people, places,
+  invitations, feedback, and meal decisions, so those lookups stay quick as
+  a crew’s history grows.
+- Profile and site-admin permission checks look up the signed-in person once
+  per question. The same people can still see a profile or the admin list:
+  you see your own profile and people you share a loop with, and a site
+  admin still sees the admin list.
+- The live site allows 60 requests a minute from each internet address on
+  `/api/` paths. That limit was added on October 19 and is already in front
+  of the site.
 - The website framework and a few supporting packages were moved to the
   smallest newer versions that close the known security warnings. Five
   warnings remain, and they live only in the tool that checks the code while
@@ -28,21 +40,6 @@ review.
   “Something went wrong” in the browser. The technical detail stays in the
   server log. Messages Lunch Loop wrote for members, such as a full crew or a
   bad invitation, still show as before.
-
-## 2026-10-19
-
-App build remains 2026.10.01.58. These notes describe work on the live
-database and the site’s front door.
-
-- Lunch Loop now keeps an index on the links between people, places,
-  invitations, feedback, and meal decisions, so those lookups stay quick as
-  a crew’s history grows.
-- Profile and site-admin permission checks look up the signed-in person once
-  per question. The same people can still see a profile or the admin list:
-  you see your own profile and people you share a loop with, and a site
-  admin still sees the admin list.
-- The live site allows 60 requests a minute from each internet address on
-  `/api/` paths.
 
 ## Build 2026.10.01.58
 

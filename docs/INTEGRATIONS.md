@@ -50,7 +50,7 @@ Authentication → Emails → SMTP Settings:
   `Lunch Loop <invites@lunchloop.app>`.
 - Sender name: Lunch Loop.
 
-In Authentication → URL Configuration:
+In Authentication → URL Configuration for the production project:
 
 - Site URL remains `https://lunchloop.app`.
 - Allowlist:
@@ -65,16 +65,34 @@ In Authentication → URL Configuration:
 The wildcard entries let a magic link return to the page the person was
 trying to open, such as `/join`. Keep only those Lunch Loop origins.
 
-In Authentication → Email Templates, set both Magic Link and Confirm signup
-to this link. Do not put a secret or a real token in the template:
+Production deployments rewrite a `*.vercel.app` host to `https://lunchloop.app`
+before Google or a magic link starts, so the production Supabase project does
+not need the old Vercel alias on its allowlist. Preview deployments
+(`VERCEL_ENV=preview`) and local development do not rewrite the host. They
+send OAuth and magic-link redirects to their own origin. The staging Supabase
+project used by previews needs that preview origin on its allowlist, including
+`/auth/callback`, `/auth/confirm`, and a wildcard for return paths such as
+`/join`. A preview URL looks like
+`https://<project>-git-<branch>-<team>.vercel.app`.
+
+In Authentication → Email Templates, use these links. Do not put a secret or
+a real token in the template.
+
+Magic Link (`supabase/templates/magic_link.html`):
 
     {{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=email&next={{ .RedirectTo }}
 
-Local copies live in `supabase/templates/magic_link.html` and
-`supabase/templates/confirmation.html`. Hosted projects need the same markup
-pasted into the dashboard; the config file does not update production
-templates. Disable email-link click tracking in Resend so the link is not
-rewritten.
+Confirm signup (`supabase/templates/confirmation.html`):
+
+    {{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=signup&next={{ .RedirectTo }}
+
+`/auth/confirm` forwards that `type` to `verifyOtp`. GoTrue stores a magic-link
+hash as a recovery token and a confirm-signup hash as a confirmation token.
+`type=email` finds either hash. `type=signup` finds only the confirmation
+hash, so a magic-link template must stay on `type=email`. Hosted projects
+need the markup pasted into the dashboard; the config file does not update
+production templates. Disable email-link click tracking in Resend so the link
+is not rewritten.
 
 An email invitation still matches `auth.users.email`. A magic-link user and a
 Google user with the same address can redeem the invite that was sent to that

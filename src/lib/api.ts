@@ -1,19 +1,19 @@
 import { NextResponse } from "next/server";
 import { ZodError } from "zod";
+import { originForHost } from "@/lib/auth-redirect";
 import { RouteAccessError } from "@/lib/supabase/server";
 
 const noStore = { "Cache-Control": "private, no-store" };
 
 /**
- * Origin used in emails and copied invite links. A Vercel preview or the old
- * project alias must not leak into those links: sign-in only allowlists the
- * canonical site, and a preview link would drop the recipient on the wrong host.
- * Local development keeps its own origin so invite testing still works.
+ * Origin used in emails and copied invite links. A production *.vercel.app
+ * alias is rewritten to lunchloop.app. Preview deployments and local
+ * development keep the host that served the request, matching the Supabase
+ * project that deployment uses.
  */
 export function appOrigin(request: Request) {
   const url = new URL(request.url);
-  if (url.hostname.endsWith("vercel.app")) return "https://lunchloop.app";
-  return url.origin;
+  return originForHost(url.hostname, url.origin);
 }
 
 export function jsonNoStore(body: unknown, status = 200) {

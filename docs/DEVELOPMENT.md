@@ -150,8 +150,12 @@ work.
    Place, a decision/veto, Settings, Feedback, Global Admin, and Discord if
    configured.
 
-Production is https://lunchloop.app. The old Vercel address redirects to it and
-should not be shared. Redeploy after server-side environment-variable changes.
+Production is https://lunchloop.app. A production deployment still redirects
+its `*.vercel.app` host there, and that address should not be shared. Preview
+deployments stay on their own host and sign in against the staging Supabase
+project, using that preview origin for Google and magic-link redirects. Local
+development does the same with localhost. Redeploy after server-side
+environment-variable changes.
 
 ## Backup and restore
 
@@ -175,9 +179,11 @@ in the existing project.
 
 ## Sign-in callback essentials
 
-In Supabase Auth, set Site URL to https://lunchloop.app and allowlist the
-callback and confirm routes, including local development. Google’s OAuth
-client redirect URI remains the exact Supabase callback supplied by its
-provider settings, not Lunch Loop’s /auth/callback. Email magic links use
-/auth/confirm. See [Integrations](INTEGRATIONS.md) before changing identity
-configuration.
+In the production Supabase project, set Site URL to https://lunchloop.app and
+allowlist the callback and confirm routes, including local development. The
+staging project used by Vercel previews allowlists that preview origin
+instead. Google’s OAuth client redirect URI remains the exact Supabase
+callback supplied by its provider settings, not Lunch Loop’s /auth/callback.
+Email magic links use /auth/confirm with `type=email`. Confirm-signup mail
+uses the same path with `type=signup`. See
+[Integrations](INTEGRATIONS.md) before changing identity configuration.

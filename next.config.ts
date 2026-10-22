@@ -5,6 +5,11 @@ const localSupabaseConnect = process.env.NODE_ENV === "development"
   : "";
 
 const nextConfig: NextConfig = {
+  env: {
+    // Vercel sets VERCEL_ENV for the build. The sign-in page reads the public
+    // copy so a preview host is not rewritten to lunchloop.app in the browser.
+    NEXT_PUBLIC_VERCEL_ENV: process.env.NEXT_PUBLIC_VERCEL_ENV ?? process.env.VERCEL_ENV ?? "",
+  },
   experimental: {
     useWasmBinary: true,
   },

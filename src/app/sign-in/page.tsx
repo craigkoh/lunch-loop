@@ -3,20 +3,20 @@
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
-import { authErrorMessage, isAuthRateLimit, safeReturnPath } from "@/lib/auth-redirect";
+import { authErrorMessage, canonicalSiteOrigin, isAuthRateLimit, originForHost, safeReturnPath } from "@/lib/auth-redirect";
 import { createClient, hasSupabaseEnv } from "@/lib/supabase/client";
 
 const resendCooldownMs = 60_000;
 const sentStorageKey = "lunch-loop-magic-link-sent";
 
-function canonicalOrigin() {
-  if (window.location.hostname.endsWith("vercel.app")) return "https://lunchloop.app";
-  return window.location.origin;
+function authOrigin() {
+  if (typeof window === "undefined") return canonicalSiteOrigin;
+  return originForHost(window.location.hostname, window.location.origin);
 }
 
 function SignInScreen() {
   const searchParams = useSearchParams();
-  const nextPath = safeReturnPath(searchParams.get("next"), "https://lunchloop.app");
+  const nextPath = safeReturnPath(searchParams.get("next"), canonicalSiteOrigin);
   const [email, setEmail] = useState("");
   const [sentTo, setSentTo] = useState("");
   const [sentAt, setSentAt] = useState<number | null>(null);
@@ -66,7 +66,7 @@ function SignInScreen() {
     if (sentTo === address && cooldownLeft > 0) return;
     setBusy("email");
     setMessage("");
-    const origin = canonicalOrigin();
+    const origin = authOrigin();
     const destination = safeReturnPath(searchParams.get("next"), origin);
     const { error } = await createClient().auth.signInWithOtp({
       email: address,
@@ -94,7 +94,7 @@ function SignInScreen() {
     }
     setBusy("google");
     setMessage("");
-    const origin = canonicalOrigin();
+    const origin = authOrigin();
     const destination = safeReturnPath(searchParams.get("next"), origin);
     const { error } = await createClient().auth.signInWithOAuth({
       provider: "google",
@@ -103,9 +103,9 @@ function SignInScreen() {
         // requested scopes explicit prevents future feature work from quietly
         // broadening access to a person's Google account.
         scopes: "openid email profile",
-        // Never start a production OAuth flow on the legacy Vercel alias.
-        // Supabase allowlists this canonical callback and it keeps browser
-        // cookies, share links, and every post-login URL on lunchloop.app.
+        // Production *.vercel.app aliases sign in on lunchloop.app. Preview
+        // and local hosts keep their own origin so the callback cookie and
+        // the Supabase allowlist match the deployment that started sign-in.
         redirectTo: `${origin}/auth/callback?next=${encodeURIComponent(destination)}`,
       },
     });

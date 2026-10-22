@@ -26,6 +26,9 @@ ships.
   in Supabase Vault. The alert and the Resend fallback both leave out the
   reporter’s email address. A missing secret or the site switch skips the
   alert without blocking the note.
+- Preview deployments stay on their own Vercel host and sign in there.
+  Production `*.vercel.app` addresses still open lunchloop.app. Confirm-signup
+  mail uses `type=signup`; magic-link mail uses `type=email`.
 
 ## Build 2026.10.19.59
 

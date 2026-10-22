@@ -3,6 +3,34 @@
  * magic-link /auth/confirm route. A backslash or another site's origin never
  * becomes the redirect target.
  */
+export const canonicalSiteOrigin = "https://lunchloop.app";
+
+/**
+ * Vercel sets VERCEL_ENV on the server. next.config copies it to
+ * NEXT_PUBLIC_VERCEL_ENV so the sign-in page can read the same value.
+ * Preview and local builds are not "production", so they keep their own host.
+ */
+export function deploymentEnv(env: NodeJS.ProcessEnv = process.env) {
+  return env.NEXT_PUBLIC_VERCEL_ENV || env.VERCEL_ENV || "";
+}
+
+export function originForHost(
+  hostname: string,
+  currentOrigin: string,
+  env = deploymentEnv(),
+) {
+  if (env === "production" && hostname.endsWith(".vercel.app")) {
+    return canonicalSiteOrigin;
+  }
+  return currentOrigin;
+}
+
+/** Confirm-route types that verifyOtp accepts for an email token hash. */
+export function confirmOtpType(type: string | null): "email" | "signup" | null {
+  if (type === "email" || type === "signup") return type;
+  return null;
+}
+
 function originsMatch(candidate: URL, origin: string) {
   if (candidate.origin === origin) return true;
   let requestOrigin: URL;

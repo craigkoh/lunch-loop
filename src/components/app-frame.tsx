@@ -3,7 +3,9 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState, type ReactNode } from "react";
+import { FeedbackBugLink } from "./feedback-bug-link";
 import { appInfo } from "@/lib/app-info";
+import { dismissFeedbackPrompt, feedbackPromptOpenFor } from "@/lib/feedback-prompt";
 import { createClient, hasSupabaseEnv } from "@/lib/supabase/client";
 import { getMyLunchLoops, type LunchLoopSummary } from "@/lib/supabase/group";
 import { applyThemePreference, asThemePreference, storedThemePreference } from "@/lib/theme-preference";
@@ -24,10 +26,22 @@ type MembershipNotification = {
 export function AppFrame({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const [account, setAccount] = useState("");
+  const [userId, setUserId] = useState("");
+  const [feedbackPromptOpen, setFeedbackPromptOpen] = useState(false);
   const [currentLoop, setCurrentLoop] = useState<LunchLoopSummary | null>(null);
   const [isGlobalAdmin, setIsGlobalAdmin] = useState(false);
   const [membershipNotifications, setMembershipNotifications] = useState<MembershipNotification[]>([]);
   const headerLoadInFlight = useRef(false);
+  const userIdRef = useRef("");
+  userIdRef.current = userId;
+  useEffect(() => {
+    function refreshFeedbackPrompt() {
+      const id = userIdRef.current;
+      if (id && feedbackPromptOpenFor(id)) setFeedbackPromptOpen(true);
+    }
+    window.addEventListener("lunch-loop-feedback-prompt", refreshFeedbackPrompt);
+    return () => window.removeEventListener("lunch-loop-feedback-prompt", refreshFeedbackPrompt);
+  }, []);
   useEffect(() => {
     if (!hasSupabaseEnv()) return;
     const supabase = createClient();
@@ -38,7 +52,9 @@ export function AppFrame({ children }: { children: ReactNode }) {
       try {
         const { data: { session } } = await supabase.auth.getSession();
         const user = session?.user;
-        setAccount(user ? user.user_metadata.full_name || user.email || "Signed in" : "");
+        setAccount(user ? user.user_metadata.full_name || user.user_metadata.name || user.email?.split("@")[0] || user.email || "Signed in" : "");
+        setUserId(user?.id ?? "");
+        setFeedbackPromptOpen(Boolean(user && feedbackPromptOpenFor(user.id)));
         if (user) {
           const adminRequest = supabase.rpc("is_site_admin");
           const notificationRequest = supabase.rpc("get_my_lunch_loop_member_notifications");
@@ -73,6 +89,7 @@ export function AppFrame({ children }: { children: ReactNode }) {
           setCurrentLoop(null);
           setIsGlobalAdmin(false);
           setMembershipNotifications([]);
+          setFeedbackPromptOpen(false);
         }
       } finally {
         headerLoadInFlight.current = false;
@@ -86,6 +103,12 @@ export function AppFrame({ children }: { children: ReactNode }) {
     });
     return () => listener.subscription.unsubscribe();
   }, []);
+  function dismissPrompt() {
+    if (!userId) return;
+    dismissFeedbackPrompt(userId);
+    setFeedbackPromptOpen(false);
+  }
+  const feedbackPage = pathname || "/";
   async function signOut() {
     await createClient().auth.signOut();
     window.location.assign("/");
@@ -148,7 +171,8 @@ export function AppFrame({ children }: { children: ReactNode }) {
           </div>
         </div>
         {account && (
-          <div className="mx-auto mt-2 flex max-w-5xl items-center justify-end gap-2 text-xs text-stone-500">
+          <div className="mx-auto mt-2 flex max-w-5xl flex-wrap items-center justify-end gap-2 text-xs text-stone-500">
+            <FeedbackBugLink page={feedbackPage} />
             <span className="max-w-40 truncate">Signed in as {account}</span>
             <Link href="/account" className="font-bold text-orange-700 underline">
               Account settings
@@ -180,6 +204,17 @@ export function AppFrame({ children }: { children: ReactNode }) {
               <Link href="/loops" className="ml-auto text-xs font-black text-orange-700 underline">
                 My Lunch Loops
               </Link>
+            </div>
+          </div>
+        )}
+        {account && feedbackPromptOpen && pathname !== "/feedback" && (
+          <div className="mx-auto mt-3 max-w-5xl">
+            <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-orange-200 bg-orange-50 px-4 py-3 text-sm text-orange-950">
+              <p>How did that decision go? A short note helps the next build.</p>
+              <div className="flex items-center gap-3">
+                <FeedbackBugLink page={feedbackPage} onClick={dismissPrompt} className="font-black text-orange-800 underline" />
+                <button type="button" onClick={dismissPrompt} className="text-xs font-bold text-stone-600 underline">Not now</button>
+              </div>
             </div>
           </div>
         )}

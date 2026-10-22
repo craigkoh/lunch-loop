@@ -4,7 +4,9 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { AppFrame } from "./app-frame";
+import { suggestedDisplayName } from "@/lib/display-name";
 import { createClient, hasSupabaseEnv } from "@/lib/supabase/client";
+import { FeedbackBugLink } from "./feedback-bug-link";
 import { getMyLunchLoops } from "@/lib/supabase/group";
 import { LoopAreaPicker, type LoopHomeArea } from "./loop-area-picker";
 
@@ -28,7 +30,7 @@ export function StartLoopScreen() {
     async function loadAccount() {
       const { data: { user } } = await createClient().auth.getUser();
       setSignedIn(Boolean(user));
-      setDisplayName(user?.user_metadata.full_name || user?.user_metadata.name || "");
+      setDisplayName(suggestedDisplayName(user));
       if (user) {
         try {
           const loops = await getMyLunchLoops();
@@ -82,7 +84,7 @@ export function StartLoopScreen() {
         <h1 className="mt-1 text-3xl font-black">Build your Lunch Loop</h1>
         <p className="mt-2 max-w-2xl text-stone-600">Choose its rhythm and home area, then invite up to five friends to share the restaurant list, picks, and vetoes.</p>
         {loading ? <p className="mt-6 text-sm font-semibold text-stone-500">Checking your secure sign-in…</p> : !signedIn ? (
-          <Link href={`/sign-in?next=${encodeURIComponent(currentPath)}`} className="mt-6 inline-flex rounded-xl bg-orange-500 px-5 py-3 text-sm font-black text-white">Sign in with Google to continue →</Link>
+          <Link href={`/sign-in?next=${encodeURIComponent(currentPath)}`} className="mt-6 inline-flex rounded-xl bg-orange-500 px-5 py-3 text-sm font-black text-white">Sign in to continue →</Link>
         ) : started ? (
           <div className="mt-6 rounded-3xl bg-orange-50 p-5">
             <h2 className="text-xl font-black text-orange-950">Your loop is ready! 🍽️</h2>
@@ -148,7 +150,10 @@ export function StartLoopScreen() {
   }
   return <main className="grid min-h-dvh place-items-center bg-[#fffaf3] p-4">
     <div className="w-full max-w-4xl">
-      <Link href="/" className="mb-4 inline-flex text-sm font-black text-orange-700 underline">← Back to Lunch Loop</Link>
+      <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+        <Link href="/" className="inline-flex text-sm font-black text-orange-700 underline">← Back to Lunch Loop</Link>
+        {signedIn && <FeedbackBugLink page={currentPath} />}
+      </div>
       {setupCard}
     </div>
   </main>;

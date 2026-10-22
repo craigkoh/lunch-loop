@@ -1,28 +1,15 @@
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
+import { requestOrigin, safeReturnPath, signInRedirect } from "@/lib/auth-redirect";
 
 export async function GET(request: Request) {
   const url = new URL(request.url);
+  const origin = requestOrigin(request);
   const code = url.searchParams.get("code");
-  const requestedNext = url.searchParams.get("next");
-  // `new URL()` treats a backslash as a path separator. Without rejecting it,
-  // a value such as `/\\evil.example` can become an external redirect.
-  const candidateNext =
-    requestedNext &&
-    requestedNext.startsWith("/") &&
-    !requestedNext.startsWith("//") &&
-    !requestedNext.includes("\\")
-      ? new URL(requestedNext, url.origin)
-      : null;
-  const safeNext =
-    candidateNext?.origin === url.origin
-      ? `${candidateNext.pathname}${candidateNext.search}${candidateNext.hash}`
-      : "/";
-  const redirect = new URL(safeNext, url.origin);
-  const signIn = new URL("/sign-in", url.origin);
-  signIn.searchParams.set("error", "signin");
-  if (safeNext !== "/") signIn.searchParams.set("next", safeNext);
+  const safeNext = safeReturnPath(url.searchParams.get("next"), origin);
+  const redirect = new URL(safeNext, origin);
+  const signIn = signInRedirect(origin, safeNext, "signin");
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const key = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
   if (!code || !supabaseUrl || !key) return NextResponse.redirect(signIn);

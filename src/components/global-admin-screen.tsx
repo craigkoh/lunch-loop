@@ -77,6 +77,9 @@ type FeedbackItem = {
   duplicate_of: string | null;
   created_at: string;
   updated_at: string;
+  credit_opt_in: boolean;
+  credit_name: string | null;
+  notified_at: string | null;
 };
 type PlacesLimits = {
   place_search_user_limit_10m: number;
@@ -173,6 +176,7 @@ export function GlobalAdminScreen() {
   const [inviteRequests, setInviteRequests] = useState<InviteRequest[]>([]);
   const [feedbackItems, setFeedbackItems] = useState<FeedbackItem[]>([]);
   const [allowNewGroups, setAllowNewGroups] = useState(true);
+  const [feedbackWebhookEnabled, setFeedbackWebhookEnabled] = useState(true);
   const [ownedLoopLimit, setOwnedLoopLimit] = useState(4);
   const [memberInviteLimit, setMemberInviteLimit] = useState("");
   const [placesLimits, setPlacesLimits] = useState<PlacesLimits>(defaultPlacesLimits);
@@ -255,7 +259,7 @@ export function GlobalAdminScreen() {
       ] = await Promise.all([
         supabase
           .from("site_settings")
-          .select("allow_new_groups, owned_loop_limit, member_invite_limit_per_day, place_search_user_limit_10m, place_search_group_limit_10m, place_detail_user_limit_10m, place_detail_group_limit_10m, area_search_user_limit_10m, places_user_limit_per_day, places_group_limit_per_day")
+          .select("allow_new_groups, owned_loop_limit, member_invite_limit_per_day, feedback_webhook_enabled, place_search_user_limit_10m, place_search_group_limit_10m, place_detail_user_limit_10m, place_detail_group_limit_10m, area_search_user_limit_10m, places_user_limit_per_day, places_group_limit_per_day")
           .eq("singleton", true)
           .single(),
         supabase
@@ -312,6 +316,7 @@ export function GlobalAdminScreen() {
       setInviteRequests((inviteRequestsResult.data ?? []) as InviteRequest[]);
       setFeedbackItems((feedbackResult.data ?? []) as FeedbackItem[]);
       setAllowNewGroups(Boolean(settingsResult.data?.allow_new_groups));
+      setFeedbackWebhookEnabled(settingsResult.data?.feedback_webhook_enabled !== false);
       setOwnedLoopLimit(settingsResult.data?.owned_loop_limit ?? 4);
       setMemberInviteLimit(
         settingsResult.data?.member_invite_limit_per_day?.toString() ?? "",
@@ -503,6 +508,20 @@ export function GlobalAdminScreen() {
       allowNewGroups
         ? "New lunch-loop creation is enabled."
         : "New lunch-loop creation is paused.",
+    );
+  }
+  function saveFeedbackWebhook() {
+    void run(
+      async () => {
+        const { error: updateError } = await createClient().rpc(
+          "global_admin_set_feedback_webhook_enabled",
+          { new_enabled: feedbackWebhookEnabled },
+        );
+        if (updateError) throw updateError;
+      },
+      feedbackWebhookEnabled
+        ? "Feedback alerts are enabled. They still skip quietly when the vault secrets are missing."
+        : "Feedback alerts are paused. The email fallback still sends without the reporter email.",
     );
   }
   function saveMemberInviteLimit() {
@@ -892,7 +911,7 @@ export function GlobalAdminScreen() {
                 <h2 className="mt-1 text-xl font-black">New lunch loops</h2>
                 <p className="mt-1 max-w-xl text-sm text-orange-50">
                   Pause new group creation without affecting existing groups.
-                  Google sign-in remains managed in Supabase, so current members
+                  Sign-in remains managed in Supabase, so current members
                   can still sign in.
                 </p>
               </div>
@@ -914,6 +933,19 @@ export function GlobalAdminScreen() {
             >
               Save site setting
             </button>
+            <div className="mt-5 rounded-2xl bg-white/10 p-4">
+              <div className="flex flex-wrap items-start justify-between gap-3">
+                <div>
+                  <p className="font-black">Feedback alerts</p>
+                  <p className="mt-1 max-w-xl text-sm text-orange-50">When this is on, a new note can alert the maintainer bot. The alert skips quietly if the vault secrets are missing, and the email fallback never includes the reporter’s email address.</p>
+                </div>
+                <label className="flex items-center gap-3 rounded-2xl bg-white/10 px-4 py-3 text-sm font-bold">
+                  <input type="checkbox" checked={feedbackWebhookEnabled} onChange={(event) => setFeedbackWebhookEnabled(event.target.checked)} className="size-5 accent-orange-500" />
+                  Send feedback alerts
+                </label>
+              </div>
+              <button type="button" disabled={busy} onClick={saveFeedbackWebhook} className="mt-4 rounded-xl bg-white px-4 py-3 text-sm font-black text-orange-900 disabled:opacity-60">Save alert setting</button>
+            </div>
             <div className="mt-5 rounded-2xl bg-white/15 p-4">
               <p className="font-black">Owned Lunch Loop limit</p>
               <p className="mt-1 text-sm text-orange-50">Set the maximum number of active Lunch Loops one account may own. It applies to creation, invitation redemption, restoring an archived loop, and ownership changes.</p>
@@ -1108,7 +1140,7 @@ export function GlobalAdminScreen() {
                 </p>
                 <h2 className="mt-1 text-xl font-black">Invite requests</h2>
                 <p className="mt-1 max-w-2xl text-sm text-stone-500">
-                  Requests are tied to a Google-signed-in Lunch Loop account, so
+                  Requests are tied to a signed-in Lunch Loop account, so
                   the queue is more useful than an open public email form. Mark
                   a request invited after you send the person their next step.
                 </p>
@@ -1140,11 +1172,11 @@ export function GlobalAdminScreen() {
                         </div>
                         <p className="mt-1 break-all text-sm text-stone-600">
                           {request.account_email ??
-                            "Google account email unavailable"}
+                            "Account email unavailable"}
                         </p>
                         <p className="mt-1 text-xs text-stone-500">
                           Requested {timeLabel(request.requested_at)} ·{" "}
-                          {request.auth_provider ?? "Google"} sign-in
+                          {request.auth_provider ?? "account"} sign-in
                         </p>
                         {request.note && (
                           <p className="mt-3 rounded-xl bg-white p-3 text-sm leading-6 text-stone-700">
@@ -1225,7 +1257,7 @@ export function GlobalAdminScreen() {
               ) : (
                 <p className="rounded-2xl bg-stone-50 p-4 text-sm text-stone-500">
                   No invite requests yet. The landing page directs interested
-                  people through Google sign-in before they can join this queue.
+                  people through sign-in before they can join this queue.
                 </p>
               )}
             </div>
@@ -1246,7 +1278,7 @@ export function GlobalAdminScreen() {
                     <div className="min-w-0 flex-1">
                       <div className="flex flex-wrap items-center gap-2"><span className="rounded-full bg-white px-2 py-1 text-xs font-black text-stone-600 ring-1 ring-stone-200">{item.kind}</span><h3 className="font-black">{item.title}</h3></div>
                       <p className="mt-3 whitespace-pre-wrap text-sm leading-6 text-stone-700">{item.details}</p>
-                      <p className="mt-3 text-xs leading-5 text-stone-500">From {item.display_name}{item.account_email ? ` · ${item.account_email}` : ""}{item.group_name ? ` · ${item.group_name}` : ""} · {timeLabel(item.created_at)}{item.page_path ? ` · ${item.page_path}` : ""}{item.build ? ` · build ${item.build}` : ""}</p>
+                      <p className="mt-3 text-xs leading-5 text-stone-500">From {item.display_name}{item.account_email ? ` · ${item.account_email}` : ""}{item.group_name ? ` · ${item.group_name}` : ""} · {timeLabel(item.created_at)}{item.page_path ? ` · ${item.page_path}` : ""}{item.build ? ` · build ${item.build}` : ""}{item.credit_opt_in && item.credit_name ? ` · release-note credit: ${item.credit_name}` : " · no public credit"}{item.notified_at ? ` · alert queued ${timeLabel(item.notified_at)}` : ""}</p>
                     </div>
                     <div className="flex shrink-0 flex-wrap gap-2">
                       <select value={item.status} disabled={busy} onChange={(event) => updateFeedback(item, { status: event.target.value as FeedbackItem["status"] })} className="rounded-lg border border-stone-200 bg-white px-2 py-2 text-xs font-bold"><option value="new">New</option><option value="triaged">Triaged</option><option value="planned">Planned</option><option value="in_progress">In progress</option><option value="shipped">Shipped</option><option value="declined">Declined</option><option value="duplicate">Duplicate</option></select>
@@ -1261,7 +1293,7 @@ export function GlobalAdminScreen() {
                     <textarea defaultValue={item.reporter_note ?? ""} maxLength={2000} rows={2} onBlur={(event) => { if (event.target.value !== (item.reporter_note ?? "")) updateFeedback(item, { reporter_note: event.target.value }); }} placeholder="What changed, in plain language? This is shown to the person who sent the feedback." className="mt-1 w-full rounded-xl border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm font-normal outline-none focus:ring-2 focus:ring-emerald-300" />
                   </label>
                 </article>
-              )) : <p className="rounded-2xl bg-stone-50 p-4 text-sm text-stone-500">No feedback yet. Signed-in members can use the Feedback link in their account bar.</p>}
+              )) : <p className="rounded-2xl bg-stone-50 p-4 text-sm text-stone-500">No feedback yet. Signed-in members can use Feedback / Report a bug.</p>}
             </div>
           </section>
           <section className="mt-7 grid gap-5 lg:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)]">

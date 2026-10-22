@@ -33,6 +33,73 @@ For Google OAuth branding:
 Google sign-in requests only openid, email, and profile. It does not request
 Gmail, Drive, Calendar, Contacts, or device location.
 
+## Email magic-link sign-in
+
+Lunch Loop also signs people in with a one-time email link. There is no
+password field and the app never calls a password sign-in. The Email provider
+stays enabled so `signInWithOtp` can create an account (`shouldCreateUser`
+true) and send the link.
+
+Custom SMTP uses the same Resend account as invitation mail. In Supabase
+Authentication → Emails → SMTP Settings:
+
+- Enable custom SMTP.
+- Host `smtp.resend.com`, port `465`, username `resend`.
+- Password is the Resend API key. Store it only in the Supabase dashboard.
+- Sender email matches `RESEND_FROM_EMAIL`, for example
+  `Lunch Loop <invites@lunchloop.app>`.
+- Sender name: Lunch Loop.
+
+In Authentication → URL Configuration:
+
+- Site URL remains `https://lunchloop.app`.
+- Allowlist:
+  - `https://lunchloop.app/auth/callback`
+  - `https://lunchloop.app/auth/confirm`
+  - `https://lunchloop.app/**`
+  - `http://localhost:3000/auth/callback`
+  - `http://localhost:3000/auth/confirm`
+  - `http://localhost:3000/**`
+  - `http://127.0.0.1:3000/**`
+
+The wildcard entries let a magic link return to the page the person was
+trying to open, such as `/join`. Keep only those Lunch Loop origins.
+
+In Authentication → Email Templates, set both Magic Link and Confirm signup
+to this link. Do not put a secret or a real token in the template:
+
+    {{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=email&next={{ .RedirectTo }}
+
+Local copies live in `supabase/templates/magic_link.html` and
+`supabase/templates/confirmation.html`. Hosted projects need the same markup
+pasted into the dashboard; the config file does not update production
+templates. Disable email-link click tracking in Resend so the link is not
+rewritten.
+
+An email invitation still matches `auth.users.email`. A magic-link user and a
+Google user with the same address can redeem the invite that was sent to that
+address. Local mail is captured by Supabase Inbucket or Mailpit
+(`npx supabase status` prints the mailbox URL). No message leaves the machine.
+
+## Feedback alerts
+
+A new feedback row can notify the maintainer bot from Postgres. The database
+reads two Supabase Vault secrets by name. Create them in the Vault UI with
+those exact names and never copy the values into Git, docs, or chat:
+
+| Secret name | What it holds |
+| --- | --- |
+| lunchloop_feedback_webhook_url | HTTPS URL that receives the feedback JSON |
+| lunchloop_feedback_webhook_key | Bearer token sent as `Authorization: Bearer …` |
+
+The JSON includes the feedback id, kind, title, details, page, build,
+created time, reporter display name, credit opt-in, credit name, and the
+Global Admin link. It does not include the reporter’s email address. If
+either secret is missing, the URL is not https, or Global Admin has turned
+feedback alerts off, the insert still succeeds and `notified_at` stays empty.
+The Resend note to `ADMIN_NOTIFICATION_EMAIL` is the fallback and also omits
+the reporter email.
+
 ## Google Maps Platform
 
 Enable Places API (New) for the server-only Google key. Restrict it to the

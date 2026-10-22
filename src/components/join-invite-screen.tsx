@@ -3,7 +3,9 @@
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
+import { suggestedDisplayName } from "@/lib/display-name";
 import { createClient, hasSupabaseEnv } from "@/lib/supabase/client";
+import { FeedbackBugLink } from "./feedback-bug-link";
 
 export function JoinInviteScreen() {
   const searchParams = useSearchParams();
@@ -20,7 +22,7 @@ export function JoinInviteScreen() {
     if (!hasSupabaseEnv()) return;
     createClient().auth.getUser().then(({ data: { user } }) => {
       setSignedIn(Boolean(user));
-      setDisplayName(user?.user_metadata.full_name || user?.user_metadata.name || "");
+      setDisplayName(suggestedDisplayName(user));
       setLoading(false);
     });
   }, []);
@@ -53,9 +55,9 @@ export function JoinInviteScreen() {
         <div className="text-4xl">🍽️</div>
         <p className="mt-4 text-sm font-bold uppercase tracking-widest text-orange-600">One-time invitation</p>
         <h1 className="mt-1 text-3xl font-black">Join a Lunch Loop</h1>
-        <p className="mt-2 text-stone-600">You’re about to join a crew’s places, picks, and lunch lore. Email invitations must match the Google account the owner invited; a shareable one-time code works for the first person who uses it.</p>
+        <p className="mt-2 text-stone-600">You’re about to join a crew’s places, picks, and lunch lore. Email invitations must match the email address the owner invited, whether you sign in with Google or a one-time email link. A shareable one-time code works for the first person who uses it.</p>
         {loading ? <p className="mt-6 text-sm font-semibold text-stone-500">Checking your secure sign-in…</p> : !signedIn ? (
-          <Link href={`/sign-in?next=${encodeURIComponent(currentPath)}`} className="mt-6 inline-flex rounded-xl bg-orange-500 px-5 py-3 text-sm font-black text-white">Sign in with Google to continue →</Link>
+          <Link href={`/sign-in?next=${encodeURIComponent(currentPath)}`} className="mt-6 inline-flex rounded-xl bg-orange-500 px-5 py-3 text-sm font-black text-white">Sign in to continue →</Link>
         ) : (
           <form onSubmit={join} className="mt-6 space-y-4">
             <label className="block text-sm font-black">What should your crew call you?
@@ -69,6 +71,7 @@ export function JoinInviteScreen() {
         )}
         {message && <p role="status" className="mt-4 rounded-xl bg-emerald-50 p-3 text-sm font-bold text-emerald-800">{message}</p>}
         {error && <p role="alert" className="mt-4 rounded-xl bg-rose-50 p-3 text-sm font-bold text-rose-700">{error}</p>}
+        {signedIn && <div className="mt-5"><FeedbackBugLink page={currentPath} /></div>}
         <p className="mt-5 text-xs leading-5 text-stone-500">This invitation is single-use and expires after 14 days. Need help? Ask the Lunch Loop owner to send a new invitation.</p>
       </section>
     </main>

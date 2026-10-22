@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { createClient, hasSupabaseEnv } from "@/lib/supabase/client";
+import { FeedbackBugLink } from "./feedback-bug-link";
 
 type RequestStatus = "new" | "reviewed" | "invited" | "declined" | "spam";
 
@@ -17,12 +18,12 @@ const statusCopy: Record<
   },
   reviewed: {
     title: "Your request is being reviewed",
-    body: "Thanks for your patience. We’ll use the Google account below if we can invite you.",
+    body: "Thanks for your patience. We’ll use the account below if we can invite you.",
     tone: "bg-amber-50 text-amber-950 ring-amber-200",
   },
   invited: {
     title: "You’re on the invite list",
-    body: "Check the email attached to this Google account for your next step.",
+    body: "Check the email attached to this account for your next step.",
     tone: "bg-orange-50 text-orange-950 ring-orange-200",
   },
   declined: {
@@ -127,7 +128,7 @@ export function RequestInviteScreen() {
           Request a Lunch Loop invite
         </h1>
         <p className="mt-3 max-w-lg text-sm leading-6 text-stone-600">
-          We ask you to sign in with Google first so this request is attached to
+          We ask you to sign in first so this request is attached to
           a real Lunch Loop account—not an open email form that gets buried in
           spam. This does not create a group or add you to one.
         </p>
@@ -144,15 +145,15 @@ export function RequestInviteScreen() {
           <div className="mt-7 rounded-3xl bg-orange-50 p-5">
             <h2 className="text-lg font-black">First, identify your crew</h2>
             <p className="mt-2 text-sm leading-6 text-stone-600">
-              Continue with the Google account you&apos;d use for Lunch Loop. We
-              use it to keep requests manageable and to send any invitation to
+              Sign in with Google or a one-time email link. We
+              use that account to keep requests manageable and to send any invitation to
               the right person.
             </p>
             <Link
               href="/sign-in?next=/request-invite"
               className="mt-4 inline-flex rounded-xl bg-orange-500 px-4 py-3 text-sm font-black text-white shadow-sm"
             >
-              Continue with Google →
+              Sign in to continue →
             </Link>
           </div>
         ) : requestStatus ? (
@@ -163,7 +164,7 @@ export function RequestInviteScreen() {
             ].join(" ")}
           >
             <p className="text-xs font-black uppercase tracking-[0.16em] opacity-75">
-              {email || "Your Google account"}
+              {email || "Your account"}
             </p>
             <h2 className="mt-2 text-xl font-black">
               {statusCopy[requestStatus].title}
@@ -179,7 +180,7 @@ export function RequestInviteScreen() {
                 Requesting as
               </p>
               <p className="mt-1 break-all text-sm font-black text-stone-800">
-                {email || "Your signed-in Google account"}
+                {email || "Your signed-in account"}
               </p>
             </div>
             <label className="mt-5 block text-sm font-black">
@@ -207,6 +208,7 @@ export function RequestInviteScreen() {
           </form>
         )}
 
+        {signedIn && <div className="mt-5"><FeedbackBugLink page="/request-invite" /></div>}
         {error && (
           <p
             role="alert"

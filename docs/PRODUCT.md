@@ -27,10 +27,11 @@ created and is not changed later, so its history always has one clear rhythm.
    private Standing or Occasion loop and set its name, home area, search radius
    (1–35 miles), and time zone.
 2. An owner can add a person they already share another active Lunch Loop with
-   directly, invite a new person by intended Google email, or generate a short
+   directly, invite a new person by email, or generate a short
    shareable one-time code and link when email is not handy. Direct additions
    receive email and an in-app welcome message. Email invitations are bound to
-   the intended Google account; shareable codes are for the first signed-in
+   the invited email address, whether that person signs in with Google or a
+   one-time email link; shareable codes are for the first signed-in
    person to redeem them. Both are single-use, expire after 14 days, reserve
    one of the remaining six crew spots, and can be revoked. Owners may create
    one separately named shareable code for each currently open crew spot. Any member may also
@@ -74,7 +75,7 @@ copy of their existing additions before inviting anyone else.
 | Settings | Owner controls for people, Standing rotation or Occasion crew, invitations, area/radius/time zone, cleanup, export/archive/transfer, and Discord. |
 | Account settings | Saved System, Light, or Dark appearance. The same theme is applied across signed-in, public, install, and legal pages. |
 | My Loops | Active-loop switcher and loop management. An account can own up to the site-wide configured number of active loops (initially four). |
-| Feedback | Signed-in bug, idea, question, and note submission. |
+| Feedback | Signed-in bug, idea, question, and note submission. A Feedback / Report a bug button on signed-in pages opens the form with the current page and build filled in. After a decision is closed, a light prompt appears at most once every 14 days. |
 
 Restaurant cards should be clickable. Their detail panel combines
 Google-provided information, required attribution, and group facts such as who
@@ -93,8 +94,12 @@ loop, so groups never share restaurant history or statistics.
 
 ## Account and lifecycle rules
 
-- Google sign-in requests only openid, email, and profile. Lunch Loop does not
-  read Gmail, Drive, Calendar, Contacts, Maps Timeline, or device location.
+- Sign-in is Google (`openid`, `email`, and `profile`) or a one-time email
+  link. Lunch Loop does not collect a password and does not read Gmail, Drive,
+  Calendar, Contacts, Maps Timeline, or device location.
+- When Google does not supply a name, the part of the email before `@` is the
+  starting display name. A profile photo is stored only when Google provides
+  one.
 - A loop has two to six members. The database enforces the six-member cap on
   every join path. A pending email or shareable invitation reserves one of the
   remaining seats, so an owner never accidentally promises the same spot twice.
@@ -116,6 +121,20 @@ loop, so groups never share restaurant history or statistics.
   Global Admin safeguard.
 - Contact [support@lunchloop.app](mailto:support@lunchloop.app) for account
   removal requests or help with a lifecycle action.
+
+## Feedback credit in release notes
+
+The credit checkbox on Feedback is unchecked until the person opts in. The
+name field starts from their display name and can be edited, from 1 to 60
+characters. They can withdraw the credit later from their own feedback
+history. Release notes and What’s New use that opted-in name only, in this
+shape:
+
+    Fixed the picker card on narrow phones (reported by Sam — thanks!)
+
+What’s New entries can carry an optional `credit` field. Leave it off when
+the reporter did not opt in, even if a display name is known. Do not invent
+a credit, and do not publish the reporter’s email address.
 
 ## Install on a phone
 

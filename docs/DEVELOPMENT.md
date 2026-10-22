@@ -56,8 +56,9 @@ or raw backup data in source, docs, screenshots, Git, or chat.
     npm run lint
     npm run build
 
-Use a separate local/test group for experiments. Verify Google sign-in,
-restaurant search, selection/veto, Settings, and the owner/admin paths changed.
+Use a separate local/test group for experiments. Verify Google sign-in, a
+one-time email link, restaurant search, selection/veto, Settings, Feedback,
+and the owner/admin paths changed.
 For Occasion work, also run the rollback-safe fixture:
 
     PATH="/Applications/Docker.app/Contents/Resources/bin:$PATH" \
@@ -91,6 +92,14 @@ Run all three fixtures after a local schema reset when a change touches
 invitations, deletion, Occasion loops, or account lifecycle. Each fixture
 rolls its own data back.
 
+When a change touches email sign-in, profile names, or feedback credit, also
+run:
+
+    PATH="/Applications/Docker.app/Contents/Resources/bin:$PATH" \
+      docker exec -i supabase_db_lunch-rotation \
+      psql -v ON_ERROR_STOP=1 -U postgres -d postgres \
+      < supabase/tests/email-signin-and-feedback-fixture.sql
+
 Direct dependencies in package.json stay on exact versions, without a caret
 or tilde. After a dependency change, run `npm audit`. Prefer the smallest
 patch or minor upgrade that clears a warning. On 2026-10-20, Next.js,
@@ -104,19 +113,16 @@ downgrade was not applied.
 
 ## Database changes
 
-1. Add a timestamped SQL file in supabase/migrations/. Never edit a migration
-   already applied in production.
+1. Add a timestamped SQL file with `npx supabase migration new <name>`. Never
+   edit a migration already applied in production.
 2. Test locally with npx supabase db reset.
 3. Run relevant rollback-safe SQL fixtures, then lint and the production build.
-4. Create and verify a production backup.
-5. Confirm the linked production migration history matches local files, then
-   review and apply only the pending migration:
-
-       npx supabase migration list --linked
-       npx supabase db push --linked --dry-run
-       npx supabase db push --linked
-
-6. Verify the affected production flow after deployment.
+4. Do not apply the migration to production yourself. The maintainer bot
+   applies pending migrations to production after a checksummed backup
+   (see Backup and restore). Ideally, the same migration is tested on a
+   separate staging project before that production apply.
+5. Verify the affected production flow after the bot’s apply and the
+   application deploy.
 
 The previous migration-history drift was repaired on September 7, 2026; do not
 manually alter migration history unless a future recovery procedure explicitly
@@ -136,12 +142,13 @@ work.
        npm run lint
        npm run build
 
-3. Deploy:
+3. Deploy only after the maintainer bot has applied any pending migration:
 
        npx vercel --prod --yes --scope craig-kohlers-projects
 
-4. Smoke-test the canonical domain: sign-in, Add Place, a decision/veto,
-   Settings, Global Admin, and Discord if configured.
+4. Smoke-test the canonical domain: Google sign-in, an email magic link, Add
+   Place, a decision/veto, Settings, Feedback, Global Admin, and Discord if
+   configured.
 
 Production is https://lunchloop.app. The old Vercel address redirects to it and
 should not be shared. Redeploy after server-side environment-variable changes.
@@ -166,13 +173,11 @@ equivalent Supabase project, verify users/data/auth/integrations, then choose
 whether to switch traffic. Prefer Supabase managed backup/PITR for an incident
 in the existing project.
 
-## OAuth callback essentials
+## Sign-in callback essentials
 
-In Supabase Auth, set Site URL to https://lunchloop.app and allowlist:
-
-    https://lunchloop.app/auth/callback
-    http://localhost:3000/auth/callback
-
-Google’s OAuth client redirect URI remains the exact Supabase callback supplied
-by its provider settings, not Lunch Loop’s /auth/callback. See
-[Integrations](INTEGRATIONS.md) before changing identity configuration.
+In Supabase Auth, set Site URL to https://lunchloop.app and allowlist the
+callback and confirm routes, including local development. Google’s OAuth
+client redirect URI remains the exact Supabase callback supplied by its
+provider settings, not Lunch Loop’s /auth/callback. Email magic links use
+/auth/confirm. See [Integrations](INTEGRATIONS.md) before changing identity
+configuration.

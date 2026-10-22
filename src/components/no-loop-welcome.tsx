@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { FeedbackBugLink } from "./feedback-bug-link";
 import { createClient } from "@/lib/supabase/client";
 
 export function NoLoopWelcome() {
@@ -17,7 +18,7 @@ export function NoLoopWelcome() {
       const supabase = createClient();
       const { data: { session }, error: sessionError } = await supabase.auth.getSession();
       if (sessionError || !session?.user) throw new Error("Your sign-in could not be restored. Please sign in again.");
-      setEmail(session.user.email ?? "your Google account");
+      setEmail(session.user.email ?? "your account");
     } catch (loadError) {
       setError(loadError instanceof Error ? loadError.message : "We could not restore your Lunch Loop sign-in.");
     } finally {
@@ -57,7 +58,7 @@ export function NoLoopWelcome() {
 
         <div className="p-6 sm:p-9">
           <div className="rounded-2xl bg-orange-50 px-4 py-3 text-sm text-orange-950">
-            <span className="font-black">Signed in as </span>{email || "your Google account"}
+            <span className="font-black">Signed in as </span>{email || "your account"}
           </div>
 
           {loading ? (
@@ -73,7 +74,7 @@ export function NoLoopWelcome() {
 
           <div className="mt-5 rounded-3xl bg-stone-50 p-5">
             <p className="text-sm font-black">Joining someone else’s Lunch Loop?</p>
-            <p className="mt-1 text-sm text-stone-600">Use the one-time code your Lunch Loop owner sent you. It is private, tied to your invited Google account, and expires after 14 days.</p>
+            <p className="mt-1 text-sm text-stone-600">Use the one-time code your Lunch Loop owner sent you. A shareable code works for the first person who uses it. An email invitation stays tied to that email address. Both expire after 14 days.</p>
             <form onSubmit={useCode} className="mt-4 flex flex-col gap-3 sm:flex-row">
               <input
                 value={code}
@@ -94,7 +95,7 @@ export function NoLoopWelcome() {
 
           <div className="mt-6 flex flex-wrap items-center justify-between gap-3 border-t border-stone-100 pt-5 text-sm">
             <Link href="/" className="font-bold text-orange-700 underline">← Back to Lunch Loop</Link>
-            <div className="flex items-center gap-3"><Link href="/account" className="font-bold text-orange-700 underline">Account settings</Link><button type="button" onClick={() => void signOut()} className="font-bold text-stone-600 underline">Use a different Google account</button></div>
+            <div className="flex flex-wrap items-center gap-3"><FeedbackBugLink page="/" /><Link href="/account" className="font-bold text-orange-700 underline">Account settings</Link><button type="button" onClick={() => void signOut()} className="font-bold text-stone-600 underline">Use a different account</button></div>
           </div>
         </div>
       </section>

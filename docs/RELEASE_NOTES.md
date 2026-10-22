@@ -1,5 +1,32 @@
 # Release Notes
 
+## Build 2026.10.22.60
+
+You can now sign in with a one-time email link instead of Google. Feedback is
+easier to send, and you can choose to be thanked by name when your report
+ships.
+
+- The sign-in page keeps Continue with Google and adds an email field. The
+  link is a magic link only: there is still no password. It confirms at
+  /auth/confirm, so it works on another device and inside an in-app mail
+  browser. An invalid or expired link, and a rate limit, each get a short
+  message on the sign-in page.
+- An email invitation still matches the invited address. Signing in with the
+  magic link for that address is enough; it does not have to be Google.
+- When an account has no Google name, Lunch Loop uses the part of the email
+  before @ as the starting display name. A photo is stored only when one is
+  provided.
+- Signed-in pages show Feedback / Report a bug. The form already includes the
+  page and build. After a decision is closed, a dismissible prompt appears at
+  most once every 14 days for that person.
+- Feedback can include an optional credit name. The checkbox starts
+  unchecked. Release notes use only that opted-in name, for example “Fixed X
+  (reported by Sam — thanks!).” The person can withdraw the credit later.
+- A new feedback row can alert the maintainer bot. The address and key stay
+  in Supabase Vault. The alert and the Resend fallback both leave out the
+  reporter’s email address. A missing secret or the site switch skips the
+  alert without blocking the note.
+
 ## Build 2026.10.19.59
 
 This is the build being published. It gathers the October 19 database and

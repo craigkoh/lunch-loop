@@ -741,7 +741,7 @@ export function SettingsScreen() {
                   <h2 className="mt-1 text-xl font-black">Invite people, the easy way</h2>
                 </div>
               </div>
-              <p className="mt-3 max-w-3xl text-sm leading-6 text-orange-50">Owners can invite a specific Google account by email or create short shareable codes to text friends. Every invite is single-use and expires after 14 days; anyone in the crew can also help a friend start an independent Lunch Loop.</p>
+              <p className="mt-3 max-w-3xl text-sm leading-6 text-orange-50">Owners can invite a specific email address or create short shareable codes to text friends. An email invitation works when that person signs in with Google or a one-time email link for the same address. Every invite is single-use and expires after 14 days; anyone in the crew can also help a friend start an independent Lunch Loop.</p>
               {context.role === "owner" ? <>
                 {knownPeople.length > 0 && <div className="mt-5 rounded-2xl bg-white/95 p-4 text-stone-900 shadow-sm">
                   <p className="text-sm font-black">Bring in someone from another Lunch Loop</p>
@@ -814,8 +814,8 @@ export function SettingsScreen() {
               </div>
               <p className="mt-4 rounded-2xl bg-orange-50 px-3 py-2 text-xs leading-5 text-stone-600">
                 These are names for this Lunch Loop only—they do not change
-                anyone’s Google account or name in another Lunch Loop. The
-                signed-in Google account beneath each person identifies the
+                anyone’s account name or their name in another Lunch Loop. The
+                signed-in account beneath each person identifies the
                 actual member; only the owner can see everyone’s account.
               </p>
               <div className="mt-4 space-y-2">

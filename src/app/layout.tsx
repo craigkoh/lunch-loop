@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import type { ReactNode } from "react";
+import { AuthHashReturn } from "@/components/auth-hash-return";
 import { ThemeInitializer } from "@/components/theme-initializer";
 import { appInfo } from "@/lib/app-info";
 import "./globals.css";
@@ -46,7 +47,7 @@ export const viewport: Viewport = { themeColor: "#f97316" };
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en" className="h-full antialiased">
-      <body className="min-h-full flex flex-col"><ThemeInitializer />{children}</body>
+      <body className="min-h-full flex flex-col"><ThemeInitializer /><AuthHashReturn />{children}</body>
     </html>
   );
 }

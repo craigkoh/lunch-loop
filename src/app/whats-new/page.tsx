@@ -6,7 +6,25 @@ export const metadata: Metadata = {
   description: "Build-by-build Lunch Loop release notes.",
 };
 
-const releases = [
+type ReleaseChange = string | { text: string; credit?: string };
+
+function changeText(change: ReleaseChange) {
+  if (typeof change === "string") return change;
+  const credit = change.credit?.trim();
+  // Only an opted-in feedback credit_name belongs in `credit`.
+  return credit ? `${change.text} (reported by ${credit} — thanks!)` : change.text;
+}
+
+const releases: { build: string; changes: ReleaseChange[] }[] = [
+  {
+    build: "2026.10.22.60",
+    changes: [
+      "You can now sign in with a one-time email link instead of Google. Feedback is easier to send, and you can choose to be thanked by name when your report ships.",
+      "If an email sign-in link is invalid or expired, Lunch Loop says so on the sign-in page instead of leaving you on the home page unsigned-in.",
+      "Starting your first Lunch Loop works without an invitation. If something you entered needs a change, the message says which part.",
+      "City suggestions sit directly under the search-area field, including in Safari.",
+    ],
+  },
   {
     build: "2026.10.19.59",
     changes: [
@@ -287,9 +305,10 @@ export default function WhatsNewPage() {
       {releases.map((release) => (
         <LegalSection key={release.build} title={`Build ${release.build}`}>
           <ul className="list-disc space-y-1 pl-5">
-            {release.changes.map((change) => (
-              <li key={change}>{change}</li>
-            ))}
+            {release.changes.map((change) => {
+              const text = changeText(change);
+              return <li key={text}>{text}</li>;
+            })}
           </ul>
         </LegalSection>
       ))}

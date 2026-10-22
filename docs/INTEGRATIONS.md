@@ -33,6 +33,103 @@ For Google OAuth branding:
 Google sign-in requests only openid, email, and profile. It does not request
 Gmail, Drive, Calendar, Contacts, or device location.
 
+## Email magic-link sign-in
+
+Lunch Loop also signs people in with a one-time email link. There is no
+password field and the app never calls a password sign-in. The Email provider
+stays enabled so `signInWithOtp` can create an account (`shouldCreateUser`
+true) and send the link.
+
+Custom SMTP uses the same Resend account as invitation mail. In Supabase
+Authentication → Emails → SMTP Settings:
+
+- Enable custom SMTP.
+- Host `smtp.resend.com`, port `465`, username `resend`.
+- Password is the Resend API key. Store it only in the Supabase dashboard.
+- Sender email matches `RESEND_FROM_EMAIL`, for example
+  `Lunch Loop <invites@lunchloop.app>`.
+- Sender name: Lunch Loop.
+
+In Authentication → URL Configuration for the production project:
+
+- Site URL remains `https://lunchloop.app`.
+- Allowlist:
+  - `https://lunchloop.app/auth/callback`
+  - `https://lunchloop.app/auth/confirm`
+  - `https://lunchloop.app/**`
+  - `http://localhost:3000/auth/callback`
+  - `http://localhost:3000/auth/confirm`
+  - `http://localhost:3000/**`
+  - `http://127.0.0.1:3000/**`
+
+The wildcard entries let a magic link return to the page the person was
+trying to open, such as `/join`. The app also sends `emailRedirectTo` to
+`/auth/callback` on that same origin, because Supabase's default template
+(used until custom SMTP unlocks custom templates) verifies at
+`/auth/v1/verify` and then redirects there with `?code=`. That callback must
+be allowlisted exactly, or GoTrue drops the person on the Site URL after
+confirming the email and no session is created. Keep only those Lunch Loop
+origins.
+
+Production deployments rewrite a `*.vercel.app` host to `https://lunchloop.app`
+before Google or a magic link starts, so the production Supabase project does
+not need the old Vercel alias on its allowlist. Preview deployments
+(`VERCEL_ENV=preview`) and local development do not rewrite the host. They
+send OAuth and magic-link redirects to their own origin. The staging Supabase
+project used by previews needs that preview origin on its allowlist, including
+`/auth/callback`, `/auth/confirm`, and a wildcard for return paths such as
+`/join`. A preview URL looks like
+`https://<project>-git-<branch>-<team>.vercel.app`.
+
+In Authentication → Email Templates, use these links. Do not put a secret or
+a real token in the template.
+
+Magic Link (`supabase/templates/magic_link.html`):
+
+    {{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=email&next={{ .RedirectTo }}
+
+Confirm signup (`supabase/templates/confirmation.html`):
+
+    {{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=signup&next={{ .RedirectTo }}
+
+`/auth/confirm` forwards that `type` to `verifyOtp`, and it also exchanges a
+`?code=` if the default template redirected there. GoTrue stores a magic-link
+hash as a recovery token and a confirm-signup hash as a confirmation token.
+`type=email` finds either hash. `type=signup` finds only the confirmation
+hash, so a magic-link template must stay on `type=email`. Hosted projects
+need the markup pasted into the dashboard; the config file does not update
+production templates. Until custom SMTP is enabled, the dashboard keeps
+Supabase's default `{{ .ConfirmationURL }}` template. That link still signs
+the person in: `/auth/v1/verify` confirms the email, then Lunch Loop exchanges
+the returned `?code=` at `/auth/callback`. If the code or an auth error lands
+on any other page, the proxy forwards it there. A `#access_token` fragment is
+finished in the browser, because the server never receives it. Disable
+email-link click tracking in Resend so a custom link is not rewritten.
+
+An email invitation still matches `auth.users.email`. A magic-link user and a
+Google user with the same address can redeem the invite that was sent to that
+address. Local mail is captured by Supabase Inbucket or Mailpit
+(`npx supabase status` prints the mailbox URL). No message leaves the machine.
+
+## Feedback alerts
+
+A new feedback row can notify the maintainer bot from Postgres. The database
+reads two Supabase Vault secrets by name. Create them in the Vault UI with
+those exact names and never copy the values into Git, docs, or chat:
+
+| Secret name | What it holds |
+| --- | --- |
+| lunchloop_feedback_webhook_url | HTTPS URL that receives the feedback JSON |
+| lunchloop_feedback_webhook_key | Bearer token sent as `Authorization: Bearer …` |
+
+The JSON includes the feedback id, kind, title, details, page, build,
+created time, reporter display name, credit opt-in, credit name, and the
+Global Admin link. It does not include the reporter’s email address. If
+either secret is missing, the URL is not https, or Global Admin has turned
+feedback alerts off, the insert still succeeds and `notified_at` stays empty.
+The Resend note to `ADMIN_NOTIFICATION_EMAIL` is the fallback and also omits
+the reporter email.
+
 ## Google Maps Platform
 
 Enable Places API (New) for the server-only Google key. Restrict it to the

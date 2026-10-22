@@ -6,7 +6,7 @@ export const metadata: Metadata = {
   description: "How Lunch Loop collects, uses, shares, and protects information.",
 };
 
-const updated = "September 2, 2026";
+const updated = "October 22, 2026";
 
 export default function PrivacyPage() {
   return (
@@ -33,8 +33,8 @@ export default function PrivacyPage() {
       <LegalSection title="2. Information we collect">
         <p>We collect only information needed to operate Lunch Loop:</p>
         <ul className="list-disc space-y-1 pl-5">
-          <li><strong>Account information:</strong> your email address, display name, profile image URL when supplied by Google, authentication provider, and a technical account identifier.</li>
-          <li><strong>Lunch Loop information:</strong> the groups you join or own, member display names and order, invitations (including an optional owner-only name label for a shareable invite), restaurant entries, decisions, vetoes, planned meal times, notes, and feedback you submit.</li>
+          <li><strong>Account information:</strong> your email address, display name, profile image URL when Google supplies one, authentication provider, and a technical account identifier. Email sign-in does not include a password. If Google does not supply a name, the display name starts as the part of your email address before the @ sign.</li>
+          <li><strong>Lunch Loop information:</strong> the groups you join or own, member display names and order, invitations (including an optional owner-only name label for a shareable invite), restaurant entries, decisions, vetoes, planned meal times, notes, and feedback you submit. Feedback can include the page and app build. A public thank-you name is stored only if you check the credit box, and you can turn that credit off later.</li>
           <li><strong>Area information:</strong> a loop owner’s chosen city/area center, search radius, and time zone. Lunch Loop does not ask for or use your device’s precise GPS location.</li>
           <li><strong>Restaurant information:</strong> place names, addresses, maps, hours, ratings, phone numbers, categories, and place identifiers returned by Google Maps Platform when a member searches or adds a place.</li>
           <li><strong>Service and security information:</strong> limited request, device, browser, IP/log, and error information processed by the companies that host and protect Lunch Loop.</li>
@@ -42,9 +42,11 @@ export default function PrivacyPage() {
         </ul>
       </LegalSection>
 
-      <LegalSection title="3. Google sign-in: what we receive and what we do not">
-        <p>Lunch Loop uses Google only to sign you in. We request the standard <code>openid</code>, <code>email</code>, and <code>profile</code> permissions. Through that sign-in, we receive basic profile information: your name, email address, profile-photo URL when Google provides one, and a technical account identifier.</p>
-        <p>We use that information to create and secure your Lunch Loop account, show who is participating in a loop, and let a loop owner tell members apart. A profile photo is stored as a URL provided by Google; Lunch Loop does not upload or host a copy of that photo as its own file.</p>
+      <LegalSection title="3. Sign-in: what we receive and what we do not">
+        <p>You can sign in with Google or with a one-time link sent to an email address you enter. Lunch Loop does not collect or store a password.</p>
+        <p>If you choose Google, we request the standard <code>openid</code>, <code>email</code>, and <code>profile</code> permissions. Through that sign-in, we receive basic profile information: your name, email address, profile-photo URL when Google provides one, and a technical account identifier. A profile photo is stored as a URL provided by Google; Lunch Loop does not upload or host a copy of that photo as its own file.</p>
+        <p>If you choose an email link, Supabase Auth sends a single-use link to that address through Resend. We store the email address, a display name (the part before @ when no other name is available), and a technical account identifier. The link expires and works once. We do not receive the contents of your mailbox.</p>
+        <p>We use that information to create and secure your Lunch Loop account, show who is participating in a loop, and let a loop owner tell members apart. An invitation addressed to a specific email must be accepted by an account signed in with that same address.</p>
         <p>Lunch Loop does <strong>not</strong> request or read your Gmail, Google Drive, Calendar, Contacts, Google Maps Timeline, or device location from Google.</p>
       </LegalSection>
 
@@ -60,15 +62,17 @@ export default function PrivacyPage() {
       <LegalSection title="6. Who can see information">
         <p>Lunch Loop is intentionally collaborative. Members of the same loop can see the group’s display names, restaurant list, picks, vetoes, history, and related statistics. The loop owner can also see member account email addresses and authentication-provider labels in Settings so they can manage invitations and the roster.</p>
         <p>Craig Kohler, as the service administrator, may access information when reasonably necessary to operate, secure, support, investigate abuse, or improve Lunch Loop. We do not make one group’s information available to another ordinary group.</p>
+        <p>If you check “Credit me by name in release notes,” the name you enter may appear in public What’s New notes when that report ships, for example “Fixed X (reported by Sam — thanks!)”. Your email address is not published there. Leave the box unchecked and the thank-you stays private. You can withdraw the credit later from the feedback screen.</p>
       </LegalSection>
 
       <LegalSection title="7. Service providers and third parties">
         <p>We use trusted providers to run Lunch Loop:</p>
         <ul className="list-disc space-y-1 pl-5">
-          <li><strong>Google:</strong> Google Sign-In and Google Maps Platform, including Google Places and Google Maps.</li>
-          <li><strong>Supabase:</strong> authentication, database, and access-control services.</li>
+          <li><strong>Google:</strong> optional Google Sign-In, and Google Maps Platform, including Google Places and Google Maps.</li>
+          <li><strong>Supabase:</strong> authentication (including one-time email links), database, and access-control services.</li>
           <li><strong>Vercel:</strong> application hosting, delivery, and operational logs.</li>
-          <li><strong>Resend:</strong> invitation and operational email when email delivery is enabled.</li>
+          <li><strong>Resend:</strong> invitation email, one-time sign-in links, and operational email when email delivery is enabled.</li>
+          <li><strong>Maintainer feedback alerts:</strong> when the site switch is on, a new feedback report is sent to the operator’s notification bot. The alert includes the report, your display name, and a credit name only if you opted in. It does not include your email address. The destination address and access key stay in Supabase Vault and are not written into the app or this policy.</li>
           <li><strong>Discord:</strong> only when a loop owner voluntarily configures a Discord webhook.</li>
         </ul>
         <p>These providers process information under their own terms and privacy practices. We may also disclose information when required by law, to protect people or the service, or in connection with a business transfer.</p>
@@ -96,7 +100,7 @@ export default function PrivacyPage() {
       </LegalSection>
 
       <LegalSection title="11. Security">
-        <p>We use account authentication, row-level database access controls, server-side API keys, rate limits, and operational safeguards designed to protect Lunch Loop. No online service is perfectly secure, so please protect your Google account and do not share invitation links or one-time codes publicly.</p>
+        <p>We use account authentication, row-level database access controls, server-side API keys, rate limits, and operational safeguards designed to protect Lunch Loop. No online service is perfectly secure, so please protect the Google or email account you use to sign in, and do not share invitation links or one-time codes publicly.</p>
       </LegalSection>
 
       <LegalSection title="12. Children and international users">

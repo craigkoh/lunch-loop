@@ -63,7 +63,7 @@ export function GroupSetup() {
       <section className="mt-7 rounded-3xl border border-orange-200 bg-white p-5 shadow-sm">
         <h2 className="text-lg font-black">Ready to join a Lunch Loop?</h2>
         <p className="mt-1 text-sm text-stone-600">
-          Sign in with Google, then use your crew&apos;s invitation code to join
+          Sign in, then use your crew&apos;s invitation code to join
           its private restaurant database, history, and stats.
         </p>
         <div className="mt-4 flex flex-wrap gap-3">

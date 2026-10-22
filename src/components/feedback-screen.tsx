@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { AppFrame } from "./app-frame";
 import { appInfo } from "@/lib/app-info";
+import { suggestedDisplayName } from "@/lib/display-name";
 import { createClient } from "@/lib/supabase/client";
 
 type MyFeedback = {
@@ -13,7 +14,16 @@ type MyFeedback = {
   priority: string;
   reporter_note: string | null;
   created_at: string;
+  credit_opt_in: boolean;
+  credit_name: string | null;
 };
+
+function safeReportedPage(value: string | undefined) {
+  if (!value || !value.startsWith("/") || value.startsWith("//") || value.includes("\\") || value.includes("://")) {
+    return "";
+  }
+  return value.slice(0, 500);
+}
 
 const kindLabels = {
   bug: "🐛 Something is broken",
@@ -22,11 +32,15 @@ const kindLabels = {
   other: "📝 Something else",
 } as const;
 
-export function FeedbackScreen() {
+export function FeedbackScreen({ reportedPage = "" }: { reportedPage?: string }) {
+  const pagePath = safeReportedPage(reportedPage);
   const [kind, setKind] = useState<keyof typeof kindLabels>("bug");
   const [title, setTitle] = useState("");
   const [details, setDetails] = useState("");
+  const [creditOptIn, setCreditOptIn] = useState(false);
+  const [creditName, setCreditName] = useState("");
   const [items, setItems] = useState<MyFeedback[]>([]);
+  const [creditDrafts, setCreditDrafts] = useState<Record<string, { optIn: boolean; name: string }>>({});
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState("");
@@ -38,15 +52,29 @@ export function FeedbackScreen() {
       "get_my_lunch_loop_feedback",
     );
     if (loadError) setError(loadError.message);
-    else setItems((data ?? []) as MyFeedback[]);
+    else {
+      const nextItems = (data ?? []) as MyFeedback[];
+      setItems(nextItems);
+      setCreditDrafts(Object.fromEntries(nextItems.map((item) => [item.id, { optIn: item.credit_opt_in, name: item.credit_name ?? "" }])));
+    }
     setLoading(false);
   }
   useEffect(() => {
     void load();
+    void createClient().auth.getUser().then(async ({ data: { user } }) => {
+      if (!user) return;
+      const { data: profile } = await createClient().from("profiles").select("display_name").eq("id", user.id).maybeSingle();
+      const fromProfile = typeof profile?.display_name === "string" ? profile.display_name.trim() : "";
+      setCreditName(fromProfile && fromProfile !== "Lunch friend" ? fromProfile.slice(0, 60) : suggestedDisplayName(user));
+    });
   }, []);
 
   async function submit(event: React.FormEvent) {
     event.preventDefault();
+    if (creditOptIn && (creditName.trim().length < 1 || creditName.trim().length > 60)) {
+      setError("Add a name of 1 to 60 characters, or leave the credit box unchecked.");
+      return;
+    }
     setBusy(true);
     setError("");
     setMessage("");
@@ -58,14 +86,17 @@ export function FeedbackScreen() {
           kind,
           title,
           details,
-          pagePath: window.location.pathname,
+          pagePath: pagePath || window.location.pathname,
           build: appInfo.build,
+          creditOptIn,
+          creditName: creditOptIn ? creditName.trim() : undefined,
         }),
       });
       const result = (await response.json()) as { error?: string };
       if (!response.ok) throw new Error(result.error ?? "Feedback could not be sent.");
       setTitle("");
       setDetails("");
+      setCreditOptIn(false);
       setMessage("Thank you—your feedback is in the Lunch Loop queue.");
       await load();
     } catch (submitError) {
@@ -78,6 +109,31 @@ export function FeedbackScreen() {
       setBusy(false);
     }
   }
+
+  async function saveCredit(item: MyFeedback) {
+    const draft = creditDrafts[item.id] ?? { optIn: item.credit_opt_in, name: item.credit_name ?? "" };
+    if (draft.optIn && (draft.name.trim().length < 1 || draft.name.trim().length > 60)) {
+      setError("Add a name of 1 to 60 characters, or leave the credit box unchecked.");
+      return;
+    }
+    setBusy(true);
+    setError("");
+    setMessage("");
+    const { error: creditError } = await createClient().rpc("update_my_lunch_loop_feedback_credit", {
+      target_feedback: item.id,
+      new_credit_opt_in: draft.optIn,
+      new_credit_name: draft.optIn ? draft.name.trim() : null,
+    });
+    setBusy(false);
+    if (creditError) {
+      setError(creditError.message);
+      return;
+    }
+    setMessage(draft.optIn ? "We’ll use that name if this note ships in the release notes." : "Public credit is off for this note.");
+    await load();
+  }
+
+  const shownPage = pagePath || "/feedback";
 
   return (
     <AppFrame>
@@ -133,8 +189,29 @@ export function FeedbackScreen() {
             className="mt-2 w-full resize-y rounded-xl border border-orange-200 px-3 py-3 font-normal outline-none focus:ring-2 focus:ring-orange-300"
           />
         </label>
+        <p className="mt-4 rounded-2xl bg-orange-50 px-3 py-2 text-xs leading-5 text-stone-600">
+          This note includes page <span className="font-bold">{shownPage}</span> and build <span className="font-bold">{appInfo.build}</span>.
+        </p>
+        <label className="mt-5 flex items-start gap-3 text-sm font-bold">
+          <input
+            type="checkbox"
+            checked={creditOptIn}
+            onChange={(event) => setCreditOptIn(event.target.checked)}
+            className="mt-1 size-4 accent-orange-500"
+          />
+          <span>Credit me by name in release notes if this ships</span>
+        </label>
+        <label className="mt-3 block text-sm font-black">
+          Name to show
+          <input
+            value={creditName}
+            maxLength={60}
+            onChange={(event) => setCreditName(event.target.value)}
+            className="mt-2 w-full rounded-xl border border-orange-200 px-3 py-3 font-normal outline-none focus:ring-2 focus:ring-orange-300"
+          />
+        </label>
         <p className="mt-2 text-xs leading-5 text-stone-500">
-          Please avoid passwords, payment details, or other sensitive personal information.
+          Leave this unchecked unless you want a public thank-you, such as “Fixed X (reported by Sam — thanks!)”. You can turn it off later. Please avoid passwords, payment details, or other sensitive personal information.
         </p>
         <button disabled={busy} className="mt-5 rounded-xl bg-orange-500 px-5 py-3 text-sm font-black text-white shadow-sm disabled:opacity-60">
           {busy ? "Sending…" : "Send feedback →"}
@@ -152,6 +229,27 @@ export function FeedbackScreen() {
                 <div className="flex flex-wrap justify-between gap-2"><strong>{item.title}</strong><span className="rounded-full bg-white/20 px-2 py-0.5 text-xs font-bold">{item.status.replaceAll("_", " ")}</span></div>
                 <p className="mt-1 text-xs text-orange-50">{item.kind} · {new Date(item.created_at).toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric", year: "numeric" })}</p>
                 {item.reporter_note && <div className="mt-3 rounded-xl bg-emerald-950/20 px-3 py-2 text-sm leading-6 text-white"><p className="text-xs font-black uppercase tracking-widest text-emerald-100">What changed</p><p className="mt-1 whitespace-pre-wrap">{item.reporter_note}</p></div>}
+                <div className="mt-3 rounded-xl bg-white/10 px-3 py-3">
+                  <label className="flex items-start gap-2 text-sm font-bold">
+                    <input
+                      type="checkbox"
+                      checked={creditDrafts[item.id]?.optIn ?? false}
+                      onChange={(event) => setCreditDrafts((current) => ({ ...current, [item.id]: { optIn: event.target.checked, name: current[item.id]?.name ?? item.credit_name ?? "" } }))}
+                      className="mt-1 size-4 accent-orange-500"
+                    />
+                    <span>Credit me by name in release notes if this ships</span>
+                  </label>
+                  <input
+                    value={creditDrafts[item.id]?.name ?? ""}
+                    maxLength={60}
+                    onChange={(event) => setCreditDrafts((current) => ({ ...current, [item.id]: { optIn: current[item.id]?.optIn ?? false, name: event.target.value } }))}
+                    className="mt-2 w-full rounded-xl border border-white/30 bg-white px-3 py-2 text-sm font-normal text-stone-900 outline-none"
+                    aria-label={`Credit name for ${item.title}`}
+                  />
+                  <button type="button" disabled={busy} onClick={() => void saveCredit(item)} className="mt-2 text-xs font-black text-white underline disabled:opacity-60">
+                    {creditDrafts[item.id]?.optIn ? "Save credit" : "Withdraw credit"}
+                  </button>
+                </div>
               </article>
             ))}
           </div>

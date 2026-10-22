@@ -11,7 +11,10 @@ project, Google Cloud project, and, when enabled, Resend and Discord.
 Before a production change:
 
 1. Back up the database and verify SHA256SUMS.
-2. Review the migration; do not use supabase db push on current production.
+2. Review the migration. The maintainer bot applies it to production after a
+   checksummed backup, ideally after the same migration has been tested on a
+   separate staging project. Do not run supabase db push against production
+   outside that process.
 3. Run npm run lint and npm run build.
 4. Deploy and test the canonical URL logged out and as an owner.
 5. Confirm the active decision, restaurant search, and notification path
@@ -43,7 +46,10 @@ requests, seven-day Places usage, provider errors, and Google Cloud budgets.
 
 ## Security model
 
-- Authentication uses Google through Supabase Auth.
+- Authentication uses Google or a one-time email magic link through Supabase
+  Auth. Lunch Loop does not collect or store passwords. An email invitation
+  still has to match the invited address, whether that person signs in with
+  Google or the magic link.
 - Supabase Row Level Security scopes members to their own loops. Owner and
   Global Admin actions use server/database checks; a visible UI control is
   never the only permission check.
@@ -90,7 +96,7 @@ requests, seven-day Places usage, provider errors, and Google Cloud budgets.
   immediate membership, copies only their restaurant additions into the new
   loop, and queues an in-app welcome message; it never exposes a site-wide
   member directory.
-- Email invitations remain bound to the intended Google account. Pending email
+- Email invitations remain bound to the invited email address. Pending email
   and shareable invitations each reserve one open crew seat, so revoke an
   unused invitation to free that seat. A separate
   owner-created shareable code is intentionally a bearer invite for the first
@@ -136,10 +142,16 @@ or a verified removal request, the permanent-delete control requires the exact
 group name and immediately removes the group and its group-scoped data.
 
 Feedback is submitted by signed-in users and records category, title, details,
-page path, loop context, and build number. It is reviewed only when a
-maintainer opens the queue; it is not automatically monitored. When a report is
-shipped, Global Admin adds a reporter-visible “What changed” note; private
-implementation notes never appear in the reporter's history or data export.
+page path, loop context, build number, and an optional public credit name. A
+new note can alert the maintainer bot when the Vault secrets are present and
+the site switch is on. That alert does not include the reporter’s email.
+Resend remains a fallback and also omits the reporter email. If the secrets
+are missing or the switch is off, the insert still succeeds and notified_at
+stays empty. When a report is shipped, Global Admin adds a reporter-visible
+“What changed” note. Release notes thank the person only with the credit name
+they opted in, for example “Fixed X (reported by Sam — thanks!).” A reporter
+can withdraw that credit later. Private implementation notes never appear in
+the reporter's history or data export.
 
 ## Incident response
 
@@ -147,7 +159,9 @@ implementation notes never appear in the reporter's history or data export.
 | --- | --- |
 | Suspected key/webhook exposure | Revoke/rotate it in the provider dashboard, update secure config, redeploy if needed, and inspect logs. |
 | Places usage spike | Lower limits in Global Admin, pause new loops if needed, check Google Cloud usage/quota/billing, and investigate activity. |
-| OAuth failure | Check Supabase Site URL/redirect allowlist, Google client config, and canonical redirects in a private window. |
+| OAuth failure | Check the Supabase project for that deployment. Production rewrites `*.vercel.app` to lunchloop.app. A preview stays on its own host, so its staging allowlist must include that origin. Also check Google client config. |
+| Magic link not arriving or signs in with no session | Check Supabase custom SMTP (Resend), the redirect allowlist for that project (it must include `/auth/callback`), the spam folder, and Supabase Auth logs. `email_confirmed_at` set with `last_sign_in_at` empty means `/auth/v1/verify` confirmed the address and the app never exchanged the returned `?code=`. The Magic Link template uses `/auth/confirm` with `type=email` once custom templates are unlocked. The Confirm signup template uses the same path with `type=signup`. Until then, the default `{{ .ConfirmationURL }}` link is handled at `/auth/callback`. |
+| Feedback webhook failing | Confirm Vault secrets lunchloop_feedback_webhook_url and lunchloop_feedback_webhook_key exist, the site feedback-alert switch is on, and pg_net request logs. A missing secret skips the alert and leaves notified_at empty. The Resend fallback still sends and does not include the reporter email. |
 | Broken production release | Stop compounding changes, inspect Vercel/Supabase logs, and revert to a known good deployment if appropriate. |
 | Discord failure | Confirm webhook/channel/events, then inspect Supabase asynchronous HTTP records/logs. |
 | Data-loss concern | Stop destructive actions, preserve backups, use Supabase recovery/PITR where available, and validate restore outside production. |

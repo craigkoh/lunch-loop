@@ -2,7 +2,7 @@
 
 Lunch Loop uses private per-loop memberships. A signed-in person without an
 active loop may create their first private crew; joining an existing crew still
-requires an owner-issued, Google-email-bound invitation. The multi-loop
+requires an owner-issued, email-bound invitation. The multi-loop
 foundation is live: isolated data, 2–6 members, a Global Admin-configurable
 limit of active loops per owner (initially four),
 per-loop area/radius/time zone, feedback, Global Admin, Places limits, and PWA

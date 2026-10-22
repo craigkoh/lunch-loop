@@ -17,6 +17,7 @@ import { RestaurantSearchFilters } from "./restaurant-database-browser";
 import { QuickAddPlacePanel } from "./quick-add-place-panel";
 import type { Restaurant } from "@/lib/types";
 import { hoursAtPlannedLunch } from "@/lib/location-hours";
+import { offerFeedbackPrompt } from "@/lib/feedback-prompt";
 import { createClient, hasSupabaseEnv } from "@/lib/supabase/client";
 import {
   getLunchLoopHomeSnapshot,
@@ -880,6 +881,7 @@ export function HomeScreen() {
           ? "Occasion complete — any crew member can start the next one when ready."
           : "Loop closed — the next picker is up.",
       );
+      if (context?.userId) offerFeedbackPrompt(context.userId);
       await load();
     } catch (closeError) {
       setError(

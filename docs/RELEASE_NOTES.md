@@ -1,5 +1,46 @@
 # Release Notes
 
+## Build 2026.10.22.60
+
+You can now sign in with a one-time email link instead of Google. Feedback is
+easier to send, and you can choose to be thanked by name when your report
+ships.
+
+- The sign-in page keeps Continue with Google and adds an email field. The
+  link is a magic link only: there is still no password. A custom template
+  confirms at /auth/confirm, so it works on another device and inside an
+  in-app mail browser. Supabase's default template, used when custom mail is
+  locked, confirms on Supabase and returns to /auth/callback with a one-time
+  code that this browser exchanges. An invalid or expired link, and a rate
+  limit, each get a short message on the sign-in page instead of a blank form.
+- An email invitation still matches the invited address. Signing in with the
+  magic link for that address is enough; it does not have to be Google.
+- When an account has no Google name, Lunch Loop uses the part of the email
+  before @ as the starting display name. A photo is stored only when one is
+  provided.
+- Signed-in pages show Feedback / Report a bug. The form already includes the
+  page and build. After a decision is closed, a dismissible prompt appears at
+  most once every 14 days for that person.
+- Feedback can include an optional credit name. The checkbox starts
+  unchecked. Release notes use only that opted-in name, for example “Fixed X
+  (reported by Sam — thanks!).” The person can withdraw the credit later.
+- A new feedback row can alert the maintainer bot. The address and key stay
+  in Supabase Vault. The alert and the Resend fallback both leave out the
+  reporter’s email address. A missing secret or the site switch skips the
+  alert without blocking the note.
+- Preview deployments stay on their own Vercel host and sign in there.
+  Production `*.vercel.app` addresses still open lunchloop.app. Confirm-signup
+  mail uses `type=signup`; magic-link mail uses `type=email`.
+- Starting a first Lunch Loop with no invitation no longer fails a hidden
+  20-character check. The create form was sending an empty invitation token, and
+  that empty string was validated as if it were a real token. A blank token
+  is now left out, and the first-loop path runs. If a field still needs a
+  change, the message names that field in plain language instead of showing
+  the validator’s own wording.
+- City suggestions on the create-loop form open directly under the search-area
+  field, including in Safari. Arrow keys, Enter, and a tap choose a city, and
+  the list closes after that pick.
+
 ## Build 2026.10.19.59
 
 This is the build being published. It gathers the October 19 database and

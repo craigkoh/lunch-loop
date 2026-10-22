@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import timeZoneAt from "tz-lookup";
 import type { AreaSuggestion } from "@/lib/types";
 
@@ -45,8 +45,11 @@ export function LoopAreaPicker({
 }) {
   const [query, setQuery] = useState(value.label);
   const [results, setResults] = useState<AreaSuggestion[]>([]);
+  const [activeIndex, setActiveIndex] = useState(-1);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const anchorRef = useRef<HTMLDivElement>(null);
+  const listId = useId();
   const [timeZones] = useState(() => {
     const zones = availableTimeZones();
     return zones.includes(value.timeZone)
@@ -90,6 +93,27 @@ export function LoopAreaPicker({
     };
   }, [query, value.label]);
 
+  const resultKey = results.map((area) => `${area.lat}:${area.lng}:${area.address}`).join("|");
+  const [indexedKey, setIndexedKey] = useState(resultKey);
+  if (indexedKey !== resultKey) {
+    setIndexedKey(resultKey);
+    setActiveIndex(0);
+  }
+  const highlightedIndex = results.length === 0 ? -1 : Math.min(activeIndex < 0 ? 0 : activeIndex, results.length - 1);
+
+  const suggestionsOpen = loading || results.length > 0 || Boolean(error);
+  useEffect(() => {
+    if (!suggestionsOpen) return;
+    function closeOnOutsidePointer(event: PointerEvent) {
+      if (!anchorRef.current?.contains(event.target as Node)) {
+        setResults([]);
+        setError("");
+      }
+    }
+    document.addEventListener("pointerdown", closeOnOutsidePointer);
+    return () => document.removeEventListener("pointerdown", closeOnOutsidePointer);
+  }, [suggestionsOpen]);
+
   const mapUrl =
     value.lat !== null && value.lng !== null
       ? `https://www.google.com/maps?q=${encodeURIComponent(`${value.lat},${value.lng}`)}&z=9&output=embed`
@@ -103,26 +127,86 @@ export function LoopAreaPicker({
     onChange({ ...value, label, lat: area.lat, lng: area.lng, timeZone });
     setQuery(label);
     setResults([]);
+    setError("");
+    setActiveIndex(0);
+  }
+
+  function onInputKeyDown(event: React.KeyboardEvent<HTMLInputElement>) {
+    if (event.key === "Escape") {
+      if (!suggestionsOpen) return;
+      event.preventDefault();
+      setResults([]);
+      setError("");
+      return;
+    }
+    if (!results.length) return;
+    if (event.key === "ArrowDown") {
+      event.preventDefault();
+      setActiveIndex((index) => (index + 1) % results.length);
+    } else if (event.key === "ArrowUp") {
+      event.preventDefault();
+      setActiveIndex((index) => (index <= 0 ? results.length - 1 : index - 1));
+    } else if (event.key === "Enter") {
+      event.preventDefault();
+      const area = results[highlightedIndex];
+      if (area) choose(area);
+    }
   }
 
   return (
     <div className="rounded-2xl bg-orange-50 p-4 ring-1 ring-orange-100">
-      <label className="block text-sm font-black text-stone-900">
+      <label htmlFor={listId + "-input"} className="block text-sm font-black text-stone-900">
         Center of your search area
+      </label>
+      <div ref={anchorRef} className="relative z-30 mt-2">
         <input
+          id={listId + "-input"}
           value={query}
           disabled={disabled}
+          role="combobox"
+          aria-autocomplete="list"
+          aria-expanded={suggestionsOpen}
+          aria-controls={listId}
+          aria-activedescendant={highlightedIndex >= 0 ? `${listId}-option-${highlightedIndex}` : undefined}
           onChange={(event) => {
             setQuery(event.target.value);
             if (event.target.value !== value.label) {
               onChange({ ...value, label: "", lat: null, lng: null });
             }
           }}
+          onKeyDown={onInputKeyDown}
           placeholder="Start with a city, e.g. Evansville, IN"
           autoComplete="off"
-          className="mt-2 w-full rounded-xl border border-orange-200 bg-white px-3 py-3 font-normal outline-none focus:ring-2 focus:ring-orange-300 disabled:opacity-60"
+          className="w-full rounded-xl border border-orange-200 bg-white px-3 py-3 font-normal outline-none focus:ring-2 focus:ring-orange-300 disabled:opacity-60"
         />
-      </label>
+        {suggestionsOpen && (
+          <div
+            id={listId}
+            role="listbox"
+            className="absolute left-0 right-0 top-full z-30 mt-1 max-h-64 w-full overflow-y-auto rounded-xl border border-orange-200 bg-white shadow-lg"
+          >
+            {loading ? <p className="px-3 py-3 text-sm text-stone-500">Finding places and cities…</p> : null}
+            {results.map((area, index) => (
+              <button
+                key={`${area.lat}:${area.lng}:${area.address}`}
+                id={`${listId}-option-${index}`}
+                type="button"
+                role="option"
+                aria-selected={index === highlightedIndex}
+                disabled={disabled}
+                onMouseDown={(event) => event.preventDefault()}
+                onMouseEnter={() => setActiveIndex(index)}
+                onClick={() => choose(area)}
+                className={"block min-h-11 w-full border-b border-stone-100 px-3 py-3 text-left last:border-0 disabled:opacity-60 " + (index === highlightedIndex ? "bg-orange-50" : "hover:bg-orange-50")}
+              >
+                <strong className="block text-sm">{area.label}</strong>
+                <span className="mt-0.5 block text-xs text-stone-500">{area.address}</span>
+              </button>
+            ))}
+            {!loading && !results.length && error ? <p className="px-3 py-3 text-sm font-semibold text-rose-700">{error}</p> : null}
+          </div>
+        )}
+      </div>
       <label className="mt-5 block text-sm font-black text-stone-900">
         Your crew’s time zone
         <select
@@ -142,26 +226,6 @@ export function LoopAreaPicker({
       <p className="mt-2 text-xs leading-5 text-stone-600">
         Pick the city or area your crew considers home. We use its map point to keep restaurant searches inside your chosen radius.
       </p>
-      {(loading || results.length > 0 || error) && (
-        <div className="relative mt-2">
-          <div className="absolute z-10 w-full overflow-hidden rounded-xl border border-orange-200 bg-white shadow-lg">
-            {loading ? <p className="px-3 py-3 text-sm text-stone-500">Finding places and cities…</p> : null}
-            {results.map((area) => (
-              <button
-                key={`${area.lat}:${area.lng}:${area.address}`}
-                type="button"
-                disabled={disabled}
-                onClick={() => choose(area)}
-                className="block w-full border-b border-stone-100 px-3 py-3 text-left last:border-0 hover:bg-orange-50 disabled:opacity-60"
-              >
-                <strong className="block text-sm">{area.label}</strong>
-                <span className="mt-0.5 block text-xs text-stone-500">{area.address}</span>
-              </button>
-            ))}
-            {!loading && !results.length && error ? <p className="px-3 py-3 text-sm font-semibold text-rose-700">{error}</p> : null}
-          </div>
-        </div>
-      )}
       <label className="mt-5 block text-sm font-black text-stone-900">
         Search radius: {value.radiusMiles} {value.radiusMiles === 1 ? "mile" : "miles"}
         <input

@@ -1,24 +1,12 @@
-import { z } from "zod";
 import { apiError, jsonNoStore, requireSameOrigin } from "@/lib/api";
+import { createLoopBodySchema } from "@/lib/create-loop-body";
 import { notifyCraig } from "@/lib/email";
 import { requireAuthenticatedSupabase } from "@/lib/supabase/server";
-
-const bodySchema = z.object({
-  token: z.string().min(20).max(128).optional(),
-  groupName: z.string().trim().min(1).max(80),
-  displayName: z.string().trim().min(1).max(50),
-  homeLabel: z.string().trim().min(2).max(160),
-  homeLat: z.number().min(-90).max(90),
-  homeLng: z.number().min(-180).max(180),
-  radiusMiles: z.number().int().min(1).max(35),
-  timeZone: z.string().trim().min(1).max(100),
-  loopType: z.enum(["standing", "occasion"]).default("standing"),
-});
 
 export async function POST(request: Request) {
   try {
     requireSameOrigin(request);
-    const body = bodySchema.parse(await request.json());
+    const body = createLoopBodySchema.parse(await request.json());
     const { supabase, user } = await requireAuthenticatedSupabase();
     const rpcArgs = {
       new_group_name: body.groupName,

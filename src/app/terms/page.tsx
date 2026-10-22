@@ -6,7 +6,7 @@ export const metadata: Metadata = {
   description: "The terms that govern use of Lunch Loop.",
 };
 
-const updated = "September 2, 2026";
+const updated = "October 22, 2026";
 
 export default function TermsPage() {
   return (
@@ -23,13 +23,13 @@ export default function TermsPage() {
       </LegalSection>
 
       <LegalSection title="2. Accounts, invitations, and loops">
-        <p>Lunch Loop currently uses Google Sign-In. Keep your Google account secure and do not share it. Invitations and short join codes are single-use and may expire; do not publish or misuse them.</p>
+        <p>You can sign in with Google or a one-time email link. Lunch Loop does not use passwords. Keep the Google or email account you use secure, and do not share it. An invitation sent to a specific email address must be accepted while signed in with that address. Invitations and short join codes are single-use and may expire; do not publish or misuse them.</p>
         <p>A signed-in person without an active Lunch Loop may create a loop and invite their crew. A Lunch Loop owner manages their loop’s roster, invitations, home search area, restaurant database, notifications, exports, ownership transfer, and archive choices. A loop is designed for 2–6 people. Each account may own up to the current site-wide active-loop limit, which is initially four and may change as the service grows.</p>
         <p>A member may ask the loop owner to remove them from a loop, or contact us for help. Removing someone from a loop ends future access but does not automatically delete their Lunch Loop account or erase the loop’s historical record. Self-service personal-data export and account deletion are currently unavailable while we review those workflows; contact <a className="font-bold text-orange-700 underline" href="mailto:support@lunchloop.app">support@lunchloop.app</a> for an information or deletion request. Owners may remove members, archive a loop, or transfer ownership. We may suspend or end access when necessary to protect the service, comply with law, or address abuse.</p>
       </LegalSection>
 
       <LegalSection title="3. Your content and group data">
-        <p>You are responsible for the display names, restaurants, feedback, notes, and other content you submit. Do not submit unlawful, harmful, deceptive, infringing, or confidential information you do not have permission to share.</p>
+        <p>You are responsible for the display names, restaurants, feedback, notes, and other content you submit. Do not submit unlawful, harmful, deceptive, infringing, or confidential information you do not have permission to share. If you opt in, the name you enter with feedback may be published in release notes. Leave that option off if you do not want a public thank-you, and you may withdraw it later.</p>
         <p>You keep ownership of your content. You grant Lunch Loop a limited right to host, process, display, and share it with the members of the relevant loop solely to operate and improve the service. Do not use Lunch Loop to scrape, copy, or build a public restaurant directory from third-party data.</p>
       </LegalSection>
 
@@ -39,7 +39,7 @@ export default function TermsPage() {
       </LegalSection>
 
       <LegalSection title="5. Optional third-party services">
-        <p>Google Sign-In, Google Maps Platform, Supabase, Vercel, Resend, and optional Discord notifications are provided by third parties. Their availability and policies are outside Lunch Loop’s control. A loop owner is responsible for using a Discord webhook only in a server and channel they are authorized to manage. When Discord notifications are enabled, selected decision events—including member display names, restaurant names, scheduled dates/times, and pick or veto activity—are copied to that Discord channel.</p>
+        <p>Google Sign-In, one-time email links delivered through Supabase and Resend, Google Maps Platform, Vercel, and optional Discord notifications are provided by third parties. Their availability and policies are outside Lunch Loop’s control. A loop owner is responsible for using a Discord webhook only in a server and channel they are authorized to manage. When Discord notifications are enabled, selected decision events—including member display names, restaurant names, scheduled dates/times, and pick or veto activity—are copied to that Discord channel. Feedback alerts, when enabled, go to the operator’s notification bot and do not include the reporter’s email address.</p>
       </LegalSection>
 
       <LegalSection title="6. Acceptable use">

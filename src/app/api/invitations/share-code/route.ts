@@ -3,8 +3,8 @@ import { apiError, appOrigin, jsonNoStore, requireSameOrigin } from "@/lib/api";
 import { requireAuthenticatedSupabase } from "@/lib/supabase/server";
 
 const bodySchema = z.object({
-  groupId: z.string().uuid(),
-  label: z.string().trim().max(80).optional(),
+  groupId: z.string().uuid("Choose a Lunch Loop."),
+  label: z.string().trim().max(80, "That label is too long.").optional(),
 });
 
 export async function POST(request: Request) {

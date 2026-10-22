@@ -3,7 +3,11 @@ import { apiError, jsonNoStore, requireSameOrigin } from "@/lib/api";
 import { notifyCraig } from "@/lib/email";
 import { requireAuthenticatedSupabase } from "@/lib/supabase/server";
 
-const bodySchema = z.object({ token: z.string().max(128).optional(), code: z.string().max(32).optional(), displayName: z.string().trim().min(1).max(50).optional() }).refine((value) => value.token || value.code, { message: "Enter an invitation link or code." });
+const bodySchema = z.object({
+  token: z.string().max(128, "That invitation link is incomplete.").optional(),
+  code: z.string().max(32, "That invitation code is too long.").optional(),
+  displayName: z.string().trim().min(1, "Add your name.").max(50, "That name is too long.").optional(),
+}).refine((value) => value.token || value.code, { message: "Enter an invitation link or code." });
 
 export async function POST(request: Request) {
   try {

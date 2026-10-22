@@ -4,13 +4,13 @@ import { notifyCraig } from "@/lib/email";
 import { requireAuthenticatedSupabase } from "@/lib/supabase/server";
 
 const bodySchema = z.object({
-  kind: z.enum(["bug", "feature", "question", "other"]),
-  title: z.string().trim().min(3).max(140),
-  details: z.string().trim().min(10).max(5000),
-  pagePath: z.string().max(500).optional(),
-  build: z.string().max(80).optional(),
-  creditOptIn: z.boolean().optional(),
-  creditName: z.string().trim().max(60).optional(),
+  kind: z.enum(["bug", "feature", "question", "other"], { error: "Choose what kind of note this is." }),
+  title: z.string().trim().min(3, "Add a short title.").max(140, "That title is too long."),
+  details: z.string().trim().min(10, "Add a few more details.").max(5000, "Those details are too long."),
+  pagePath: z.string().max(500, "That page could not be saved with this note.").optional(),
+  build: z.string().max(80, "That build could not be saved with this note.").optional(),
+  creditOptIn: z.boolean({ error: "Check the credit box again." }).optional(),
+  creditName: z.string().trim().max(60, "Credit names can be up to 60 characters.").optional(),
 });
 
 export async function POST(request: Request) {

@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { ZodError } from "zod";
 import { originForHost } from "@/lib/auth-redirect";
 import { RouteAccessError } from "@/lib/supabase/server";
+import { validationErrorMessage } from "@/lib/validation-message";
 
 const noStore = { "Cache-Control": "private, no-store" };
 
@@ -65,7 +66,7 @@ export function apiError(error: unknown) {
   }
   if (error instanceof ZodError) {
     return NextResponse.json(
-      { error: error.issues[0]?.message ?? "Check what you entered and try again." },
+      { error: validationErrorMessage(error) },
       { status: 400, headers: noStore },
     );
   }

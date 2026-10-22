@@ -54,7 +54,7 @@ export function StartLoopScreen() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          token,
+          ...(token.trim() ? { token: token.trim() } : {}),
           groupName,
           displayName,
           homeLabel: homeArea.label,

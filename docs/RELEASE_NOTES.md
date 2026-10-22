@@ -31,6 +31,12 @@ ships.
 - Preview deployments stay on their own Vercel host and sign in there.
   Production `*.vercel.app` addresses still open lunchloop.app. Confirm-signup
   mail uses `type=signup`; magic-link mail uses `type=email`.
+- Starting a first Lunch Loop with no invitation no longer fails a hidden
+  20-character check. The create form was sending an empty invitation token, and
+  that empty string was validated as if it were a real token. A blank token
+  is now left out, and the first-loop path runs. If a field still needs a
+  change, the message names that field in plain language instead of showing
+  the validator’s own wording.
 
 ## Build 2026.10.19.59
 

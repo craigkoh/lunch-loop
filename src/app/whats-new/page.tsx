@@ -21,6 +21,7 @@ const releases: { build: string; changes: ReleaseChange[] }[] = [
     changes: [
       "You can now sign in with a one-time email link instead of Google. Feedback is easier to send, and you can choose to be thanked by name when your report ships.",
       "If an email sign-in link is invalid or expired, Lunch Loop says so on the sign-in page instead of leaving you on the home page unsigned-in.",
+      "Starting your first Lunch Loop works without an invitation. If something you entered needs a change, the message says which part.",
     ],
   },
   {

@@ -3,7 +3,10 @@ import { apiError, appOrigin, jsonNoStore, requireSameOrigin } from "@/lib/api";
 import { escapeHtml, sendLunchLoopEmail } from "@/lib/email";
 import { requireAuthenticatedSupabase } from "@/lib/supabase/server";
 
-const bodySchema = z.object({ groupId: z.string().uuid(), email: z.string().email().max(320) });
+const bodySchema = z.object({
+  groupId: z.string().uuid("Choose a Lunch Loop."),
+  email: z.string().email("Enter a valid email address.").max(320, "Enter a valid email address."),
+});
 
 export async function POST(request: Request) {
   try {

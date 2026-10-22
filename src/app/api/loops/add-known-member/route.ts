@@ -4,8 +4,8 @@ import { escapeHtml, sendLunchLoopEmail } from "@/lib/email";
 import { requireAuthenticatedSupabase } from "@/lib/supabase/server";
 
 const bodySchema = z.object({
-  groupId: z.string().uuid(),
-  userId: z.string().uuid(),
+  groupId: z.string().uuid("Choose a Lunch Loop."),
+  userId: z.string().uuid("Choose a friend to add."),
 });
 
 export async function POST(request: Request) {

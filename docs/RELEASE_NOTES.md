@@ -37,6 +37,9 @@ ships.
   is now left out, and the first-loop path runs. If a field still needs a
   change, the message names that field in plain language instead of showing
   the validator’s own wording.
+- City suggestions on the create-loop form open directly under the search-area
+  field, including in Safari. Arrow keys, Enter, and a tap choose a city, and
+  the list closes after that pick.
 
 ## Build 2026.10.19.59
 

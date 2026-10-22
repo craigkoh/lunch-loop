@@ -63,7 +63,13 @@ In Authentication → URL Configuration for the production project:
   - `http://127.0.0.1:3000/**`
 
 The wildcard entries let a magic link return to the page the person was
-trying to open, such as `/join`. Keep only those Lunch Loop origins.
+trying to open, such as `/join`. The app also sends `emailRedirectTo` to
+`/auth/callback` on that same origin, because Supabase's default template
+(used until custom SMTP unlocks custom templates) verifies at
+`/auth/v1/verify` and then redirects there with `?code=`. That callback must
+be allowlisted exactly, or GoTrue drops the person on the Site URL after
+confirming the email and no session is created. Keep only those Lunch Loop
+origins.
 
 Production deployments rewrite a `*.vercel.app` host to `https://lunchloop.app`
 before Google or a magic link starts, so the production Supabase project does
@@ -86,13 +92,19 @@ Confirm signup (`supabase/templates/confirmation.html`):
 
     {{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=signup&next={{ .RedirectTo }}
 
-`/auth/confirm` forwards that `type` to `verifyOtp`. GoTrue stores a magic-link
+`/auth/confirm` forwards that `type` to `verifyOtp`, and it also exchanges a
+`?code=` if the default template redirected there. GoTrue stores a magic-link
 hash as a recovery token and a confirm-signup hash as a confirmation token.
 `type=email` finds either hash. `type=signup` finds only the confirmation
 hash, so a magic-link template must stay on `type=email`. Hosted projects
 need the markup pasted into the dashboard; the config file does not update
-production templates. Disable email-link click tracking in Resend so the link
-is not rewritten.
+production templates. Until custom SMTP is enabled, the dashboard keeps
+Supabase's default `{{ .ConfirmationURL }}` template. That link still signs
+the person in: `/auth/v1/verify` confirms the email, then Lunch Loop exchanges
+the returned `?code=` at `/auth/callback`. If the code or an auth error lands
+on any other page, the proxy forwards it there. A `#access_token` fragment is
+finished in the browser, because the server never receives it. Disable
+email-link click tracking in Resend so a custom link is not rewritten.
 
 An email invitation still matches `auth.users.email`. A magic-link user and a
 Google user with the same address can redeem the invite that was sent to that

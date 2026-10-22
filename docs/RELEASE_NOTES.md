@@ -7,10 +7,12 @@ easier to send, and you can choose to be thanked by name when your report
 ships.
 
 - The sign-in page keeps Continue with Google and adds an email field. The
-  link is a magic link only: there is still no password. It confirms at
-  /auth/confirm, so it works on another device and inside an in-app mail
-  browser. An invalid or expired link, and a rate limit, each get a short
-  message on the sign-in page.
+  link is a magic link only: there is still no password. A custom template
+  confirms at /auth/confirm, so it works on another device and inside an
+  in-app mail browser. Supabase's default template, used when custom mail is
+  locked, confirms on Supabase and returns to /auth/callback with a one-time
+  code that this browser exchanges. An invalid or expired link, and a rate
+  limit, each get a short message on the sign-in page instead of a blank form.
 - An email invitation still matches the invited address. Signing in with the
   magic link for that address is enough; it does not have to be Google.
 - When an account has no Google name, Lunch Loop uses the part of the email

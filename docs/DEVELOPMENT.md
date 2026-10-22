@@ -184,6 +184,8 @@ allowlist the callback and confirm routes, including local development. The
 staging project used by Vercel previews allowlists that preview origin
 instead. Google’s OAuth client redirect URI remains the exact Supabase
 callback supplied by its provider settings, not Lunch Loop’s /auth/callback.
-Email magic links use /auth/confirm with `type=email`. Confirm-signup mail
-uses the same path with `type=signup`. See
-[Integrations](INTEGRATIONS.md) before changing identity configuration.
+Email magic links prefer /auth/confirm with `type=email`. Confirm-signup mail
+uses the same path with `type=signup`. Supabase's default template, which is
+what staging sends until custom SMTP is turned on, instead returns `?code=`
+to /auth/callback. See [Integrations](INTEGRATIONS.md) before changing
+identity configuration.

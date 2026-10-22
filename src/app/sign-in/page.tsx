@@ -68,11 +68,15 @@ function SignInScreen() {
     setMessage("");
     const origin = authOrigin();
     const destination = safeReturnPath(searchParams.get("next"), origin);
+    const emailRedirectTo = new URL("/auth/callback", origin);
+    if (destination !== "/") emailRedirectTo.searchParams.set("next", destination);
     const { error } = await createClient().auth.signInWithOtp({
       email: address,
       options: {
         shouldCreateUser: true,
-        emailRedirectTo: new URL(destination, origin).toString(),
+        // Supabase's default template sends the browser to this URL with
+        // ?code=. /auth/callback exchanges it with the PKCE cookie set here.
+        emailRedirectTo: emailRedirectTo.toString(),
       },
     });
     setBusy(null);
@@ -137,7 +141,7 @@ function SignInScreen() {
             <h2 className="text-lg font-black text-orange-950">Check your email</h2>
             <p className="mt-2 text-sm leading-6 text-stone-700">
               We sent a one-time sign-in link to <span className="font-bold">{sentTo}</span>.
-              Open it on this device or any other. The link still works from an in-app mail browser.
+              Open it in this browser. If a mail app opens a different browser and you are not signed in, request a new link there.
             </p>
             <button
               type="button"

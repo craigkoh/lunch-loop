@@ -20,6 +20,7 @@ const releases: { build: string; changes: ReleaseChange[] }[] = [
     build: "2026.10.22.60",
     changes: [
       "You can now sign in with a one-time email link instead of Google. Feedback is easier to send, and you can choose to be thanked by name when your report ships.",
+      "If an email sign-in link is invalid or expired, Lunch Loop says so on the sign-in page instead of leaving you on the home page unsigned-in.",
     ],
   },
   {

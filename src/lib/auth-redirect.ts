@@ -86,6 +86,59 @@ export function requestOrigin(request: Request) {
   return url.origin;
 }
 
+const ownSignInErrors = new Set(["link", "rate", "signin"]);
+
+/** Invite codes are 8–12 characters. A Supabase PKCE code is much longer. */
+export function isSupabaseAuthCode(code: string | null) {
+  return Boolean(code && code.length >= 20);
+}
+
+/**
+ * Default magic-link mail verifies on Supabase, then redirects to whatever
+ * page was requested with ?code= or an error. Send that return here so the
+ * session can be stored. Invite links that use a short ?code= stay put.
+ */
+export function authCallbackTarget(url: URL) {
+  if (url.pathname === "/auth/callback" || url.pathname === "/auth/confirm") return null;
+  const code = url.searchParams.get("code");
+  const error = url.searchParams.get("error");
+  const errorCode = url.searchParams.get("error_code");
+  const errorDescription = url.searchParams.get("error_description");
+  const authCode = isSupabaseAuthCode(code);
+  const supabaseError = Boolean(
+    errorCode || errorDescription || (error && !ownSignInErrors.has(error)),
+  );
+  if (!authCode && !supabaseError) return null;
+
+  const leftover = new URLSearchParams(url.searchParams);
+  for (const key of ["code", "error", "error_code", "error_description", "next"]) leftover.delete(key);
+  const pathIsSignIn = url.pathname === "/" || url.pathname === "/sign-in";
+  const nextPath = pathIsSignIn
+    ? url.searchParams.get("next")
+    : `${url.pathname}${leftover.size ? `?${leftover.toString()}` : ""}`;
+  const target = new URL("/auth/callback", url.origin);
+  if (authCode && code) target.searchParams.set("code", code);
+  if (error) target.searchParams.set("error", error);
+  if (errorCode) target.searchParams.set("error_code", errorCode);
+  if (errorDescription) target.searchParams.set("error_description", errorDescription);
+  const safeNext = safeReturnPath(nextPath, url.origin);
+  if (safeNext !== "/") target.searchParams.set("next", safeNext);
+  return target;
+}
+
+export function authReturnErrorCode(details: {
+  error?: string | null;
+  errorCode?: string | null;
+  errorDescription?: string | null;
+  exchangeMessage?: string | null;
+}) {
+  const blob = [details.errorCode, details.errorDescription, details.exchangeMessage].filter(Boolean).join(" ");
+  if (isAuthRateLimit({ message: blob, code: details.errorCode ?? undefined })) return "rate";
+  if (/otp|email link|expir|invalid|verifier|flow state|pkce/i.test(blob)) return "link";
+  if (details.errorDescription || details.errorCode) return "link";
+  return "signin";
+}
+
 export function signInRedirect(origin: string, safeNext: string, errorCode: string) {
   const signIn = new URL("/sign-in", origin);
   signIn.searchParams.set("error", errorCode);
@@ -109,7 +162,7 @@ export function isAuthRateLimit(
 
 export function authErrorMessage(code: string | null) {
   if (code === "link") {
-    return "That email link is invalid or has expired. Request a new one.";
+    return "That email link is invalid or has expired. Request a new one and open it in this browser.";
   }
   if (code === "rate") {
     return "Too many email links were requested. Wait a minute, then try again.";

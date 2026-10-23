@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { apiError, jsonNoStore, requireSameOrigin } from "@/lib/api";
-import { escapeHtml, sendLunchLoopEmail } from "@/lib/email";
+import { escapeHtml, lunchLoopEmailDocument, sendLunchLoopEmail } from "@/lib/email";
 import { requireAuthenticatedSupabase } from "@/lib/supabase/server";
 
 const bodySchema = z.object({
@@ -29,7 +29,11 @@ export async function POST(request: Request) {
       ? await sendLunchLoopEmail({
           to: added.account_email,
           subject: `You’ve been added to ${added.group_name}`,
-          html: `<main style="font-family:Arial,sans-serif;color:#292524;line-height:1.5"><h1 style="color:#ea580c">🍽️ You’re in a new Lunch Loop</h1><p>Hi ${escapeHtml(added.display_name ?? "there")}, you’ve been added to <strong>${escapeHtml(added.group_name)}</strong>.</p><p>Its people and restaurant database are separate from your other Lunch Loops. Open the app any time to switch crews and see what is happening.</p><p><a href="https://lunchloop.app/loops" style="display:inline-block;background:#f97316;color:white;padding:12px 18px;border-radius:10px;font-weight:700;text-decoration:none">Open my Lunch Loops</a></p></main>`,
+          html: lunchLoopEmailDocument({
+            heading: "You’re in a new Lunch Loop",
+            bodyHtml: `<p style="margin:0 0 12px">Hi ${escapeHtml(added.display_name ?? "there")}, you’ve been added to <strong>${escapeHtml(added.group_name)}</strong>.</p><p style="margin:0">Its people and restaurant database are separate from your other Lunch Loops. Open the app any time to switch crews and see what is happening.</p>`,
+            button: { href: "https://lunchloop.app/loops", label: "Open my Lunch Loops" },
+          }),
           text: `You’ve been added to ${added.group_name}. Open your Lunch Loops: https://lunchloop.app/loops`,
         })
       : { sent: false };

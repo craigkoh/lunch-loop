@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { BrandMark } from "./brand-mark";
 import { useEffect, useState } from "react";
 
 type Platform = "iphone" | "android";
@@ -85,9 +86,7 @@ export function InstallGuide() {
           href="/"
           className="flex items-center gap-2 font-black tracking-tight text-orange-950"
         >
-          <span className="grid size-10 place-items-center rounded-2xl bg-orange-500 text-xl shadow-sm">
-            🍽️
-          </span>
+          <BrandMark className="size-10" />
           <span>Lunch Loop</span>
         </Link>
         <Link

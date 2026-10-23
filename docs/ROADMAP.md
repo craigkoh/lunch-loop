@@ -48,15 +48,18 @@ rate limits and a hosted bot challenge.
 
 ## Backlog
 
-- Design a more clever logo with a hidden meaning (Craig's idea).
+- Plate Loop is the live icon. The arrow is documented in
+  [Design](DESIGN.md). Fork L and Tray LL stay in [docs/brand/](brand/) as
+  studies.
 
 ## Respectful monetization
 
 Never bias restaurant selection. The first step is live: a public Value for
 Value page, a small “Fuel the loop” footer link, and a note on every finished
 pick. The note is a paper receipt about half the time, and otherwise a
-one-liner or a tip jar, never the same style twice in a row. “Not now” hides
-it for that pick. There is no pop-up. A new database keeps `donations_enabled`
+one-liner or a tip jar, never the same style twice in a row. On a wide
+screen the note sits beside the result. On a phone it stacks under the
+result. “Not now” hides it for that pick. There is no pop-up. A new database keeps `donations_enabled`
 off until a site admin turns it on. Production follows that same switch. A
 donation does not change restaurant selection or unlock anything.
 

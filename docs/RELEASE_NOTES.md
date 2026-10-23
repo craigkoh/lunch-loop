@@ -1,5 +1,42 @@
 # Release Notes
 
+## Build 2026.10.23.66
+
+Plate Loop redraw, per Craig's feedback.
+
+- The rim and arrowhead are one solid piece, with no gap. The head sits at
+  3 o'clock, pointing down (clockwise).
+- The knife is now a clear table knife: a solid blade with a separate handle.
+  The fork is redrawn to match.
+- Updated everywhere: favicon (SVG and ICO), app icon, phone home-screen icon
+  (Apple touch icon and manifest), header, share image, README hero, and
+  docs/brand/. The build bump also refreshes cached icons.
+
+## Build 2026.10.23.65
+
+The live icon is Plate Loop. The rim of the plate is an arrow.
+
+- The arrowhead is about three times as wide as the rim stroke, with a gap of
+  plate in front of it, so the loop reads at favicon size. A wider head was
+  drawn and kept as a study because it crowded the fork and knife.
+- Favicon, Apple touch icon, header, README hero, and the share image use
+  this mark. Email stays a wordmark.
+- Fork L and Tray LL remain in docs/brand/ and are not the icon.
+
+## Build 2026.10.23.64
+
+The thank-you after a finished pick sits with the result, and shared links
+preview as Lunch Loop.
+
+- On a tablet or desktop, the receipt, one-liner, or tip jar is a right-hand
+  column beside the restaurant and the close actions. On a phone it stays
+  stacked under the result, without a wide empty margin.
+- If support is off, that column is not reserved.
+- Invite links, sign-in, and the public pages carry a title, description, and
+  share image so a friend’s preview is Lunch Loop.
+- The brand guide is [docs/DESIGN.md](DESIGN.md). Logo concepts are in
+  docs/brand/. The live icon is unchanged.
+
 ## Build 2026.10.23.63
 
 A finished lunch can leave a small thank-you under the result. It might be a

@@ -143,6 +143,49 @@ input {
   -webkit-tap-highlight-color: transparent;
 }
 
+/* iOS Safari zooms a focused field when its computed font size is under 16px. */
+@media (max-width: 767px) {
+  input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="button"]):not([type="submit"]):not([type="hidden"]):not([type="image"]):not([type="file"]),
+  select,
+  textarea {
+    font-size: 16px;
+  }
+}
+
+/* Chosen-pick hero. The thank-you sits in the right column only while it is
+   actually rendered, so a hidden nudge does not leave an empty gutter. */
+.pick-layout {
+  display: grid;
+  align-items: start;
+  gap: 1rem;
+}
+
+.pick-nudge:empty {
+  display: none;
+}
+
+@media (min-width: 768px) {
+  .pick-layout:has(.pick-nudge:not(:empty)) {
+    grid-template-columns: minmax(0, 1fr) minmax(16.5rem, 22rem);
+    column-gap: 1.5rem;
+  }
+
+  .pick-layout:has(.pick-nudge:not(:empty)) .pick-main {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  .pick-layout:has(.pick-nudge:not(:empty)) .pick-actions {
+    grid-column: 1;
+    grid-row: 2;
+  }
+
+  .pick-layout:has(.pick-nudge:not(:empty)) .pick-nudge {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+  }
+}
+
 @keyframes install-pulse {
   0%,
   100% {

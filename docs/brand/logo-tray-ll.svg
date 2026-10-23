@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512" role="img" aria-labelledby="title desc">
+  <title id="title">Tray LL</title>
+  <desc id="desc">Orange app icon. A cream lunch tray whose two wells are a pair of L letters: LL for Lunch Loop.</desc>
+  <rect width="512" height="512" rx="112" fill="#F97316"/>
+  <rect x="78" y="118" width="356" height="276" rx="56" fill="#FFF7ED"/>
+  <circle cx="256" cy="394" r="22" fill="#F97316"/>
+  <path d="M118 196 h56 v108 h96 v52 h-152 Z" fill="#F97316"/>
+  <path d="M262 196 h56 v108 h96 v52 h-152 Z" fill="#F97316"/>
+</svg>

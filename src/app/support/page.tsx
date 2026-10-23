@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { BrandMark } from "@/components/brand-mark";
 import { OperatorCredit, FuelTheLoopLink } from "@/components/quiet-donation-link";
 import { donationUrl } from "@/lib/donation";
 import { getDonationsEnabled } from "@/lib/supabase/server";
@@ -7,6 +8,17 @@ import { getDonationsEnabled } from "@/lib/supabase/server";
 export const metadata: Metadata = {
   title: "Value for Value | Lunch Loop",
   description: "Lunch Loop is free. If it helped your crew decide lunch, you can send some value back.",
+  openGraph: {
+    title: "Value for Value | Lunch Loop",
+    description: "Lunch Loop is free. If it helped your crew decide lunch, you can send some value back.",
+    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Lunch Loop — the fun lunch loop for 2–6 friends" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Value for Value | Lunch Loop",
+    description: "Lunch Loop is free. If it helped your crew decide lunch, you can send some value back.",
+    images: ["/twitter-image"],
+  },
 };
 
 export const dynamic = "force-dynamic";
@@ -18,10 +30,10 @@ export default async function SupportPage() {
       <header className="border-b border-orange-100 bg-[#fffaf3]/95 px-4 py-4 backdrop-blur sm:px-6">
         <div className="mx-auto flex max-w-3xl items-center justify-between gap-4">
           <Link href="/" className="flex items-center gap-2 font-black tracking-tight text-orange-950">
-            <span className="grid size-10 place-items-center rounded-2xl bg-orange-500 text-xl shadow-sm">🍽️</span>
+            <BrandMark className="size-10" />
             <span>Lunch Loop</span>
           </Link>
-          <Link href="/" className="rounded-xl bg-white px-3 py-2 text-sm font-black text-stone-700 shadow-sm ring-1 ring-orange-100">
+          <Link href="/" className="inline-flex min-h-11 items-center rounded-xl bg-white px-3 text-sm font-black text-stone-700 shadow-sm ring-1 ring-orange-100">
             Back to Lunch Loop
           </Link>
         </div>

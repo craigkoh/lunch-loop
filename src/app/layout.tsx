@@ -5,11 +5,26 @@ import { ThemeInitializer } from "@/components/theme-initializer";
 import { appInfo } from "@/lib/app-info";
 import "./globals.css";
 
+const siteDescription =
+  "The fun, data-driven lunch club for 2–6 friends: turns, vetoes, and a shared restaurant list.";
+
 export const metadata: Metadata = {
+  metadataBase: new URL("https://lunchloop.app"),
   title: "Lunch Loop | The fun lunch loop for friends",
   applicationName: "Lunch Loop",
-  description:
-    "The fun, data-driven lunch club for 2–6 friends: turns, vetoes, and a shared restaurant list.",
+  description: siteDescription,
+  openGraph: {
+    type: "website",
+    siteName: "Lunch Loop",
+    title: "Lunch Loop | The fun lunch loop for friends",
+    description: siteDescription,
+    url: "https://lunchloop.app",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Lunch Loop | The fun lunch loop for friends",
+    description: siteDescription,
+  },
   manifest: "/manifest.webmanifest",
   appleWebApp: {
     capable: true,

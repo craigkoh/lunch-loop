@@ -28,6 +28,10 @@ function changeText(change: ReleaseChange) {
 
 const releases: { build: string; changes: ReleaseChange[] }[] = [
   {
+    build: "2026.10.23.67",
+    changes: ["Fixed the home-screen app icon so phones show the new Lunch Loop logo."],
+  },
+  {
     build: "2026.10.23.66",
     changes: [
       "A cleaner app icon: the arrow is now one solid loop around the plate, and the knife looks like a knife. Re-add Lunch Loop to your home screen to see the new icon there.",

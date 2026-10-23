@@ -1,5 +1,12 @@
 # Release Notes
 
+## Build 2026.10.23.67
+
+- Fixed the app icon links. The page and manifest pointed at `/icon` and
+  `/apple-icon`, which return 404 because the icons are static files. They now
+  point at `/icon.png` and `/apple-icon.png`, so phones get the Plate Loop
+  icon when you add Lunch Loop to the home screen.
+
 ## Build 2026.10.23.66
 
 Plate Loop redraw, per Craig's feedback.

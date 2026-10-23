@@ -10,10 +10,11 @@ function shownAt(userId: string) {
 
 export function offerFeedbackPrompt(userId: string) {
   const lastShown = shownAt(userId);
-  if (lastShown !== null && Date.now() - lastShown < fourteenDaysMs) return;
+  if (lastShown !== null && Date.now() - lastShown < fourteenDaysMs) return false;
   window.localStorage.setItem(shownPrefix + userId, String(Date.now()));
   window.sessionStorage.setItem(openKey, userId);
   window.dispatchEvent(new Event("lunch-loop-feedback-prompt"));
+  return true;
 }
 
 export function feedbackPromptOpenFor(userId: string) {

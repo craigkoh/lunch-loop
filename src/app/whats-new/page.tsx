@@ -17,6 +17,13 @@ function changeText(change: ReleaseChange) {
 
 const releases: { build: string; changes: ReleaseChange[] }[] = [
   {
+    build: "2026.10.23.61",
+    changes: [
+      "Lunch Loop has a new plate, fork, and knife icon. The footer says Lunch Loop is run by Craig Kohler.",
+      "An optional “keep it running” chip-in can appear after a lunch is closed. It stays off until it is turned on, and it never changes which restaurant is chosen.",
+    ],
+  },
+  {
     build: "2026.10.22.60",
     changes: [
       "You can now sign in with a one-time email link instead of Google. Feedback is easier to send, and you can choose to be thanked by name when your report ships.",

@@ -45,11 +45,18 @@ rate limits and a hosted bot challenge.
 - Office/team administration after the core friend experience is proven.
 - A native iPhone wrapper only if the PWA has a real user-facing limitation.
 
+## Backlog
+
+- Design a more clever logo with a hidden meaning (Craig's idea).
+
 ## Respectful monetization
 
-Never bias restaurant selection. The safest early option is a low-frequency,
-optional “Keep Lunch Loop running” contribution after a completed decision,
-with clear opt-out and no feature pressure.
+Never bias restaurant selection. The first step is a low-frequency, optional
+“Keep Lunch Loop running” contribution after a completed decision, with a
+clear “Not now” and no feature pressure. It is shipped behind
+`donations_enabled`, which defaults to off until the Stripe account review
+is finished. A donation does not change restaurant selection or unlock
+anything.
 
 Possible later options: group supporter plan, gifting, or optional post-choice
 actions such as reservations, order-ahead, calendar, or directions—with clear

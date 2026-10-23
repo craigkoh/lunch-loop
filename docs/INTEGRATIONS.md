@@ -199,10 +199,19 @@ The webhook is private and not returned to the browser after save. Treat it
 like a password. When enabled, member display names, restaurant names, planned
 local date/time, and decision events are copied to the selected Discord channel.
 
+## Stripe donation link
+
+The optional “Keep Lunch Loop running” link is a public Stripe Payment Link.
+It is not a secret. It stays hidden until Global Admin sets
+`donations_enabled` to true, which should wait until Stripe finishes reviewing
+the account. Do not send a test payment while the link is paused. Stripe hosts
+the payment page. Lunch Loop does not receive the card number, and a donation
+does not change restaurant selection.
+
 ## PWA and hosting
 
-Vercel hosts the canonical app at lunchloop.app. The manifest, generated orange
-icons, favicon route, and foreground synchronization make it installable on
+Vercel hosts the canonical app at lunchloop.app. The manifest, the plate
+icon, the favicon, and foreground synchronization make it installable on
 iPhone/iPad and Android. Test phone installation after domain, icon,
 service-worker, or authentication changes.
 

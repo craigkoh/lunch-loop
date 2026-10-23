@@ -177,6 +177,7 @@ export function GlobalAdminScreen() {
   const [feedbackItems, setFeedbackItems] = useState<FeedbackItem[]>([]);
   const [allowNewGroups, setAllowNewGroups] = useState(true);
   const [feedbackWebhookEnabled, setFeedbackWebhookEnabled] = useState(true);
+  const [donationsEnabled, setDonationsEnabled] = useState(false);
   const [ownedLoopLimit, setOwnedLoopLimit] = useState(4);
   const [memberInviteLimit, setMemberInviteLimit] = useState("");
   const [placesLimits, setPlacesLimits] = useState<PlacesLimits>(defaultPlacesLimits);
@@ -259,7 +260,7 @@ export function GlobalAdminScreen() {
       ] = await Promise.all([
         supabase
           .from("site_settings")
-          .select("allow_new_groups, owned_loop_limit, member_invite_limit_per_day, feedback_webhook_enabled, place_search_user_limit_10m, place_search_group_limit_10m, place_detail_user_limit_10m, place_detail_group_limit_10m, area_search_user_limit_10m, places_user_limit_per_day, places_group_limit_per_day")
+          .select("allow_new_groups, owned_loop_limit, member_invite_limit_per_day, feedback_webhook_enabled, donations_enabled, place_search_user_limit_10m, place_search_group_limit_10m, place_detail_user_limit_10m, place_detail_group_limit_10m, area_search_user_limit_10m, places_user_limit_per_day, places_group_limit_per_day")
           .eq("singleton", true)
           .single(),
         supabase
@@ -317,6 +318,7 @@ export function GlobalAdminScreen() {
       setFeedbackItems((feedbackResult.data ?? []) as FeedbackItem[]);
       setAllowNewGroups(Boolean(settingsResult.data?.allow_new_groups));
       setFeedbackWebhookEnabled(settingsResult.data?.feedback_webhook_enabled !== false);
+      setDonationsEnabled(settingsResult.data?.donations_enabled === true);
       setOwnedLoopLimit(settingsResult.data?.owned_loop_limit ?? 4);
       setMemberInviteLimit(
         settingsResult.data?.member_invite_limit_per_day?.toString() ?? "",
@@ -508,6 +510,20 @@ export function GlobalAdminScreen() {
       allowNewGroups
         ? "New lunch-loop creation is enabled."
         : "New lunch-loop creation is paused.",
+    );
+  }
+  function saveDonations() {
+    void run(
+      async () => {
+        const { error: updateError } = await createClient().rpc(
+          "global_admin_set_donations_enabled",
+          { new_enabled: donationsEnabled },
+        );
+        if (updateError) throw updateError;
+      },
+      donationsEnabled
+        ? "The donation link is on. It stays optional and does not change restaurant selection."
+        : "The donation link is off.",
     );
   }
   function saveFeedbackWebhook() {
@@ -945,6 +961,19 @@ export function GlobalAdminScreen() {
                 </label>
               </div>
               <button type="button" disabled={busy} onClick={saveFeedbackWebhook} className="mt-4 rounded-xl bg-white px-4 py-3 text-sm font-black text-orange-900 disabled:opacity-60">Save alert setting</button>
+            </div>
+            <div className="mt-5 rounded-2xl bg-white/10 p-4">
+              <div className="flex flex-wrap items-start justify-between gap-3">
+                <div>
+                  <p className="font-black">Donation link</p>
+                  <p className="mt-1 max-w-xl text-sm text-orange-50">Off until the Stripe account is ready. When on, a quiet footer link appears, and a dismissible note can show after a lunch is closed, at most once every 14 days. It does not change which restaurant is chosen or unlock features.</p>
+                </div>
+                <label className="flex items-center gap-3 rounded-2xl bg-white/10 px-4 py-3 text-sm font-bold">
+                  <input type="checkbox" checked={donationsEnabled} onChange={(event) => setDonationsEnabled(event.target.checked)} className="size-5 accent-orange-500" />
+                  Show donation link
+                </label>
+              </div>
+              <button type="button" disabled={busy} onClick={saveDonations} className="mt-4 rounded-xl bg-white px-4 py-3 text-sm font-black text-orange-900 disabled:opacity-60">Save donation setting</button>
             </div>
             <div className="mt-5 rounded-2xl bg-white/15 p-4">
               <p className="font-black">Owned Lunch Loop limit</p>

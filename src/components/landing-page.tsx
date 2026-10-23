@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { OperatorCredit, QuietDonationLink } from "./quiet-donation-link";
 
 const loopSteps = [
   {
@@ -180,6 +181,8 @@ export function LandingPage() {
 
       <footer className="border-t border-orange-100 px-4 py-8 text-center text-xs leading-5 text-stone-500">
         <p>© Craig Kohler · Lunch Loop · Private crews for real-life friends</p>
+        <OperatorCredit />
+        <QuietDonationLink />
         <p className="mt-1">
           <a
             href="https://craigkohler.com"

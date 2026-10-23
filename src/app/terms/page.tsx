@@ -4,6 +4,15 @@ import { LegalPage, LegalSection } from "@/components/legal-page";
 export const metadata: Metadata = {
   title: "Terms of Use | Lunch Loop",
   description: "The terms that govern use of Lunch Loop.",
+  openGraph: {
+    title: "Terms of Use | Lunch Loop",
+    description: "The terms that govern use of Lunch Loop.",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Terms of Use | Lunch Loop",
+    description: "The terms that govern use of Lunch Loop.",
+  },
 };
 
 const updated = "October 23, 2026";

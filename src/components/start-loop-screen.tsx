@@ -84,7 +84,7 @@ export function StartLoopScreen() {
         <h1 className="mt-1 text-3xl font-black">Build your Lunch Loop</h1>
         <p className="mt-2 max-w-2xl text-stone-600">Choose its rhythm and home area, then invite up to five friends to share the restaurant list, picks, and vetoes.</p>
         {loading ? <p className="mt-6 text-sm font-semibold text-stone-500">Checking your secure sign-in…</p> : !signedIn ? (
-          <Link href={`/sign-in?next=${encodeURIComponent(currentPath)}`} className="mt-6 inline-flex rounded-xl bg-orange-500 px-5 py-3 text-sm font-black text-white">Sign in to continue →</Link>
+          <Link href={`/sign-in?next=${encodeURIComponent(currentPath)}`} className="mt-6 inline-flex min-h-11 items-center rounded-xl bg-orange-500 px-5 py-3 text-sm font-black text-white">Sign in to continue →</Link>
         ) : started ? (
           <div className="mt-6 rounded-3xl bg-orange-50 p-5">
             <h2 className="text-xl font-black text-orange-950">Your loop is ready! 🍽️</h2>
@@ -94,15 +94,15 @@ export function StartLoopScreen() {
               <li><strong>Start the first {loopType === "occasion" ? "occasion" : "loop"}.</strong> Make the picks, set the time, and let the vetoes do their work.</li>
             </ol>
             {loopType === "occasion" && <p className="mt-4 rounded-2xl bg-white/70 p-3 text-sm leading-6 text-stone-700">✨ We also brought in a clean copy of places you added in your other Lunch Loops. Their past visits, vetoes, and never-again notes stay private to those original loops.</p>}
-            <Link href="/settings" className="mt-5 inline-flex rounded-xl bg-orange-500 px-5 py-3 text-sm font-black text-white">Set up my crew →</Link>
+            <Link href="/settings" className="mt-5 inline-flex min-h-11 items-center rounded-xl bg-orange-500 px-5 py-3 text-sm font-black text-white">Set up my crew →</Link>
           </div>
         ) : (
           <form onSubmit={start} className="mt-6 space-y-4">
             <label className="block text-sm font-black">Your name
-              <input required value={displayName} onChange={(event) => setDisplayName(event.target.value)} maxLength={50} placeholder="What your crew calls you" className="mt-2 w-full rounded-xl border border-orange-200 px-3 py-3 font-normal outline-none focus:ring-2 focus:ring-orange-300" />
+              <input required value={displayName} onChange={(event) => setDisplayName(event.target.value)} maxLength={50} placeholder="What your crew calls you" className="mt-2 w-full rounded-xl border border-orange-200 px-3 py-3 text-base font-normal outline-none focus:ring-2 focus:ring-orange-300" />
             </label>
             <label className="block text-sm font-black">Lunch Loop name
-              <input required value={groupName} onChange={(event) => setGroupName(event.target.value)} maxLength={80} placeholder="Example: Downtown Lunch Crew" className="mt-2 w-full rounded-xl border border-orange-200 px-3 py-3 font-normal outline-none focus:ring-2 focus:ring-orange-300" />
+              <input required value={groupName} onChange={(event) => setGroupName(event.target.value)} maxLength={80} placeholder="Example: Downtown Lunch Crew" className="mt-2 w-full rounded-xl border border-orange-200 px-3 py-3 text-base font-normal outline-none focus:ring-2 focus:ring-orange-300" />
             </label>
             <fieldset>
               <legend className="text-sm font-black">What kind of Lunch Loop is this?</legend>
@@ -127,7 +127,7 @@ export function StartLoopScreen() {
               <p className="mt-1 text-sm text-stone-600">Set the center and radius for the private restaurant database you’re about to create.</p>
               <div className="mt-3"><LoopAreaPicker value={homeArea} onChange={setHomeArea} disabled={busy} /></div>
             </div>
-            <button disabled={busy || !homeArea.label || homeArea.lat === null || homeArea.lng === null || !homeArea.timeZone} className="w-full rounded-xl bg-orange-500 px-5 py-3 text-sm font-black text-white disabled:opacity-60">{busy ? "Creating your Lunch Loop…" : "Create Lunch Loop →"}</button>
+            <button disabled={busy || !homeArea.label || homeArea.lat === null || homeArea.lng === null || !homeArea.timeZone} className="inline-flex min-h-11 w-full items-center justify-center rounded-xl bg-orange-500 px-5 py-3 text-sm font-black text-white disabled:opacity-60">{busy ? "Creating your Lunch Loop…" : "Create Lunch Loop →"}</button>
           </form>
         )}
         {error && <p role="alert" className="mt-4 rounded-xl bg-rose-50 p-3 text-sm font-bold text-rose-700">{error}</p>}
@@ -139,7 +139,7 @@ export function StartLoopScreen() {
         <p className="text-sm font-bold uppercase tracking-widest text-orange-600">You’re already set up</p>
         <h1 className="mt-1 text-3xl font-black">You already have a Lunch Loop</h1>
         <p className="mt-3 leading-6 text-stone-600">Use My Lunch Loops to switch crews or create another loop, up to your current {ownedLoopLimit}-loop owner limit.</p>
-        <Link href="/loops" className="mt-5 inline-flex rounded-xl bg-orange-500 px-5 py-3 text-sm font-black text-white">Go to My Lunch Loops →</Link>
+        <Link href="/loops" className="mt-5 inline-flex min-h-11 items-center rounded-xl bg-orange-500 px-5 py-3 text-sm font-black text-white">Go to My Lunch Loops →</Link>
       </div>
     </AppFrame>;
   }

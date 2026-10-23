@@ -4,6 +4,15 @@ import { LegalPage, LegalSection } from "@/components/legal-page";
 export const metadata: Metadata = {
   title: "Privacy Policy | Lunch Loop",
   description: "How Lunch Loop collects, uses, shares, and protects information.",
+  openGraph: {
+    title: "Privacy Policy | Lunch Loop",
+    description: "How Lunch Loop collects, uses, shares, and protects information.",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Privacy Policy | Lunch Loop",
+    description: "How Lunch Loop collects, uses, shares, and protects information.",
+  },
 };
 
 const updated = "October 23, 2026";

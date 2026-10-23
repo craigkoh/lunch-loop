@@ -57,9 +57,28 @@ export async function notifyCraig(
   return sendLunchLoopEmail({
     to,
     subject: `Lunch Loop · ${subject}`,
-    html: `<main style="font-family:Arial,sans-serif;color:#292524;line-height:1.5"><h1 style="color:#ea580c">Lunch Loop</h1><p>${safeDetails}</p><p><a href="https://lunchloop.app/global-admin">Open Global Admin</a></p></main>`,
+    html: lunchLoopEmailDocument({
+      heading: "Lunch Loop",
+      bodyHtml: `<p style="margin:0">${safeDetails}</p>`,
+      button: { href: "https://lunchloop.app/global-admin", label: "Open Global Admin" },
+    }),
     text: `${details}\n\nOpen Global Admin: https://lunchloop.app/global-admin`,
   });
+}
+
+/**
+ * Shared HTML shell for Lunch Loop mail. Pass already-escaped body HTML.
+ * Button href must be escaped or a trusted literal.
+ */
+export function lunchLoopEmailDocument(parts: {
+  heading: string;
+  bodyHtml: string;
+  button?: { href: string; label: string };
+}) {
+  const button = parts.button
+    ? `<p style="margin:24px 0 0"><a href="${parts.button.href}" style="display:inline-block;background:#f97316;color:#ffffff;padding:12px 18px;border-radius:12px;font-weight:800;font-size:16px;line-height:20px;text-decoration:none">${parts.button.label}</a></p>`
+    : "";
+  return `<!DOCTYPE html><html lang="en"><body style="margin:0;padding:24px;background:#fff7ed"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;margin:0 auto;background:#ffffff;border:1px solid #ffedd5;border-radius:16px"><tr><td style="padding:28px 28px 0;font-family:Arial,Helvetica,sans-serif"><p style="margin:0;font-size:12px;font-weight:800;letter-spacing:0.16em;color:#9a3412">LUNCH LOOP</p><h1 style="margin:8px 0 0;font-size:24px;line-height:1.25;color:#7c2d12">${parts.heading}</h1></td></tr><tr><td style="padding:16px 28px 28px;font-family:Arial,Helvetica,sans-serif;color:#292524;font-size:16px;line-height:1.5">${parts.bodyHtml}${button}</td></tr></table></body></html>`;
 }
 
 export function escapeHtml(value: string) {

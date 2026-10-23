@@ -28,7 +28,7 @@ export function LegalPage({
           </Link>
           <Link
             href="/"
-            className="rounded-xl bg-white px-3 py-2 text-sm font-black text-stone-700 shadow-sm ring-1 ring-orange-100"
+            className="inline-flex min-h-11 items-center rounded-xl bg-white px-3 text-sm font-black text-stone-700 shadow-sm ring-1 ring-orange-100"
           >
             Back to Lunch Loop
           </Link>
@@ -50,7 +50,7 @@ export function LegalPage({
         <p>© Craig Kohler · Lunch Loop</p>
         <OperatorCredit />
         <FuelTheLoopLink />
-        <p className="mt-2 flex justify-center gap-3">
+        <p className="mt-2 flex flex-wrap justify-center gap-x-3 gap-y-1">
           <Link className="font-bold text-orange-700 underline" href="/privacy">
             Privacy Policy
           </Link>

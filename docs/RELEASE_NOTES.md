@@ -1,5 +1,19 @@
 # Release Notes
 
+## Build 2026.10.23.64
+
+The thank-you after a finished pick sits with the result, and shared links
+preview as Lunch Loop.
+
+- On a tablet or desktop, the receipt, one-liner, or tip jar is a right-hand
+  column beside the restaurant and the close actions. On a phone it stays
+  stacked under the result, without a wide empty margin.
+- If support is off, that column is not reserved.
+- Invite links, sign-in, and the public pages carry a title, description, and
+  share image so a friend’s preview is Lunch Loop.
+- The brand guide is [docs/DESIGN.md](DESIGN.md). Logo concepts are in
+  docs/brand/. The live icon is unchanged.
+
 ## Build 2026.10.23.63
 
 A finished lunch can leave a small thank-you under the result. It might be a

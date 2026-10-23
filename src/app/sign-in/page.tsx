@@ -147,7 +147,7 @@ function SignInScreen() {
               type="button"
               disabled={busy !== null || cooldownLeft > 0}
               onClick={() => void sendMagicLink()}
-              className="mt-4 w-full rounded-xl bg-orange-500 py-3 text-sm font-black text-white disabled:opacity-60"
+              className="mt-4 inline-flex min-h-11 w-full items-center justify-center rounded-xl bg-orange-500 py-3 text-sm font-black text-white disabled:opacity-60"
             >
               {cooldownLeft > 0
                 ? `Resend in ${Math.ceil(cooldownLeft / 1000)}s`
@@ -175,13 +175,13 @@ function SignInScreen() {
                 value={email}
                 onChange={(event) => setEmail(event.target.value)}
                 placeholder="you@example.com"
-                className="mt-2 w-full rounded-xl border border-orange-200 px-3 py-3 font-normal outline-none focus:ring-2 focus:ring-orange-300"
+                className="mt-2 w-full rounded-xl border border-orange-200 px-3 py-3 text-base font-normal outline-none focus:ring-2 focus:ring-orange-300"
               />
             </label>
             <button
               type="submit"
               disabled={busy !== null}
-              className="mt-3 w-full rounded-xl bg-orange-500 py-3 text-sm font-black text-white disabled:opacity-60"
+              className="mt-3 inline-flex min-h-11 w-full items-center justify-center rounded-xl bg-orange-500 py-3 text-sm font-black text-white disabled:opacity-60"
             >
               {busy === "email" ? "Sending…" : "Email me a sign-in link"}
             </button>
@@ -196,7 +196,7 @@ function SignInScreen() {
           type="button"
           disabled={busy !== null}
           onClick={() => void signInWithGoogle()}
-          className="w-full rounded-xl border border-stone-200 py-3 text-sm font-black shadow-sm disabled:opacity-60"
+          className="inline-flex min-h-11 w-full items-center justify-center rounded-xl border border-stone-200 py-3 text-sm font-black shadow-sm disabled:opacity-60"
         >
           {busy === "google" ? "Opening Google…" : "Continue with Google"}
         </button>

@@ -4,6 +4,15 @@ import { LegalPage, LegalSection } from "@/components/legal-page";
 export const metadata: Metadata = {
   title: "What’s New | Lunch Loop",
   description: "Build-by-build Lunch Loop release notes.",
+  openGraph: {
+    title: "What’s New | Lunch Loop",
+    description: "Build-by-build Lunch Loop release notes.",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "What’s New | Lunch Loop",
+    description: "Build-by-build Lunch Loop release notes.",
+  },
 };
 
 type ReleaseChange = string | { text: string; credit?: string };
@@ -16,6 +25,13 @@ function changeText(change: ReleaseChange) {
 }
 
 const releases: { build: string; changes: ReleaseChange[] }[] = [
+  {
+    build: "2026.10.23.64",
+    changes: [
+      "On a wider screen, the thank-you sits beside the lunch result. On a phone it stays tucked under the pick.",
+      "Invite links now show a Lunch Loop preview when a friend shares them.",
+    ],
+  },
   {
     build: "2026.10.23.63",
     changes: [

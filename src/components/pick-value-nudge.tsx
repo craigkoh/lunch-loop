@@ -84,7 +84,7 @@ export function PickNudgeView({
   if (style === "jar") return <TipJarNote onDismiss={onDismiss} />;
   const line = oneLiners[variant % oneLiners.length];
   return (
-    <div className="mx-auto mt-4 flex w-full max-w-xl flex-wrap items-center justify-between gap-x-3 gap-y-1 rounded-2xl bg-white px-3 py-2 text-sm leading-5 text-stone-800 shadow-sm">
+    <div className="flex w-full flex-wrap items-center justify-between gap-x-3 gap-y-1 rounded-2xl bg-white px-3 py-2 text-sm leading-5 text-stone-800 shadow-sm">
       <p className="min-w-0 flex-1">
         {line.before}
         <Link href="/support" className="font-black text-orange-800 underline decoration-orange-400 underline-offset-2">
@@ -108,23 +108,23 @@ function LunchReceipt({
 }) {
   const lines = receiptLines(facts, variant);
   return (
-    <section className="lunch-receipt-sheet mx-auto mt-4 w-full max-w-sm" aria-label="Value for value">
-      <div className="lunch-receipt px-4 pb-3 pt-4 text-center">
+    <section className="lunch-receipt-sheet w-full" aria-label="Value for value">
+      <div className="lunch-receipt px-3 pb-2 pt-3 text-center">
         <p className="text-sm font-black tracking-[0.22em]" style={{ color: "var(--receipt-accent)" }}>
           LUNCH LOOP
         </p>
         <p className="mt-1 text-xs leading-5 [overflow-wrap:anywhere]" style={{ color: "var(--receipt-muted)" }}>
           {facts.loopName} · {facts.pickedOn}
         </p>
-        <div className="my-3 border-t border-dashed" style={{ borderColor: "var(--receipt-rule)" }} />
+        <div className="my-2 border-t border-dashed" style={{ borderColor: "var(--receipt-rule)" }} />
         <p className="text-[11px] font-bold tracking-[0.16em]" style={{ color: "var(--receipt-ink)" }}>
           TODAY&apos;S PICK
         </p>
         <p className="mt-1 text-lg font-black leading-6 [overflow-wrap:anywhere]" style={{ color: "var(--receipt-accent)" }}>
           {facts.restaurantName}
         </p>
-        <div className="my-3 border-t border-dashed" style={{ borderColor: "var(--receipt-rule)" }} />
-        <ul className="space-y-1.5 text-left text-[13px] leading-5">
+        <div className="my-2 border-t border-dashed" style={{ borderColor: "var(--receipt-rule)" }} />
+        <ul className="space-y-1 text-left text-[13px] leading-5">
           {lines.map((line) => (
             <li key={line.label} className="flex items-baseline justify-between gap-3">
               <span className="min-w-0 [overflow-wrap:anywhere]">{line.label}</span>
@@ -134,7 +134,7 @@ function LunchReceipt({
             </li>
           ))}
         </ul>
-        <div className="my-3 border-t border-dashed" style={{ borderColor: "var(--receipt-rule)" }} />
+        <div className="my-2 border-t border-dashed" style={{ borderColor: "var(--receipt-rule)" }} />
         <div className="flex items-baseline justify-between gap-3 text-sm font-bold">
           <span>DECISION FEE</span>
           <span className="tabular-nums">$0.00</span>
@@ -145,7 +145,7 @@ function LunchReceipt({
         </div>
         <Link
           href="/support"
-          className="lunch-receipt-button mt-4 inline-flex min-h-11 w-full items-center justify-center rounded-full px-4 py-2.5 text-sm font-black"
+          className="lunch-receipt-button mt-3 inline-flex min-h-11 w-full items-center justify-center rounded-full px-4 py-2.5 text-sm font-black"
         >
           Fuel the loop
         </Link>
@@ -161,7 +161,7 @@ function LunchReceipt({
 
 function TipJarNote({ onDismiss }: { onDismiss: () => void }) {
   return (
-    <div className="mx-auto mt-4 flex w-full max-w-xl items-center gap-3 rounded-2xl bg-white px-3 py-2 text-sm text-stone-800 shadow-sm">
+    <div className="flex w-full items-center gap-3 rounded-2xl bg-white px-3 py-2 text-sm text-stone-800 shadow-sm">
       <TipJarIcon />
       <p className="min-w-0 flex-1">
         <Link href="/support" className="font-black text-orange-800 underline decoration-orange-400 underline-offset-2">

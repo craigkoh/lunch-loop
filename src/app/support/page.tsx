@@ -7,6 +7,15 @@ import { getDonationsEnabled } from "@/lib/supabase/server";
 export const metadata: Metadata = {
   title: "Value for Value | Lunch Loop",
   description: "Lunch Loop is free. If it helped your crew decide lunch, you can send some value back.",
+  openGraph: {
+    title: "Value for Value | Lunch Loop",
+    description: "Lunch Loop is free. If it helped your crew decide lunch, you can send some value back.",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Value for Value | Lunch Loop",
+    description: "Lunch Loop is free. If it helped your crew decide lunch, you can send some value back.",
+  },
 };
 
 export const dynamic = "force-dynamic";
@@ -21,7 +30,7 @@ export default async function SupportPage() {
             <span className="grid size-10 place-items-center rounded-2xl bg-orange-500 text-xl shadow-sm">🍽️</span>
             <span>Lunch Loop</span>
           </Link>
-          <Link href="/" className="rounded-xl bg-white px-3 py-2 text-sm font-black text-stone-700 shadow-sm ring-1 ring-orange-100">
+          <Link href="/" className="inline-flex min-h-11 items-center rounded-xl bg-white px-3 text-sm font-black text-stone-700 shadow-sm ring-1 ring-orange-100">
             Back to Lunch Loop
           </Link>
         </div>

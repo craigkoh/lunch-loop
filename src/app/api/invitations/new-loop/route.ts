@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { apiError, appOrigin, jsonNoStore, requireSameOrigin } from "@/lib/api";
-import { escapeHtml, sendLunchLoopEmail } from "@/lib/email";
+import { escapeHtml, lunchLoopEmailDocument, sendLunchLoopEmail } from "@/lib/email";
 import { requireAuthenticatedSupabase } from "@/lib/supabase/server";
 
 const bodySchema = z.object({
@@ -26,7 +26,11 @@ export async function POST(request: Request) {
     const delivery = await sendLunchLoopEmail({
       to: body.email,
       subject: "Start your own Lunch Loop",
-      html: `<main style="font-family:Arial,sans-serif;color:#292524;line-height:1.5"><h1 style="color:#ea580c">🍽️ Build a new Lunch Loop</h1><p>Set up a Lunch Loop for another crew. Pick a name, invite friends, add places, and let the lunch decisions begin.</p><p><a href="${safeInviteUrl}" style="display:inline-block;background:#f97316;color:white;padding:12px 18px;border-radius:10px;font-weight:700;text-decoration:none">Build a Lunch Loop</a></p><p>This invitation is for ${escapeHtml(body.email)} and expires in 14 days.</p></main>`,
+      html: lunchLoopEmailDocument({
+        heading: "Build a new Lunch Loop",
+        bodyHtml: `<p style="margin:0 0 12px">Set up a Lunch Loop for another crew. Pick a name, invite friends, add places, and let the lunch decisions begin.</p><p style="margin:0">This invitation is for ${escapeHtml(body.email)} and expires in 14 days.</p>`,
+        button: { href: safeInviteUrl, label: "Build a Lunch Loop" },
+      }),
       text: `Build a new Lunch Loop: ${inviteUrl.toString()}\n\nThis invitation is for ${body.email} and expires in 14 days.`,
     });
     return jsonNoStore({ inviteUrl: inviteUrl.toString(), expiresAt: invite.expires_at, emailSent: delivery.sent });

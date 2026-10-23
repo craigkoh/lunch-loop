@@ -1539,60 +1539,72 @@ export function HomeScreen() {
     );
   }
 
+  const chosen = current?.status === "chosen";
+
   if (needsInvite) return <NoLoopWelcome />;
 
   return (
     <AppFrame>
-      <section className="relative overflow-hidden rounded-3xl bg-orange-500 p-6 text-white shadow-lg shadow-orange-200">
-        <div className="absolute -right-8 -top-6 text-9xl opacity-20">🍟</div>
-        <div className="relative">
-          <p className="text-sm font-bold uppercase tracking-widest text-orange-100">
-            {heroEyebrow}
-          </p>
-          <h1 className="mt-1 max-w-3xl text-3xl font-black tracking-tight">
-            {heroTitle}
-          </h1>
-          <p className="mt-3 max-w-2xl text-orange-50">{heroCopy}</p>
-          {heroAction}
-          {renderRoundProgress()}
-          {current?.status === "chosen" ? (
-            <div className="mt-5 grid items-start gap-4 lg:grid-cols-2">
-              {renderScheduleEditor()}
-              {renderCloseLoopPanel()}
+      <section
+        className={`relative overflow-hidden rounded-3xl bg-orange-500 text-white shadow-lg shadow-orange-200 ${chosen ? "p-4 sm:p-6" : "p-6"}`}
+      >
+        {chosen ? null : (
+          <div className="absolute -right-8 -top-6 text-9xl opacity-20">🍟</div>
+        )}
+        <div className={chosen ? "pick-layout relative" : "relative"}>
+          <div className={chosen ? "pick-main min-w-0" : undefined}>
+            <p className="text-sm font-bold uppercase tracking-widest text-orange-100">
+              {heroEyebrow}
+            </p>
+            <h1 className="mt-1 max-w-3xl break-words text-3xl font-black tracking-tight [overflow-wrap:anywhere]">
+              {heroTitle}
+            </h1>
+            <p className="mt-3 max-w-2xl text-orange-50">{heroCopy}</p>
+            {heroAction}
+          </div>
+          {chosen && context?.userId && current?.id ? (
+            <div className="pick-nudge min-w-0">
+              <PickValueNudge
+                userId={context.userId}
+                sessionId={current.id}
+                facts={{
+                  loopName: context.groupName,
+                  restaurantName: winner?.name ?? "Today's pick",
+                  pickedOn: receiptDate(current.scheduled_for, timeZone),
+                  memberCount,
+                  closedLunchCount: completedCount,
+                  vetoCount: vetoes.length,
+                }}
+              />
             </div>
-          ) : current ? (
-            <div className="mt-5">{renderScheduleEditor()}</div>
           ) : null}
-          {current?.status === "chosen" && context?.userId && current.id ? (
-            <PickValueNudge
-              userId={context.userId}
-              sessionId={current.id}
-              facts={{
-                loopName: context.groupName,
-                restaurantName: winner?.name ?? "Today's pick",
-                pickedOn: receiptDate(current.scheduled_for, timeZone),
-                memberCount,
-                closedLunchCount: completedCount,
-                vetoCount: vetoes.length,
-              }}
-            />
-          ) : null}
-          {message && (
-            <p
-              role="status"
-              className="mt-4 rounded-xl bg-emerald-50 px-3 py-2 text-sm font-bold text-emerald-900"
-            >
-              {message}
-            </p>
-          )}
-          {error && context && (
-            <p
-              role="alert"
-              className="mt-4 rounded-xl bg-rose-50 px-3 py-2 text-sm font-bold text-rose-800"
-            >
-              {error}
-            </p>
-          )}
+          <div className={chosen ? "pick-actions min-w-0" : undefined}>
+            {renderRoundProgress()}
+            {chosen ? (
+              <div className="grid items-start gap-4 lg:grid-cols-2">
+                {renderScheduleEditor()}
+                {renderCloseLoopPanel()}
+              </div>
+            ) : current ? (
+              <div className="mt-5">{renderScheduleEditor()}</div>
+            ) : null}
+            {message && (
+              <p
+                role="status"
+                className="mt-4 rounded-xl bg-emerald-50 px-3 py-2 text-sm font-bold text-emerald-900"
+              >
+                {message}
+              </p>
+            )}
+            {error && context && (
+              <p
+                role="alert"
+                className="mt-4 rounded-xl bg-rose-50 px-3 py-2 text-sm font-bold text-rose-800"
+              >
+                {error}
+              </p>
+            )}
+          </div>
         </div>
       </section>
       {loading ? (

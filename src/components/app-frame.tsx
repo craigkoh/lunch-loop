@@ -297,7 +297,7 @@ export function AppFrame({ children }: { children: ReactNode }) {
             craigkohler.com
           </a>
         </p>
-        <p className="mt-1 flex justify-center gap-3">
+        <p className="mt-1 flex flex-wrap justify-center gap-x-3 gap-y-1">
           <Link href="/privacy" className="font-bold text-orange-700 underline">
             Privacy Policy
           </Link>

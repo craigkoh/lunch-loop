@@ -35,7 +35,7 @@ export function LandingPage() {
         <div className="flex items-center gap-2">
           <Link
             href="/sign-in"
-            className="rounded-xl bg-orange-500 px-3 py-2 text-sm font-black text-white shadow-sm transition hover:bg-orange-600"
+            className="inline-flex min-h-11 items-center rounded-xl bg-orange-500 px-4 text-sm font-black text-white shadow-sm transition hover:bg-orange-600"
           >
             Sign in
           </Link>
@@ -63,7 +63,7 @@ export function LandingPage() {
           <div className="mt-7 flex flex-col gap-3 sm:flex-row">
             <Link
               href="/start"
-              className="inline-flex items-center justify-center rounded-2xl bg-orange-500 px-5 py-3.5 text-sm font-black text-white shadow-lg shadow-orange-200 transition hover:-translate-y-0.5 hover:bg-orange-600"
+              className="inline-flex min-h-11 items-center justify-center rounded-xl bg-orange-500 px-5 py-3 text-sm font-black text-white shadow-lg shadow-orange-200 transition hover:bg-orange-600"
             >
               Create your Lunch Loop <span className="ml-2 text-lg">→</span>
             </Link>
@@ -166,7 +166,7 @@ export function LandingPage() {
           </p>
           <Link
             href="/install"
-            className="mt-5 inline-flex rounded-xl bg-orange-500 px-4 py-3 text-sm font-black text-white transition hover:bg-orange-600"
+            className="mt-5 inline-flex min-h-11 items-center rounded-xl bg-orange-500 px-4 py-3 text-sm font-black text-white transition hover:bg-orange-600"
           >
             See the 30-second install guide →
           </Link>
@@ -193,7 +193,7 @@ export function LandingPage() {
             craigkohler.com
           </a>
         </p>
-        <p className="mt-2 flex justify-center gap-3">
+        <p className="mt-2 flex flex-wrap justify-center gap-x-3 gap-y-1">
           <Link href="/whats-new" className="font-bold text-orange-700 underline">
             What&apos;s New
           </Link>

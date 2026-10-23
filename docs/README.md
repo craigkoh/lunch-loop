@@ -1,6 +1,6 @@
 # Lunch Loop documentation
 
-Current release: version 0.1.0, build 2026.10.23.63. Production is
+Current release: version 0.1.0, build 2026.10.23.64. Production is
 [lunchloop.app](https://lunchloop.app). This build reaches the live site when
 the documented production deploy runs.
 
@@ -11,6 +11,7 @@ truth.
 | Read this | When you need to |
 | --- | --- |
 | [Product and User Guide](PRODUCT.md) | Understand the product, member workflow, roles, limits, and data boundaries. |
+| [Design](DESIGN.md) | Brand, color, type, components, voice, and the logo concepts Craig is choosing from. |
 | [Development and Deployment](DEVELOPMENT.md) | Run locally, add a migration, test, back up, or deploy safely. |
 | [Operations and Security](OPERATIONS.md) | Administer production, recover from an incident, or review protections. |
 | [Integrations](INTEGRATIONS.md) | Configure Supabase sign-in (Google or email magic link), Places, Resend, email forwarding, Discord, feedback alerts, or the Stripe donation link. |

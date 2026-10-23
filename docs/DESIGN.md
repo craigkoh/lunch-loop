@@ -68,10 +68,15 @@ The tile is orange `#F97316` with a 112px corner radius on the 512 canvas
 (about 22%). The plate is cream `#FFF7ED`. The rim, arrow, fork, and knife
 are `#9A3412`.
 
-Hidden meaning: the rim is the loop. It is not a closed ring. The stroke
-stops, a gap of plate shows, and an arrowhead continues around. You sit down,
-decide, close the loop, and come around again. The fork and knife stay in the
+Hidden meaning: the rim is the loop. The rim and arrowhead are one solid,
+connected piece (no gap). The head sits at 3 o'clock pointing down, so the
+loop reads clockwise. You sit down, decide, close the loop, and come around
+again. The fork and the table knife (solid blade, separate handle) stay in the
 middle so it is still a plate.
+
+Rules learned from Craig (2026-10-23): the head must touch the rim, never
+float beside it; put the head where the eye lands (3 o'clock); the knife must
+read as a knife at 32px.
 
 The first drawing of this arrow was too thin. The head was about as wide as
 the stroke, and it disappeared into the rim. The live head is a filled

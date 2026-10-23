@@ -28,6 +28,12 @@ function changeText(change: ReleaseChange) {
 
 const releases: { build: string; changes: ReleaseChange[] }[] = [
   {
+    build: "2026.10.23.66",
+    changes: [
+      "A cleaner app icon: the arrow is now one solid loop around the plate, and the knife looks like a knife. Re-add Lunch Loop to your home screen to see the new icon there.",
+    ],
+  },
+  {
     build: "2026.10.23.65",
     changes: [
       "The app icon is now a plate with an arrow in the rim: the loop you come back to.",

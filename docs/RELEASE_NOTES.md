@@ -1,5 +1,17 @@
 # Release Notes
 
+## Build 2026.10.23.66
+
+Plate Loop redraw, per Craig's feedback.
+
+- The rim and arrowhead are one solid piece, with no gap. The head sits at
+  3 o'clock, pointing down (clockwise).
+- The knife is now a clear table knife: a solid blade with a separate handle.
+  The fork is redrawn to match.
+- Updated everywhere: favicon (SVG and ICO), app icon, phone home-screen icon
+  (Apple touch icon and manifest), header, share image, README hero, and
+  docs/brand/. The build bump also refreshes cached icons.
+
 ## Build 2026.10.23.65
 
 The live icon is Plate Loop. The rim of the plate is an arrow.

@@ -44,6 +44,7 @@ rate limits and a hosted bot challenge.
   synchronized with current filters/details.
 - Office/team administration after the core friend experience is proven.
 - A native iPhone wrapper only if the PWA has a real user-facing limitation.
+- Show real site stats (e.g. lunches decided) on /support and receipts once usage grows, as V4V proof.
 
 ## Backlog
 
@@ -52,11 +53,12 @@ rate limits and a hosted bot challenge.
 ## Respectful monetization
 
 Never bias restaurant selection. The first step is live: a public Value for
-Value page, a small “Fuel the loop” footer link, and a low-frequency line
-under a finished pick, with a clear “Not now” and no feature pressure. A new
-database keeps `donations_enabled` off until a site admin turns it on.
-Production follows that same switch. A donation does not change restaurant
-selection or unlock anything.
+Value page, a small “Fuel the loop” footer link, and a note on every finished
+pick. The note is a paper receipt about half the time, and otherwise a
+one-liner or a tip jar, never the same style twice in a row. “Not now” hides
+it for that pick. There is no pop-up. A new database keeps `donations_enabled`
+off until a site admin turns it on. Production follows that same switch. A
+donation does not change restaurant selection or unlock anything.
 
 Possible later options: group supporter plan, gifting, or optional post-choice
 actions such as reservations, order-ahead, calendar, or directions—with clear

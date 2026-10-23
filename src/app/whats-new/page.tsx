@@ -17,10 +17,10 @@ function changeText(change: ReleaseChange) {
 
 const releases: { build: string; changes: ReleaseChange[] }[] = [
   {
-    build: "2026.10.23.62",
+    build: "2026.10.23.63",
     changes: [
-      "After a lunch is picked, a short line can appear under the result: if Lunch Loop gave you value, you can send some back. It shows about one pick in three, stays quiet for a few days, and can be dismissed.",
-      "A Value for Value page explains why Lunch Loop is free, and the footer can offer Fuel the loop. Both stay hidden while support is turned off.",
+      "A finished lunch can show a paper receipt, a one-line thank-you, or a tip jar. Not now hides it for that pick, and all three stay hidden while support is turned off.",
+      "The Value for Value page says a couple of bucks is plenty. The loop stays free either way.",
     ],
   },
   {

@@ -83,7 +83,7 @@ function SupportOpen() {
       <section>
         <h2 className="text-xl font-black text-orange-950">If you got value, return value</h2>
         <p className="mt-2 text-base leading-7 text-stone-700">
-          There are no ads, no paid restaurant placement, and no paywall. Everything in Lunch Loop stays free. Value for value means you give what it was worth to you. If a decision saved the group chat, send some of that value back. If it wasn&apos;t worth anything, you don&apos;t owe anything.
+          There are no ads, no paid restaurant placement, and no paywall. Everything in Lunch Loop stays free. Value for value means you give what it was worth to you. A couple of bucks is plenty. If it wasn&apos;t worth anything, you don&apos;t owe anything.
         </p>
         <a
           href={donationUrl}

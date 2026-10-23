@@ -204,10 +204,11 @@ local date/time, and decision events are copied to the selected Discord channel.
 The optional donation is a public Stripe Payment Link. It is not a secret.
 Lunch Loop shows it only on `/support`, and only while `donations_enabled` is
 true. A new database leaves that switch off. The footer “Fuel the loop” link
-and the line under a finished pick follow the same switch and go to `/support`
-rather than straight to Stripe. Do not send a test payment. Stripe hosts the
-payment page. Lunch Loop does not receive the card number, and a donation does
-not change restaurant selection. Donations are not tax-deductible.
+and the note under a finished pick (a receipt, a one-liner, or a tip jar)
+follow the same switch and go to `/support` rather than straight to Stripe.
+Do not send a test payment. Stripe hosts the payment page. Lunch Loop does not
+receive the card number, and a donation does not change restaurant selection.
+Donations are not tax-deductible.
 
 ## PWA and hosting
 

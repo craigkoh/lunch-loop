@@ -51,7 +51,7 @@ export default function PrivacyPage() {
       </LegalSection>
 
       <LegalSection title="4. Cookies and browser storage">
-        <p>Lunch Loop uses essential first-party authentication cookies from Supabase to keep you signed in and protect your session. We use ordinary browser caching for application files so the web app can load efficiently. This browser can also remember, only on this device, whether the optional value line under a finished pick was shown or dismissed. We do not use advertising cookies, cross-site tracking cookies, or third-party analytics trackers.</p>
+        <p>Lunch Loop uses essential first-party authentication cookies from Supabase to keep you signed in and protect your session. We use ordinary browser caching for application files so the web app can load efficiently. This browser can also remember, only on this device, which optional support note was shown for a finished pick and whether you dismissed it. We do not use advertising cookies, cross-site tracking cookies, or third-party analytics trackers.</p>
       </LegalSection>
 
       <LegalSection title="5. How we use information">

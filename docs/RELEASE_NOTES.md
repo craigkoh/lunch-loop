@@ -1,20 +1,20 @@
 # Release Notes
 
-## Build 2026.10.23.62
+## Build 2026.10.23.63
 
-After a lunch is picked, a short line can sit under the result. If Lunch Loop
-gave you value, you can send some back. It is easy to ignore.
+A finished lunch can leave a small thank-you under the result. It might be a
+paper receipt, a one-line note, or a tip jar. You can ignore it.
 
-- The line appears about one pick in three, then stays quiet for three days
-  for that person. The same pick can keep showing it until you choose “Not
-  now.” It never covers the result, and it does not change which restaurant
-  is chosen.
-- A public Value for Value page at `/support` tells the short story of Lunch
-  Loop, what it costs to keep running, and that everything stays free: no ads,
-  no paid restaurant placement, and no paywall. A button opens Stripe in a new
-  tab. Donations are not tax-deductible.
-- The footer can show a small “Fuel the loop” link to that page.
-- `donations_enabled` still controls all of it. Off means no line, no footer
+- Every finished pick shows one of those notes while support is on. About half
+  are receipts. The same style does not show twice in a row. “Not now” hides
+  it for that pick. It sits after the restaurant card and the close actions,
+  and it never covers them.
+- The receipt is a lunch slip: the loop, the date, today’s pick, real counts
+  for the crew, closed lunches, and vetoes, plus ads and paid placements at
+  zero. A joke line is marked VOID instead of a made-up number. Decision fee
+  is $0.00. Fuel the loop opens the Value for Value page.
+- The page says a couple of bucks is plenty. Donations are not tax-deductible.
+- `donations_enabled` still controls all of it. Off means no note, no footer
   link, and `/support` says support isn’t open. A new database still starts
   with the switch off.
 

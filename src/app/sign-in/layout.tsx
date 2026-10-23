@@ -11,11 +11,13 @@ export const metadata: Metadata = {
   openGraph: {
     title: signInTitle,
     description: signInDescription,
+    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Lunch Loop — the fun lunch loop for 2–6 friends" }],
   },
   twitter: {
     card: "summary_large_image",
     title: signInTitle,
     description: signInDescription,
+    images: ["/twitter-image"],
   },
 };
 

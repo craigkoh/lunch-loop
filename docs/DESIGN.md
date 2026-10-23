@@ -528,8 +528,9 @@ host, and not the name of the crew.
 - `/start` title: “Build a Lunch Loop”.
 - Sign-in metadata lives in `src/app/sign-in/layout.tsx` because the page is
   a client component and cannot export `metadata`.
-- Public pages set their own `openGraph.title`. Otherwise they inherit the
-  homepage title. There is no title template, on purpose.
+- Public pages set their own `openGraph.title` and repeat the share image.
+  A page that sets `openGraph` without `images` drops the picture. There is
+  no title template, on purpose.
 
 Favicon links are cache-busted with `?v=` plus the build number.
 

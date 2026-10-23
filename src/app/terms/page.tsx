@@ -7,11 +7,13 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Terms of Use | Lunch Loop",
     description: "The terms that govern use of Lunch Loop.",
+    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Lunch Loop — the fun lunch loop for 2–6 friends" }],
   },
   twitter: {
     card: "summary_large_image",
     title: "Terms of Use | Lunch Loop",
     description: "The terms that govern use of Lunch Loop.",
+    images: ["/twitter-image"],
   },
 };
 

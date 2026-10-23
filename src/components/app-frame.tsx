@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { FeedbackBugLink } from "./feedback-bug-link";
+import { BrandMark } from "./brand-mark";
 import { FuelTheLoopLink, OperatorCredit } from "./quiet-donation-link";
 import { appInfo } from "@/lib/app-info";
 import { dismissFeedbackPrompt, feedbackPromptOpenFor } from "@/lib/feedback-prompt";
@@ -135,9 +136,7 @@ export function AppFrame({ children }: { children: ReactNode }) {
             href="/"
             className="flex items-center gap-2 font-black tracking-tight text-orange-950"
           >
-            <span className="grid size-9 place-items-center rounded-xl bg-orange-500 text-xl shadow-sm">
-              🍽️
-            </span>
+            <BrandMark className="size-9" />
             <span>Lunch Loop</span>
           </Link>
           <div className="ml-auto flex items-center gap-2">

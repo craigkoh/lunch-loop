@@ -8,9 +8,9 @@ Update this file in the same change as a visual or copy change. Add a dated
 line under [Changelog / open questions](#changelog--open-questions). Do not
 treat the guide as frozen.
 
-Current live icon: `public/favicon.svg`, plus `src/app/icon.png`,
-`src/app/apple-icon.png`, and `src/app/favicon.ico`. **Do not replace it**
-until Craig picks a concept from [Logo](#logo).
+Current live icon: Plate Loop. Source is `public/favicon.svg`, plus
+`src/app/icon.png`, `src/app/apple-icon.png`, and `src/app/favicon.ico`.
+See [Logo](#logo).
 
 ## How to use this
 
@@ -49,52 +49,69 @@ the group chat, and will not guilt you about the bill.
 
 ## Logo
 
-### Live mark
+### Live mark — Plate Loop
 
-The shipping icon is a cream plate on orange `#F97316`, with a fork and knife
-in `#9A3412` and a peach inner ring `#FED7AA`. The tile uses a 112px corner
-radius on a 512px canvas (the same proportion as `rounded-[22%]`). It is the
-favicon, the Apple touch icon, the README hero, and the share image.
-
-It is recognizable at 16px. It does not yet carry a hidden meaning. That is
-the open question below. Leave the live files alone until Craig chooses.
-
-### Concepts
-
-Three studies live in `docs/brand/`. Each is a 512×512 SVG in the same flat
-colors as the live icon, so any of them can replace it without a new palette.
-PNG previews sit beside the SVGs. None of them is in production.
-
-#### 1. Plate Loop — recommended
+Craig picked Plate Loop. The live files are `public/favicon.svg`,
+`src/app/icon.png` (512), `src/app/apple-icon.png` (180), `src/app/favicon.ico`,
+the README hero (`public/readme-hero.svg`), and the header via `BrandMark`.
+The share image reads `src/app/icon.png`, so it follows this mark. Email is
+wordmark only and does not embed the icon.
 
 ![Plate Loop](brand/logo-plate-loop.png)
 
-Files: `docs/brand/logo-plate-loop.svg`, `docs/brand/logo-plate-loop.png`.
+At 64px and 32px the arrow still has to read. These are the checks to keep:
 
-The plate rim is not a closed ring. It is a circular arrow: almost a full
-turn, with a gap and an arrowhead. The fork and knife stay in the middle, so
-anyone who already knows the app still sees a plate.
+![Plate Loop at 64px](brand/logo-plate-loop-64.png)
+![Plate Loop at 32px](brand/logo-plate-loop-32.png)
 
-Hidden meaning: the loop is the plate. You sit down, decide, close it, and
-come around again.
+The tile is orange `#F97316` with a 112px corner radius on the 512 canvas
+(about 22%). The plate is cream `#FFF7ED`. The rim, arrow, fork, and knife
+are `#9A3412`.
 
-Why this is the recommendation:
+Hidden meaning: the rim is the loop. It is not a closed ring. The stroke
+stops, a gap of plate shows, and an arrowhead continues around. You sit down,
+decide, close the loop, and come around again. The fork and knife stay in the
+middle so it is still a plate.
 
-- It keeps the current silhouette. A favicon change that still reads as “the
-  plate” will not feel like a different product.
-- The trick does not depend on reading a letter. At 32px the arrow softens,
-  and what remains is still a plate, fork, and knife.
-- It matches the product noun. The thing the app is named for is drawn.
+The first drawing of this arrow was too thin. The head was about as wide as
+the stroke, and it disappeared into the rim. The live head is a filled
+triangle about three times as wide as the 22px rim stroke, with a clear gap
+before it. A second study made the head wider still (about five times the
+stroke). That one is `docs/brand/logo-plate-loop-arrow-large.svg`. It is
+unmissable, and it crowds the fork and knife, so it is not the live mark.
 
-Lockup, for social and docs only. The wordmark is Inter Bold converted to
-paths so the SVG does not depend on a font. The website itself still uses
-Arial.
+![Larger arrow study, not live](brand/logo-plate-loop-arrow-large.png)
+
+#### Do
+
+- Keep the head at least three times the rim stroke, and keep the cream gap
+  in front of it.
+- Keep the fork and knife inside the loop, clear of the head.
+- Use `BrandMark` (`src/components/brand-mark.tsx`) anywhere the product mark
+  sits next to the words Lunch Loop. It loads `/favicon.svg`.
+- Bump the build when the SVG changes so `?v=` refreshes cached icons.
+
+#### Don’t
+
+- Shrink the head back down to the width of the stroke.
+- Close the gap so the head melts into the rim.
+- Add a second arrow, a gradient, or an outline on the head.
+- Draw a different plate in the header. Meal emoji (a dish on a card, an
+  empty state) are content, not the logo.
+- Use the mark smaller than 16px. At 16px the head is a small directional
+  notch. At 32px it should be obvious. Headers use 36px and 40px.
+
+Lockup, for docs and social reference. The wordmark is Inter Bold converted
+to paths. The website sets type in Arial.
 
 ![Plate Loop lockup](brand/logo-plate-loop-lockup.png)
 
-`docs/brand/logo-plate-loop-lockup.svg`
+### Studies that were not chosen
 
-#### 2. Fork L
+Fork L and Tray LL stay in `docs/brand/` so the decision stays visible. They
+are not the favicon.
+
+#### Fork L
 
 ![Fork L](brand/logo-fork-l.png)
 
@@ -106,9 +123,8 @@ the same length, are the foot. A cream plate sits under the foot.
 Hidden meaning: L for Lunch and for Loop. One letter, doing both jobs.
 
 At 512px the tines read as a fork. At 32px the gaps collapse and the mark
-reads as a solid L on a plate, which is still legible. The knife is gone, so
-it is a bigger departure from the live icon. Strong second choice if Craig
-wants the letter more than the loop.
+reads as a solid L on a plate. The knife is gone, so it was a bigger
+departure than Plate Loop. It stays a study.
 
 #### 3. Tray LL
 
@@ -122,21 +138,7 @@ two wells are a pair of L letters.
 Hidden meaning: LL, Lunch Loop, is the lunch tray.
 
 This is the most literal of the three, and it still reads as LL at 32px. It
-is also the busiest, and it no longer looks like the plate people already
-have on their home screen. Choose it if spelling the name matters more than
-continuity.
-
-### If Craig picks one
-
-1. Replace `public/favicon.svg` with the chosen SVG (keep the 512 viewBox and
-   the 112px corner radius).
-2. Regenerate `src/app/icon.png`, `src/app/apple-icon.png`, and
-   `src/app/favicon.ico` from that SVG. Do not leave the old PNGs behind.
-3. Bump the build so cached `?v=` icon URLs refresh.
-4. Move the chosen note in this section from “recommended” to “live”, and
-   keep the other studies so the decision stays visible.
-5. The share image (`src/app/opengraph-image.tsx`) reads `src/app/icon.png`,
-   so it follows the new mark on the next build.
+is also the busiest, and it no longer looks like the plate. It stays a study.
 
 ## Color
 
@@ -378,9 +380,8 @@ and the two buttons if it keeps failing. Not a spinner-only view.
 
 ## Iconography
 
-- The product icon is the plate. Public headers currently use the 🍽️ emoji in
-  an orange rounded square as a stand-in. That is acceptable until a logo is
-  chosen. Do not mix in other plate drawings.
+- The product icon is Plate Loop, drawn by `BrandMark` from `/favicon.svg`.
+  Do not put a different plate next to the wordmark.
 - UI emoji already in the product (meal, veto scissors, trophy, party popper)
   can stay. Do not add a new emoji as a section’s only heading.
 - The tip jar is a small inline SVG, two colors plus the coin. New spot
@@ -568,30 +569,28 @@ What changed, and what was looked at and left alone.
 
 ### Changelog
 
-- **2026-10-23.** First edition. Wrote down the orange-plate system that is
-  already shipping. Added Plate Loop, Fork L, and Tray LL. Did not change the
-  live icon. Moved the finished-pick thank-you beside the result on wide
-  screens. Added the share image and the email shell.
+- **2026-10-23.** Plate Loop is the live icon. The arrowhead is about three
+  times the rim stroke, with a gap in front of it. A wider head was drawn
+  and set aside because it crowded the utensils. Headers, the README hero,
+  and the share image use this mark.
+- **2026-10-23.** First edition. Wrote down the orange-plate system. Added
+  Plate Loop, Fork L, and Tray LL. Moved the finished-pick thank-you beside
+  the result on wide screens. Added the share image and the email shell.
 
 ### Open questions
 
-1. **Which logo, if any?** Recommendation is Plate Loop. Fork L if you want a
-   letter. Tray LL if you want “LL” spelled in the icon. The live plate stays
-   until you say otherwise.
-2. **White on `#F97316`.** Buttons and the hero heading use it, and the
+1. **White on `#F97316`.** Buttons and the hero heading use it, and the
    contrast is 2.8:1. Leave the bright orange as the brand, or move primary
    buttons to `#C2410C` (5.2:1) and keep `#F97316` for large areas only?
-3. **Hero eyebrow.** `text-orange-100` on the orange hero is 2.5:1. Keep it
+2. **Hero eyebrow.** `text-orange-100` on the orange hero is 2.5:1. Keep it
    as a quiet kicker, or switch that one line to white / cream?
-4. **Page widths.** Landing is `max-w-6xl`, the app is `max-w-5xl`, policies
+3. **Page widths.** Landing is `max-w-6xl`, the app is `max-w-5xl`, policies
    are `max-w-4xl`, support is `max-w-3xl`. This guide treats that as
    intentional. Say if you want them unified.
-5. **`/support` words.** Still a draft. Edit the page when you want the public
+4. **`/support` words.** Still a draft. Edit the page when you want the public
    version, and add a changelog line.
-6. **Share images and crew names.** This guide says invite previews stay
+5. **Share images and crew names.** This guide says invite previews stay
    generic so a forwarded link does not announce the crew. Confirm that, or
    ask for a per-loop image later (it would need a careful privacy pass).
-7. **Emoji plate in the header.** Fine until a logo is chosen. After that,
-   decide whether the header uses the SVG or keeps the emoji.
-8. **One-liner list.** Eight lines live in `src/lib/donation.ts`. Replace any
+6. **One-liner list.** Eight lines live in `src/lib/donation.ts`. Replace any
    that do not sound like you. Keep them short, and keep them free of guilt.

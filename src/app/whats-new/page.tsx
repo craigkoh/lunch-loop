@@ -28,6 +28,12 @@ function changeText(change: ReleaseChange) {
 
 const releases: { build: string; changes: ReleaseChange[] }[] = [
   {
+    build: "2026.10.23.65",
+    changes: [
+      "The app icon is now a plate with an arrow in the rim: the loop you come back to.",
+    ],
+  },
+  {
     build: "2026.10.23.64",
     changes: [
       "On a wider screen, the thank-you sits beside the lunch result. On a phone it stays tucked under the pick.",

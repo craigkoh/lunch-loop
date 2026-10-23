@@ -1,5 +1,16 @@
 # Release Notes
 
+## Build 2026.10.23.65
+
+The live icon is Plate Loop. The rim of the plate is an arrow.
+
+- The arrowhead is about three times as wide as the rim stroke, with a gap of
+  plate in front of it, so the loop reads at favicon size. A wider head was
+  drawn and kept as a study because it crowded the fork and knife.
+- Favicon, Apple touch icon, header, README hero, and the share image use
+  this mark. Email stays a wordmark.
+- Fork L and Tray LL remain in docs/brand/ and are not the icon.
+
 ## Build 2026.10.23.64
 
 The thank-you after a finished pick sits with the result, and shared links

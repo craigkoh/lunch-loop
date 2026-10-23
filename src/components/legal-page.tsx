@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { BrandMark } from "./brand-mark";
 import { FuelTheLoopLink, OperatorCredit } from "./quiet-donation-link";
 import type { ReactNode } from "react";
 
@@ -21,9 +22,7 @@ export function LegalPage({
             href="/"
             className="flex items-center gap-2 font-black tracking-tight text-orange-950"
           >
-            <span className="grid size-10 place-items-center rounded-2xl bg-orange-500 text-xl shadow-sm">
-              🍽️
-            </span>
+            <BrandMark className="size-10" />
             <span>Lunch Loop</span>
           </Link>
           <Link

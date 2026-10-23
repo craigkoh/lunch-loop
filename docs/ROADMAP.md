@@ -48,9 +48,9 @@ rate limits and a hosted bot challenge.
 
 ## Backlog
 
-- Choose a logo. Three concepts with a hidden meaning are in
-  [docs/brand/](brand/) and [Design](DESIGN.md). The live plate icon stays
-  until Craig picks one.
+- Plate Loop is the live icon. The arrow is documented in
+  [Design](DESIGN.md). Fork L and Tray LL stay in [docs/brand/](brand/) as
+  studies.
 
 ## Respectful monetization
 

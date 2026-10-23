@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { BrandMark } from "./brand-mark";
 import { FuelTheLoopLink, OperatorCredit } from "./quiet-donation-link";
 
 const loopSteps = [
@@ -27,9 +28,7 @@ export function LandingPage() {
           href="/"
           className="flex items-center gap-2 font-black tracking-tight text-orange-950"
         >
-          <span className="grid size-10 place-items-center rounded-2xl bg-orange-500 text-xl shadow-sm">
-            🍽️
-          </span>
+          <BrandMark className="size-10" />
           <span>Lunch Loop</span>
         </Link>
         <div className="flex items-center gap-2">
@@ -171,8 +170,8 @@ export function LandingPage() {
             See the 30-second install guide →
           </Link>
         </div>
-        <div className="install-pulse relative mx-auto grid size-36 place-items-center rounded-[2.5rem] bg-orange-500 text-6xl shadow-xl shadow-orange-200">
-          🍽️
+        <div className="relative mx-auto size-36">
+          <BrandMark className="install-pulse size-36 shadow-xl shadow-orange-200" />
           <span className="absolute -bottom-3 -right-3 grid size-12 place-items-center rounded-2xl bg-white text-2xl shadow-lg">
             ⤴︎
           </span>

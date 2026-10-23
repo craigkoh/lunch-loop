@@ -51,12 +51,12 @@ export default function PrivacyPage() {
       </LegalSection>
 
       <LegalSection title="4. Cookies and browser storage">
-        <p>Lunch Loop uses essential first-party authentication cookies from Supabase to keep you signed in and protect your session. We use ordinary browser caching for application files so the web app can load efficiently. We do not use advertising cookies, cross-site tracking cookies, or third-party analytics trackers.</p>
+        <p>Lunch Loop uses essential first-party authentication cookies from Supabase to keep you signed in and protect your session. We use ordinary browser caching for application files so the web app can load efficiently. This browser can also remember, only on this device, whether the optional value line under a finished pick was shown or dismissed. We do not use advertising cookies, cross-site tracking cookies, or third-party analytics trackers.</p>
       </LegalSection>
 
       <LegalSection title="5. How we use information">
         <p>We use this information to authenticate members; run the private group decision flow; search for and display restaurants; send invitations and optional notifications; provide exports, recovery, support, and feedback handling; prevent abuse; protect the service; and improve Lunch Loop.</p>
-        <p>We do not sell personal information or use it for targeted advertising. We do not request payment-card information in Lunch Loop. An optional donation, when a site administrator turns it on, opens Stripe in a new tab. Lunch Loop does not receive the card number, and a donation does not change restaurant selection or unlock features.</p>
+        <p>We do not sell personal information or use it for targeted advertising. We do not request payment-card information in Lunch Loop. An optional donation, when a site administrator turns it on, is offered on the Value for Value page and then opens Stripe in a new tab. Lunch Loop does not receive the card number, and a donation does not change restaurant selection or unlock features.</p>
       </LegalSection>
 
       <LegalSection title="6. Who can see information">
@@ -74,7 +74,7 @@ export default function PrivacyPage() {
           <li><strong>Resend:</strong> invitation email, one-time sign-in links, and operational email when email delivery is enabled.</li>
           <li><strong>Maintainer feedback alerts:</strong> when the site switch is on, a new feedback report is sent to the operator’s notification bot. The alert includes the report, your display name, and a credit name only if you opted in. It does not include your email address. The destination address and access key stay in Supabase Vault and are not written into the app or this policy.</li>
           <li><strong>Discord:</strong> only when a loop owner voluntarily configures a Discord webhook.</li>
-          <li><strong>Stripe:</strong> only if you choose the optional donation link. Stripe processes that payment on its own page. Lunch Loop does not receive your card number.</li>
+          <li><strong>Stripe:</strong> only if you choose to send value from the Value for Value page. Stripe processes that payment on its own page. Lunch Loop does not receive your card number. Donations are not tax-deductible.</li>
         </ul>
         <p>These providers process information under their own terms and privacy practices. We may also disclose information when required by law, to protect people or the service, or in connection with a business transfer.</p>
       </LegalSection>

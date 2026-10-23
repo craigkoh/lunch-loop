@@ -76,7 +76,7 @@ copy of their existing additions before inviting anyone else.
 | Account settings | Saved System, Light, or Dark appearance. The same theme is applied across signed-in, public, install, and legal pages. |
 | My Loops | Active-loop switcher and loop management. An account can own up to the site-wide configured number of active loops (initially four). |
 | Feedback | Signed-in bug, idea, question, and note submission. A Feedback / Report a bug button on signed-in pages opens the form with the current page and build filled in. After a decision is closed, a light prompt appears at most once every 14 days. |
-| Donation | Optional and off until Global Admin turns `donations_enabled` on. A quiet “Keep Lunch Loop running” link can then appear in the footer, and a dismissible note can appear after a lunch is closed, at most once every 14 days. It opens Stripe in a new tab. It does not change restaurant selection or unlock features. |
+| Value for Value | Optional, and a new database keeps `donations_enabled` off until Global Admin turns it on. When it is on, the footer can show a small “Fuel the loop” link to `/support`, and a finished pick can show a short dismissible line under the result, about one pick in three and then not again for three days. The page explains the idea and opens Stripe in a new tab. It does not change restaurant selection or unlock features. When the switch is off, the line and the footer link stay hidden, and `/support` says support isn’t open. |
 
 Restaurant cards should be clickable. Their detail panel combines
 Google-provided information, required attribution, and group facts such as who

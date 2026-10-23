@@ -966,7 +966,7 @@ export function GlobalAdminScreen() {
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div>
                   <p className="font-black">Donation link</p>
-                  <p className="mt-1 max-w-xl text-sm text-orange-50">Off until the Stripe account is ready. When on, a quiet footer link appears, and a dismissible note can show after a lunch is closed, at most once every 14 days. It does not change which restaurant is chosen or unlock features.</p>
+                  <p className="mt-1 max-w-xl text-sm text-orange-50">When on, the footer can show Fuel the loop, which opens the Value for Value page, and a finished pick can show a short dismissible line underneath. About one pick in three, then not again for a few days. It does not change which restaurant is chosen or unlock features.</p>
                 </div>
                 <label className="flex items-center gap-3 rounded-2xl bg-white/10 px-4 py-3 text-sm font-bold">
                   <input type="checkbox" checked={donationsEnabled} onChange={(event) => setDonationsEnabled(event.target.checked)} className="size-5 accent-orange-500" />

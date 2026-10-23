@@ -13,6 +13,23 @@ export class RouteAccessError extends Error {
   }
 }
 
+/** Public switch for the Value for Value page, footer, and pick line. Missing config or a failed read stays off. */
+export async function getDonationsEnabled() {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const key = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
+  if (!url || !key) return false;
+  try {
+    const cookieStore = await cookies();
+    const supabase = createServerClient(url, key, {
+      cookies: { getAll: () => cookieStore.getAll(), setAll: () => undefined },
+    });
+    const { data, error } = await supabase.rpc("get_donations_enabled");
+    return !error && data === true;
+  } catch {
+    return false;
+  }
+}
+
 /**
  * Reads the current browser session without treating a signed-out visitor as
  * an error. This only chooses the public or signed-in shell; it never grants

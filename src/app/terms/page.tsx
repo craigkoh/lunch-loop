@@ -6,7 +6,7 @@ export const metadata: Metadata = {
   description: "The terms that govern use of Lunch Loop.",
 };
 
-const updated = "October 22, 2026";
+const updated = "October 23, 2026";
 
 export default function TermsPage() {
   return (
@@ -40,6 +40,7 @@ export default function TermsPage() {
 
       <LegalSection title="5. Optional third-party services">
         <p>Google Sign-In, one-time email links delivered through Supabase and Resend, Google Maps Platform, Vercel, and optional Discord notifications are provided by third parties. Their availability and policies are outside Lunch Loop’s control. A loop owner is responsible for using a Discord webhook only in a server and channel they are authorized to manage. When Discord notifications are enabled, selected decision events—including member display names, restaurant names, scheduled dates/times, and pick or veto activity—are copied to that Discord channel. Feedback alerts, when enabled, go to the operator’s notification bot and do not include the reporter’s email address.</p>
+        <p>An optional donation, when the site switch is on, is voluntary. It is not a purchase, it does not unlock features or change restaurant selection, and it is not tax-deductible. Stripe processes it on Stripe’s own page. Lunch Loop stays free either way.</p>
       </LegalSection>
 
       <LegalSection title="6. Acceptable use">

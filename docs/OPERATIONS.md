@@ -134,10 +134,14 @@ running and its current CLI must be first on `PATH`. On this Mac use:
 ## Global Admin playbook
 
 Global Admin is database-assigned. It reviews groups, invite requests, feedback,
-usage limits, feedback state/priority, the optional donation link, and
-site-wide group-creation controls. `donations_enabled` stays off until Stripe
-has finished reviewing the account. Turning it on only shows the public
-Payment Link. It does not change restaurant selection.
+usage limits, feedback state/priority, the optional Value for Value ask, and
+site-wide group-creation controls. A new database keeps `donations_enabled`
+off. Turning it on shows “Fuel the loop” in the footer, linking to `/support`,
+and can show a dismissible line under a finished pick about one time in three,
+then not again for three days for that person. Turning it off hides both, and
+`/support` says support isn’t open. The Stripe Payment Link lives only on that
+page. It does not change restaurant selection. Do not send a test payment from
+the Payment Link.
 Prefer reversible actions: suspend a loop before deletion, lower Places limits
 or pause new-loop creation during abnormal usage, revoke invitations rather
 than delete data, and leave clear internal triage notes. For test-loop cleanup

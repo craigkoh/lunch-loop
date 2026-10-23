@@ -1,5 +1,23 @@
 # Release Notes
 
+## Build 2026.10.23.62
+
+After a lunch is picked, a short line can sit under the result. If Lunch Loop
+gave you value, you can send some back. It is easy to ignore.
+
+- The line appears about one pick in three, then stays quiet for three days
+  for that person. The same pick can keep showing it until you choose “Not
+  now.” It never covers the result, and it does not change which restaurant
+  is chosen.
+- A public Value for Value page at `/support` tells the short story of Lunch
+  Loop, what it costs to keep running, and that everything stays free: no ads,
+  no paid restaurant placement, and no paywall. A button opens Stripe in a new
+  tab. Donations are not tax-deductible.
+- The footer can show a small “Fuel the loop” link to that page.
+- `donations_enabled` still controls all of it. Off means no line, no footer
+  link, and `/support` says support isn’t open. A new database still starts
+  with the switch off.
+
 ## Build 2026.10.23.61
 
 Lunch Loop has a new plate, fork, and knife icon. The footer says Lunch Loop

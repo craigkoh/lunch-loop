@@ -1,33 +1,49 @@
 export const donationUrl = "https://donate.stripe.com/aFafZg58yg91fKIdyZ53O00";
-export const donationLinkLabel = "Keep Lunch Loop running";
-export const donationCopy = "Lunch Loop is free and ad-free. If it helped, you can chip in to keep it running.";
+export const fuelLinkLabel = "Fuel the loop";
 
-const shownPrefix = "lunch-loop-donation-prompt-at:";
-const openKey = "lunch-loop-donation-prompt-open";
-const quietMs = 14 * 24 * 60 * 60 * 1000;
+const storagePrefix = "lunch-loop-v4v-nudge:";
+const quietMs = 3 * 24 * 60 * 60 * 1000;
 
-export function donationPromptDue(lastShownAt: number | null, now: number) {
-  if (lastShownAt === null) return true;
-  return now - lastShownAt >= quietMs;
-}
+export type PickNudgeRecord = {
+  shownAt: number;
+  sessionId: string;
+  dismissed: boolean;
+};
 
-export function offerDonationPrompt(userId: string, now = Date.now()) {
-  const raw = window.localStorage.getItem(shownPrefix + userId);
-  const at = raw ? Number(raw) : Number.NaN;
-  const lastShownAt = Number.isFinite(at) ? at : null;
-  if (!donationPromptDue(lastShownAt, now)) return false;
-  window.localStorage.setItem(shownPrefix + userId, String(now));
-  window.sessionStorage.setItem(openKey, userId);
-  window.dispatchEvent(new Event("lunch-loop-donation-prompt"));
-  return true;
-}
-
-export function donationPromptOpenFor(userId: string) {
-  return window.sessionStorage.getItem(openKey) === userId;
-}
-
-export function dismissDonationPrompt(userId: string) {
-  if (window.sessionStorage.getItem(openKey) === userId) {
-    window.sessionStorage.removeItem(openKey);
+export function pickNudgeBucket(userId: string, sessionId: string) {
+  let hash = 0;
+  const text = `${userId}:${sessionId}`;
+  for (let index = 0; index < text.length; index += 1) {
+    hash = (Math.imul(hash, 31) + text.charCodeAt(index)) >>> 0;
   }
+  return hash % 3;
+}
+
+/** Show on about one in three picks, and not again for three days, unless this same pick is still on screen. */
+export function pickNudgeDecision(
+  saved: PickNudgeRecord | null,
+  userId: string,
+  sessionId: string,
+  now: number,
+): "show" | "keep" | "hide" {
+  if (saved?.sessionId === sessionId) return saved.dismissed ? "hide" : "keep";
+  if (saved && now - saved.shownAt < quietMs) return "hide";
+  if (pickNudgeBucket(userId, sessionId) !== 0) return "hide";
+  return "show";
+}
+
+export function readPickNudge(userId: string): PickNudgeRecord | null {
+  const raw = window.localStorage.getItem(storagePrefix + userId);
+  if (!raw) return null;
+  try {
+    const parsed = JSON.parse(raw) as Partial<PickNudgeRecord>;
+    if (typeof parsed.shownAt !== "number" || typeof parsed.sessionId !== "string") return null;
+    return { shownAt: parsed.shownAt, sessionId: parsed.sessionId, dismissed: parsed.dismissed === true };
+  } catch {
+    return null;
+  }
+}
+
+export function writePickNudge(userId: string, record: PickNudgeRecord) {
+  window.localStorage.setItem(storagePrefix + userId, JSON.stringify(record));
 }

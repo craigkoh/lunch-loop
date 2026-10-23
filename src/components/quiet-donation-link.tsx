@@ -1,10 +1,13 @@
 "use client";
 
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import { donationLinkLabel, donationUrl } from "@/lib/donation";
+import { fuelLinkLabel } from "@/lib/donation";
 import { createClient, hasSupabaseEnv } from "@/lib/supabase/client";
 
-export function QuietDonationLink() {
+export function FuelTheLoopLink() {
+  const pathname = usePathname();
   const [enabled, setEnabled] = useState(false);
   useEffect(() => {
     if (!hasSupabaseEnv()) return;
@@ -18,17 +21,15 @@ export function QuietDonationLink() {
       }
     })();
   }, []);
-  if (!enabled) return null;
+  if (!enabled || pathname === "/support") return null;
   return (
-    <p className="mt-1">
-      <a
-        href={donationUrl}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="font-bold text-orange-700 underline"
+    <p className="mt-2">
+      <Link
+        href="/support"
+        className="inline-flex min-h-11 items-center justify-center rounded-full bg-orange-100 px-3 py-1.5 text-xs font-black text-orange-900"
       >
-        {donationLinkLabel}
-      </a>
+        {fuelLinkLabel}
+      </Link>
     </p>
   );
 }

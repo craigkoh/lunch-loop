@@ -46,13 +46,13 @@ export const metadata: Metadata = {
         sizes: "256x256",
       },
       {
-        url: `/icon?v=${appInfo.build}`,
+        url: `/icon.png?v=${appInfo.build}`,
         type: "image/png",
         sizes: "512x512",
       },
     ],
     shortcut: `/favicon.ico?v=${appInfo.build}`,
-    apple: [{ url: `/apple-icon?v=${appInfo.build}`, type: "image/png", sizes: "180x180" }],
+    apple: [{ url: `/apple-icon.png?v=${appInfo.build}`, type: "image/png", sizes: "180x180" }],
   },
   formatDetection: { telephone: false },
 };

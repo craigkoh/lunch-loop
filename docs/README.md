@@ -1,6 +1,6 @@
 # Lunch Loop documentation
 
-Current release: version 0.1.0, build 2026.10.23.61. Production is
+Current release: version 0.1.0, build 2026.10.23.63. Production is
 [lunchloop.app](https://lunchloop.app). This build reaches the live site when
 the documented production deploy runs.
 
@@ -13,13 +13,14 @@ truth.
 | [Product and User Guide](PRODUCT.md) | Understand the product, member workflow, roles, limits, and data boundaries. |
 | [Development and Deployment](DEVELOPMENT.md) | Run locally, add a migration, test, back up, or deploy safely. |
 | [Operations and Security](OPERATIONS.md) | Administer production, recover from an incident, or review protections. |
-| [Integrations](INTEGRATIONS.md) | Configure Supabase sign-in (Google or email magic link), Places, Resend, email forwarding, Discord, or feedback alerts. |
+| [Integrations](INTEGRATIONS.md) | Configure Supabase sign-in (Google or email magic link), Places, Resend, email forwarding, Discord, feedback alerts, or the Stripe donation link. |
 | [Roadmap](ROADMAP.md) | Plan private-crew growth, public launch readiness, and ethical monetization. |
 | [Release Notes](RELEASE_NOTES.md) | Share the latest friend-facing changes. |
 
 Public policies are [Privacy Policy](https://lunchloop.app/privacy) and
 [Terms of Use](https://lunchloop.app/terms). Source is in
-src/app/privacy/page.tsx and src/app/terms/page.tsx.
+src/app/privacy/page.tsx and src/app/terms/page.tsx. The Value for Value page
+is src/app/support/page.tsx and follows `donations_enabled`.
 
 ## Repository map
 

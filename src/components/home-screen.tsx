@@ -17,7 +17,8 @@ import { RestaurantSearchFilters } from "./restaurant-database-browser";
 import { QuickAddPlacePanel } from "./quick-add-place-panel";
 import type { Restaurant } from "@/lib/types";
 import { hoursAtPlannedLunch } from "@/lib/location-hours";
-import { offerDonationPrompt } from "@/lib/donation";
+import { PickValueNudge } from "./pick-value-nudge";
+import { receiptDate } from "@/lib/donation";
 import { offerFeedbackPrompt } from "@/lib/feedback-prompt";
 import { createClient, hasSupabaseEnv } from "@/lib/supabase/client";
 import {
@@ -882,13 +883,7 @@ export function HomeScreen() {
           ? "Occasion complete — any crew member can start the next one when ready."
           : "Loop closed — the next picker is up.",
       );
-      if (context?.userId) {
-        const feedbackJustOffered = offerFeedbackPrompt(context.userId);
-        if (!feedbackJustOffered) {
-          const { data: donationsOn } = await createClient().rpc("get_donations_enabled");
-          if (donationsOn === true) offerDonationPrompt(context.userId);
-        }
-      }
+      if (context?.userId) offerFeedbackPrompt(context.userId);
       await load();
     } catch (closeError) {
       setError(
@@ -1532,10 +1527,10 @@ export function HomeScreen() {
         aria-label={winner ? `View details for ${winner.name}` : undefined}
       >
         <p className="text-4xl">🎉🍽️🎉</p>
-        <p className="mt-2 text-lg font-black">
+        <p className="mt-2 break-words text-lg font-black">
           {winner?.name ?? "The final choice"}
         </p>
-        <p className="mt-1 text-sm text-stone-600">{winner?.address}</p>
+        <p className="mt-1 break-words text-sm text-stone-600">{winner?.address}</p>
         {winner && <div className="mt-2">{restaurantFacts(winner)}</div>}
         <p className="mt-3 text-xs font-bold text-emerald-800">
           Tap for restaurant details and map →
@@ -1567,6 +1562,20 @@ export function HomeScreen() {
             </div>
           ) : current ? (
             <div className="mt-5">{renderScheduleEditor()}</div>
+          ) : null}
+          {current?.status === "chosen" && context?.userId && current.id ? (
+            <PickValueNudge
+              userId={context.userId}
+              sessionId={current.id}
+              facts={{
+                loopName: context.groupName,
+                restaurantName: winner?.name ?? "Today's pick",
+                pickedOn: receiptDate(current.scheduled_for, timeZone),
+                memberCount,
+                closedLunchCount: completedCount,
+                vetoCount: vetoes.length,
+              }}
+            />
           ) : null}
           {message && (
             <p

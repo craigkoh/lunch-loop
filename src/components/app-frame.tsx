@@ -4,9 +4,8 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { FeedbackBugLink } from "./feedback-bug-link";
-import { OperatorCredit, QuietDonationLink } from "./quiet-donation-link";
+import { FuelTheLoopLink, OperatorCredit } from "./quiet-donation-link";
 import { appInfo } from "@/lib/app-info";
-import { dismissDonationPrompt, donationCopy, donationLinkLabel, donationPromptOpenFor, donationUrl } from "@/lib/donation";
 import { dismissFeedbackPrompt, feedbackPromptOpenFor } from "@/lib/feedback-prompt";
 import { createClient, hasSupabaseEnv } from "@/lib/supabase/client";
 import { getMyLunchLoops, type LunchLoopSummary } from "@/lib/supabase/group";
@@ -30,8 +29,6 @@ export function AppFrame({ children }: { children: ReactNode }) {
   const [account, setAccount] = useState("");
   const [userId, setUserId] = useState("");
   const [feedbackPromptOpen, setFeedbackPromptOpen] = useState(false);
-  const [donationPromptOpen, setDonationPromptOpen] = useState(false);
-  const [donationsEnabled, setDonationsEnabled] = useState(false);
   const [currentLoop, setCurrentLoop] = useState<LunchLoopSummary | null>(null);
   const [isGlobalAdmin, setIsGlobalAdmin] = useState(false);
   const [membershipNotifications, setMembershipNotifications] = useState<MembershipNotification[]>([]);
@@ -43,16 +40,8 @@ export function AppFrame({ children }: { children: ReactNode }) {
       const id = userIdRef.current;
       if (id && feedbackPromptOpenFor(id)) setFeedbackPromptOpen(true);
     }
-    function refreshDonationPrompt() {
-      const id = userIdRef.current;
-      if (id && donationPromptOpenFor(id)) setDonationPromptOpen(true);
-    }
     window.addEventListener("lunch-loop-feedback-prompt", refreshFeedbackPrompt);
-    window.addEventListener("lunch-loop-donation-prompt", refreshDonationPrompt);
-    return () => {
-      window.removeEventListener("lunch-loop-feedback-prompt", refreshFeedbackPrompt);
-      window.removeEventListener("lunch-loop-donation-prompt", refreshDonationPrompt);
-    };
+    return () => window.removeEventListener("lunch-loop-feedback-prompt", refreshFeedbackPrompt);
   }, []);
   useEffect(() => {
     if (!hasSupabaseEnv()) return;
@@ -62,18 +51,11 @@ export function AppFrame({ children }: { children: ReactNode }) {
       if (headerLoadInFlight.current) return;
       headerLoadInFlight.current = true;
       try {
-        try {
-          const { data: donationsOn } = await supabase.rpc("get_donations_enabled");
-          setDonationsEnabled(donationsOn === true);
-        } catch {
-          setDonationsEnabled(false);
-        }
         const { data: { session } } = await supabase.auth.getSession();
         const user = session?.user;
         setAccount(user ? user.user_metadata.full_name || user.user_metadata.name || user.email?.split("@")[0] || user.email || "Signed in" : "");
         setUserId(user?.id ?? "");
         setFeedbackPromptOpen(Boolean(user && feedbackPromptOpenFor(user.id)));
-        setDonationPromptOpen(Boolean(user && donationPromptOpenFor(user.id)));
         if (user) {
           const adminRequest = supabase.rpc("is_site_admin");
           const notificationRequest = supabase.rpc("get_my_lunch_loop_member_notifications");
@@ -109,7 +91,6 @@ export function AppFrame({ children }: { children: ReactNode }) {
           setIsGlobalAdmin(false);
           setMembershipNotifications([]);
           setFeedbackPromptOpen(false);
-          setDonationPromptOpen(false);
         }
       } finally {
         headerLoadInFlight.current = false;
@@ -127,11 +108,6 @@ export function AppFrame({ children }: { children: ReactNode }) {
     if (!userId) return;
     dismissFeedbackPrompt(userId);
     setFeedbackPromptOpen(false);
-  }
-  function dismissDonation() {
-    if (!userId) return;
-    dismissDonationPrompt(userId);
-    setDonationPromptOpen(false);
   }
   const feedbackPage = pathname || "/";
   async function signOut() {
@@ -232,17 +208,6 @@ export function AppFrame({ children }: { children: ReactNode }) {
             </div>
           </div>
         )}
-        {account && donationsEnabled && donationPromptOpen && !feedbackPromptOpen && (
-          <div className="mx-auto mt-3 max-w-5xl">
-            <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-orange-200 bg-orange-50 px-4 py-3 text-sm text-orange-950">
-              <p>{donationCopy}</p>
-              <div className="flex items-center gap-3">
-                <a href={donationUrl} target="_blank" rel="noopener noreferrer" className="font-black text-orange-800 underline">{donationLinkLabel}</a>
-                <button type="button" onClick={dismissDonation} className="text-xs font-bold text-stone-600 underline">Not now</button>
-              </div>
-            </div>
-          </div>
-        )}
         {account && feedbackPromptOpen && pathname !== "/feedback" && (
           <div className="mx-auto mt-3 max-w-5xl">
             <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-orange-200 bg-orange-50 px-4 py-3 text-sm text-orange-950">
@@ -302,7 +267,7 @@ export function AppFrame({ children }: { children: ReactNode }) {
       </nav>
       <footer className="mx-auto max-w-5xl px-4 pb-28 pt-5 text-center text-xs leading-5 text-stone-500 md:px-6 md:pb-5">
         <OperatorCredit />
-        <QuietDonationLink />
+        <FuelTheLoopLink />
         <p>
           © Craig Kohler · Lunch Loop · Build {appInfo.build} ·{" "}
           <Link href="/whats-new" className="font-bold text-orange-700 underline">

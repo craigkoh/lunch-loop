@@ -17,6 +17,13 @@ function changeText(change: ReleaseChange) {
 
 const releases: { build: string; changes: ReleaseChange[] }[] = [
   {
+    build: "2026.10.23.63",
+    changes: [
+      "A finished lunch can show a paper receipt, a one-line thank-you, or a tip jar. Not now hides it for that pick, and all three stay hidden while support is turned off.",
+      "The Value for Value page says a couple of bucks is plenty. The loop stays free either way.",
+    ],
+  },
+  {
     build: "2026.10.23.61",
     changes: [
       "Lunch Loop has a new plate, fork, and knife icon. The footer says Lunch Loop is run by Craig Kohler.",

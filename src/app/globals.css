@@ -180,6 +180,103 @@ input {
   }
 }
 
+.lunch-receipt-sheet {
+  --receipt-paper: #fffdf8;
+  --receipt-ink: #292524;
+  --receipt-muted: #57534e;
+  --receipt-accent: #9a3412;
+  --receipt-rule: #e7d3c4;
+  --receipt-button: #9a3412;
+  --receipt-button-ink: #ffffff;
+  font-family: ui-monospace, "SF Mono", "Cascadia Mono", Menlo, Consolas, monospace;
+  color: var(--receipt-ink);
+}
+
+.lunch-receipt {
+  border: 1px solid #f0c9a0;
+  border-bottom: 0;
+  border-radius: 14px 14px 0 0;
+  background: var(--receipt-paper);
+}
+
+.lunch-receipt-zigzag {
+  height: 14px;
+  background: var(--receipt-paper);
+  clip-path: polygon(
+    0 0,
+    4% 100%,
+    8% 0,
+    12% 100%,
+    16% 0,
+    20% 100%,
+    24% 0,
+    28% 100%,
+    32% 0,
+    36% 100%,
+    40% 0,
+    44% 100%,
+    48% 0,
+    52% 100%,
+    56% 0,
+    60% 100%,
+    64% 0,
+    68% 100%,
+    72% 0,
+    76% 100%,
+    80% 0,
+    84% 100%,
+    88% 0,
+    92% 100%,
+    96% 0,
+    100% 100%,
+    100% 0
+  );
+}
+
+:root[data-theme="dark"] .lunch-receipt-sheet {
+  --receipt-paper: #2a231e;
+  --receipt-ink: #f8f1eb;
+  --receipt-muted: #d0c1b6;
+  --receipt-accent: #ffb36b;
+  --receipt-rule: #5c4838;
+  --receipt-button: #fb923c;
+  --receipt-button-ink: #2a1205;
+}
+
+:root[data-theme="dark"] .lunch-receipt {
+  border-color: #5c4838;
+}
+
+.lunch-receipt-button {
+  background: var(--receipt-button);
+  color: var(--receipt-button-ink);
+}
+
+.lunch-coin {
+  animation: lunch-coin-drop 0.8s ease-in 1 both;
+}
+
+@keyframes lunch-coin-drop {
+  0% {
+    transform: translateY(-12px);
+    opacity: 0;
+  }
+  30% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(9px);
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lunch-coin {
+    animation: none;
+    opacity: 0;
+  }
+}
+
 /* Safari renders the editable portions of native date/time fields independently.
    Give those internal controls the same vertical rhythm as the surrounding form. */
 .date-time-input {

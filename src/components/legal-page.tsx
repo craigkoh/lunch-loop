@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { OperatorCredit, QuietDonationLink } from "./quiet-donation-link";
 import type { ReactNode } from "react";
 
 export function LegalPage({
@@ -47,6 +48,8 @@ export function LegalPage({
       </article>
       <footer className="border-t border-orange-100 px-4 py-8 text-center text-xs leading-5 text-stone-500">
         <p>© Craig Kohler · Lunch Loop</p>
+        <OperatorCredit />
+        <QuietDonationLink />
         <p className="mt-2 flex justify-center gap-3">
           <Link className="font-bold text-orange-700 underline" href="/privacy">
             Privacy Policy

@@ -76,6 +76,7 @@ copy of their existing additions before inviting anyone else.
 | Account settings | Saved System, Light, or Dark appearance. The same theme is applied across signed-in, public, install, and legal pages. |
 | My Loops | Active-loop switcher and loop management. An account can own up to the site-wide configured number of active loops (initially four). |
 | Feedback | Signed-in bug, idea, question, and note submission. A Feedback / Report a bug button on signed-in pages opens the form with the current page and build filled in. After a decision is closed, a light prompt appears at most once every 14 days. |
+| Donation | Optional and off until Global Admin turns `donations_enabled` on. A quiet “Keep Lunch Loop running” link can then appear in the footer, and a dismissible note can appear after a lunch is closed, at most once every 14 days. It opens Stripe in a new tab. It does not change restaurant selection or unlock features. |
 
 Restaurant cards should be clickable. Their detail panel combines
 Google-provided information, required attribution, and group facts such as who
@@ -87,7 +88,7 @@ added it, picks, vetoes, and last visit.
 | --- | --- |
 | Member | Add places, participate, veto once when eligible, move an active meal forward, browse shared data, submit feedback, and refer a new independent loop. |
 | Owner | All member abilities plus crew management (and Standing rotation), crew invitations, area/radius/time-zone changes, restaurant removal, export, archive, transfer, and Discord. |
-| Global Admin | Site-level groups, invite requests, feedback, usage limits, suspended groups, safeguards, and explicitly confirmed permanent loop deletion. Its overview cards open focused reports for loops, people, restaurants, open decisions, and winners. This is assigned in the database, never by a browser email test. |
+| Global Admin | Site-level groups, invite requests, feedback, usage limits, the optional donation link, suspended groups, safeguards, and explicitly confirmed permanent loop deletion. Its overview cards open focused reports for loops, people, restaurants, open decisions, and winners. This is assigned in the database, never by a browser email test. |
 
 Normal users access only their own loops. Google Place IDs are unique inside a
 loop, so groups never share restaurant history or statistics.

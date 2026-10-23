@@ -92,6 +92,11 @@ Run all three fixtures after a local schema reset when a change touches
 invitations, deletion, Occasion loops, or account lifecycle. Each fixture
 rolls its own data back.
 
+When a change touches the donation switch, also run
+`supabase/tests/donations-flag-fixture.sql` the same way. It checks that
+`donations_enabled` starts off, a member cannot turn it on, and a site admin
+can turn it on and back off.
+
 When a change touches email sign-in, profile names, or feedback credit, also
 run:
 

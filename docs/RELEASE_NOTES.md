@@ -1,5 +1,25 @@
 # Release Notes
 
+## Build 2026.10.23.61
+
+Lunch Loop has a new plate, fork, and knife icon. The footer says Lunch Loop
+is run by Craig Kohler. An optional chip-in can appear after a lunch is
+closed. It stays off until it is turned on, and it never changes which
+restaurant is chosen.
+
+- The app icon, favicon, Apple touch icon, and README hero use the fork and
+  knife on a plate.
+- The public footer and the signed-in footer say “Lunch Loop is run by Craig
+  Kohler.”
+- `site_settings.donations_enabled` defaults to false. A site admin turns it
+  on in Global Admin after Stripe finishes reviewing the account. The public
+  Payment Link then opens in a new tab. The copy is “Lunch Loop is free and
+  ad-free. If it helped, you can chip in to keep it running.” A quiet footer
+  link stays available while the switch is on. A dismissible note appears
+  after a lunch loop is closed, at most once every 14 days, and it waits if
+  the feedback note is showing. There are no perks and no effect on restaurant
+  selection. No payment was made while the Payment Link is paused.
+
 ## Build 2026.10.22.60
 
 You can now sign in with a one-time email link instead of Google. Feedback is

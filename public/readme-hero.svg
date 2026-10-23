@@ -13,11 +13,17 @@
   <rect width="1200" height="420" rx="42" fill="url(#orange)"/>
   <circle cx="1080" cy="-6" r="180" fill="#fb923c" opacity=".45"/>
   <circle cx="1165" cy="350" r="190" fill="#c2410c" opacity=".18"/>
-  <g filter="url(#shadow)">
-    <rect x="76" y="76" width="148" height="148" rx="38" fill="#fffaf3"/>
-    <circle cx="150" cy="150" r="48" fill="#fed7aa"/>
-    <circle cx="150" cy="150" r="34" fill="#fffaf3"/>
-    <path d="M125 111v27m10-27v27m-5-27v39c0 7 10 7 10 0v-39m35 0v76m0-76c-13 10-13 30 0 40" fill="none" stroke="#9a3412" stroke-linecap="round" stroke-linejoin="round" stroke-width="8"/>
+  <g filter="url(#shadow)" transform="translate(76 76) scale(0.2890625)">
+    <rect width="512" height="512" rx="112" fill="#F97316"/>
+    <circle cx="256" cy="256" r="176" fill="#FFF7ED"/>
+    <circle cx="256" cy="256" r="122" fill="none" stroke="#FED7AA" stroke-width="14"/>
+    <g stroke="#9A3412" stroke-linecap="round" fill="none">
+      <path d="M176 140 V210 M200 140 V210 M224 140 V210" stroke-width="14"/>
+      <path d="M176 210 Q176 238 200 238 Q224 238 224 210" stroke-width="14"/>
+      <path d="M200 238 V372" stroke-width="22"/>
+    </g>
+    <path d="M322 140 C366 160 368 240 334 262 L334 372" stroke="#9A3412" stroke-width="22" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <path d="M322 140 C366 160 368 240 334 262 L322 262 Z" fill="#9A3412"/>
   </g>
   <text x="268" y="135" fill="#fff7ed" font-family="Arial, Helvetica, sans-serif" font-size="25" font-weight="700" letter-spacing="5">IT’S LUNCH O’CLOCK</text>
   <text x="268" y="205" fill="#ffffff" font-family="Arial, Helvetica, sans-serif" font-size="72" font-weight="800">Lunch Loop</text>

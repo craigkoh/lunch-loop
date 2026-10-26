@@ -63,6 +63,23 @@ export function safeReturnPath(requestedNext: string | null, origin: string) {
 }
 
 /**
+ * Where to land after a session is stored. The magic-link email carries
+ * next={{ .RedirectTo }}, which is the /auth/callback URL the sign-in page
+ * passed to Supabase. Landing there again (with no ?code=) bounced people to
+ * /sign-in even though they were signed in. Unwrap any /auth/* hop and use
+ * its own next, or the home page.
+ */
+export function postAuthPath(requestedNext: string | null, origin: string) {
+  let next = safeReturnPath(requestedNext, origin);
+  for (let i = 0; i < 3; i += 1) {
+    const hop = new URL(next, origin);
+    if (hop.pathname !== "/auth/callback" && hop.pathname !== "/auth/confirm") return next;
+    next = safeReturnPath(hop.searchParams.get("next"), origin);
+  }
+  return "/";
+}
+
+/**
  * Prefer the browser's Host when it is only the loopback twin of the URL
  * Next constructed. A session cookie set on 127.0.0.1 is not sent to
  * localhost, so the post-login redirect has to stay on the host that was open.

@@ -1,5 +1,14 @@
 # Release Notes
 
+## Build 2026.10.26.69 (Monday, October 26, 2026)
+
+- Fixed email magic links landing on /sign-in. The live Magic Link template
+  links to `/auth/confirm?token_hash=...&next={{ .RedirectTo }}`, and
+  `RedirectTo` is the `/auth/callback` URL. `/auth/confirm` verified the token
+  and stored the session, then redirected to `/auth/callback` with no `?code=`,
+  which sent people to `/sign-in?error=signin`. Both routes now unwrap an
+  `/auth/*` `next` to its own `next` (or `/`) via `postAuthPath`.
+
 ## Build 2026.10.26.68
 
 - Added a Cloudflare Turnstile human check to the email sign-in form. Bots were

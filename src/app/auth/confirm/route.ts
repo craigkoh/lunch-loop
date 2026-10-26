@@ -1,7 +1,7 @@
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
-import { authReturnErrorCode, confirmOtpType, isAuthRateLimit, isSupabaseAuthCode, requestOrigin, safeReturnPath, signInRedirect } from "@/lib/auth-redirect";
+import { authReturnErrorCode, confirmOtpType, isAuthRateLimit, isSupabaseAuthCode, postAuthPath, requestOrigin, signInRedirect } from "@/lib/auth-redirect";
 import { establishAuthSession } from "@/lib/auth-session";
 
 /**
@@ -21,7 +21,7 @@ export async function GET(request: Request) {
   const code = url.searchParams.get("code");
   const tokenHash = url.searchParams.get("token_hash");
   const otpType = confirmOtpType(url.searchParams.get("type"));
-  const safeNext = safeReturnPath(url.searchParams.get("next"), origin);
+  const safeNext = postAuthPath(url.searchParams.get("next"), origin);
   if (isSupabaseAuthCode(code) && code) return establishAuthSession(request, code, safeNext);
   const fail = (failure: string) =>
     NextResponse.redirect(signInRedirect(origin, safeNext, failure));

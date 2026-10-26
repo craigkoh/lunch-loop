@@ -28,6 +28,10 @@ function changeText(change: ReleaseChange) {
 
 const releases: { build: string; changes: ReleaseChange[] }[] = [
   {
+    build: "2026.10.26.69",
+    changes: ["Fixed email sign-in links sending you back to the sign-in page instead of logging you in."],
+  },
+  {
     build: "2026.10.26.68",
     changes: ["Added a quick human check to email sign-in to keep spam bots out."],
   },

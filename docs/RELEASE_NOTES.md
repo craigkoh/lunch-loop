@@ -1,5 +1,16 @@
 # Release Notes
 
+## Build 2026.10.26.68
+
+- Added a Cloudflare Turnstile human check to the email sign-in form. Bots were
+  using the magic-link form (through Tor) to send sign-in emails to strangers.
+  The page sends the Turnstile token with `signInWithOtp`; Supabase enforces
+  it once Auth > Bot and Abuse Protection is turned on with the Turnstile
+  secret (done after this deploy, so sign-in never breaks).
+- Site key is public (`NEXT_PUBLIC_TURNSTILE_SITE_KEY`, with the live key as a
+  default). The secret lives only in Supabase.
+- CSP now allows `challenges.cloudflare.com` for script, frame, and connect.
+
 ## Build 2026.10.23.67
 
 - Fixed the app icon links. The page and manifest pointed at `/icon` and

@@ -46,6 +46,15 @@ requests, seven-day Places usage, provider errors, and Google Cloud budgets.
 
 ## Security model
 
+### Bot protection on sign-in (added 2026-10-26)
+
+Email sign-in uses Cloudflare Turnstile (widget "Lunch Loop sign-in" on Craig's
+Cloudflare account, hostnames lunchloop.app and localhost). The site key is
+public and set in code or `NEXT_PUBLIC_TURNSTILE_SITE_KEY`. The secret key is
+stored only in Supabase Auth > Bot and Abuse Protection (CAPTCHA provider:
+Turnstile). Turn that on only after a deploy that sends `captchaToken`, or
+email sign-in fails. Google sign-in is not affected.
+
 - Authentication uses Google or a one-time email magic link through Supabase
   Auth. Lunch Loop does not collect or store passwords. An email invitation
   still has to match the invited address, whether that person signs in with

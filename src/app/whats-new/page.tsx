@@ -28,6 +28,10 @@ function changeText(change: ReleaseChange) {
 
 const releases: { build: string; changes: ReleaseChange[] }[] = [
   {
+    build: "2026.10.26.68",
+    changes: ["Added a quick human check to email sign-in to keep spam bots out."],
+  },
+  {
     build: "2026.10.23.67",
     changes: ["Fixed the home-screen app icon so phones show the new Lunch Loop logo."],
   },

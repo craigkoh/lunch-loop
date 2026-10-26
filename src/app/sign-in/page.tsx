@@ -2,11 +2,22 @@
 
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { Suspense, useEffect, useState } from "react";
+import { Suspense, useEffect, useRef, useState } from "react";
 import { authErrorMessage, canonicalSiteOrigin, isAuthRateLimit, originForHost, safeReturnPath } from "@/lib/auth-redirect";
 import { createClient, hasSupabaseEnv } from "@/lib/supabase/client";
 
 const resendCooldownMs = 60_000;
+// Cloudflare Turnstile site key (public). Supabase checks the token when
+// Auth > Bot and Abuse Protection is on; until then it is simply ignored.
+const turnstileSiteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || "0x4AAAAAAFm4bzyJ3HIvysR-";
+
+type TurnstileApi = {
+  render: (el: HTMLElement, opts: Record<string, unknown>) => string;
+  reset: (id?: string) => void;
+};
+declare global {
+  interface Window { turnstile?: TurnstileApi }
+}
 const sentStorageKey = "lunch-loop-magic-link-sent";
 
 function authOrigin() {
@@ -23,6 +34,32 @@ function SignInScreen() {
   const [now, setNow] = useState(() => Date.now());
   const [message, setMessage] = useState(authErrorMessage(searchParams.get("error")));
   const [busy, setBusy] = useState<"email" | "google" | null>(null);
+  const [captchaToken, setCaptchaToken] = useState("");
+  const captchaBox = useRef<HTMLDivElement>(null);
+  const captchaId = useRef<string | null>(null);
+
+  useEffect(() => {
+    function mount() {
+      if (!window.turnstile || !captchaBox.current || captchaId.current) return;
+      captchaId.current = window.turnstile.render(captchaBox.current, {
+        sitekey: turnstileSiteKey,
+        callback: (token: string) => setCaptchaToken(token),
+        "expired-callback": () => setCaptchaToken(""),
+        "error-callback": () => setCaptchaToken(""),
+      });
+    }
+    if (window.turnstile) return mount();
+    const script = document.createElement("script");
+    script.src = "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit";
+    script.async = true;
+    script.onload = mount;
+    document.head.appendChild(script);
+  }, []);
+
+  function resetCaptcha() {
+    setCaptchaToken("");
+    if (window.turnstile && captchaId.current) window.turnstile.reset(captchaId.current);
+  }
 
   useEffect(() => {
     const raw = window.sessionStorage.getItem(sentStorageKey);
@@ -77,9 +114,12 @@ function SignInScreen() {
         // Supabase's default template sends the browser to this URL with
         // ?code=. /auth/callback exchanges it with the PKCE cookie set here.
         emailRedirectTo: emailRedirectTo.toString(),
+        captchaToken: captchaToken || undefined,
       },
     });
     setBusy(null);
+    // Turnstile tokens are single-use.
+    resetCaptcha();
     if (error) {
       setMessage(
         isAuthRateLimit(error)
@@ -187,6 +227,7 @@ function SignInScreen() {
             </button>
           </form>
         )}
+        <div ref={captchaBox} className="mt-4 flex min-h-[65px] justify-center" aria-label="Quick human check" />
         <div className="my-5 flex items-center gap-3 text-xs font-bold uppercase tracking-widest text-stone-400">
           <span className="h-px flex-1 bg-stone-200" />
           or

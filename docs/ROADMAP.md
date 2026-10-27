@@ -18,7 +18,9 @@ support.
    self-service deletion. Design a friend-readable personal export, and make removal,
    shared-history preservation, solo-loop cleanup, and archive recovery easy
    to understand.
-4. Configure Google Cloud budgets/quotas and observe real costs per active loop.
+4. Observe real Google costs per active loop. Budget alerts and 300-a-day
+   Places quotas are in place (2026-10-26); see
+   [Integrations](INTEGRATIONS.md#google-maps-platform).
 5. Obtain professional review of Privacy/Terms and the Lunch Loop name before
    broad public or monetized release.
 
@@ -60,7 +62,8 @@ pick. The note is a paper receipt about half the time, and otherwise a
 one-liner or a tip jar, never the same style twice in a row. On a wide
 screen the note sits beside the result. On a phone it stacks under the
 result. “Not now” hides it for that pick. There is no pop-up. A new database keeps `donations_enabled`
-off until a site admin turns it on. Production follows that same switch. A
+off until a site admin turns it on. Production has it on, with a live
+Stripe Payment Link. A
 donation does not change restaurant selection or unlock anything.
 
 Possible later options: group supporter plan, gifting, or optional post-choice
@@ -70,5 +73,7 @@ search data.
 
 Avoid sponsored search results, paid smart-pick boosts, restaurant ranking,
 selling group behavior, building a restaurant ad audience, or monetizing Google
-Places content. Move off Vercel Hobby and obtain current hosting, payment, tax,
-and Google Maps Platform guidance before taking payments.
+Places content. Vercel’s fair-use guidelines say asking for donations is not
+commercial use, so donations can stay on Hobby. Move off Vercel Hobby and get
+current payment, tax, and Google Maps Platform guidance before charging for
+anything (a paid plan, ads, or paid features).

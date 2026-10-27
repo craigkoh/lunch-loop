@@ -1,5 +1,24 @@
 # Release Notes
 
+## Docs update (Tuesday, October 27, 2026, no new build)
+
+Docs only. The live app is still build 2026.10.26.69.
+
+- Recorded the bot protection now live: Vercel Bot Protection in challenge
+  mode (scripts get HTTP 429, which counts as up), Turnstile enforced by
+  Supabase, and the nine bot accounts deleted on October 26.
+- Recorded the Google Cloud caps: 300 a day each for Places Autocomplete,
+  place details, and text search, plus a $10 monthly budget alert. A budget
+  alerts but does not stop charges.
+- Sign-in email already goes through Resend, with the custom `/auth/confirm`
+  link. Removed the old “until custom SMTP is enabled” wording.
+- Donations are on in production with a live Stripe link.
+- Noted that the Supabase Free plan has no managed restore, so manual dumps
+  are the backup, and added a playbook entry for removing a bot account.
+- Updated the build shown in the READMEs to .69, and changed “invite-only” to
+  match how sign-up works now: anyone can start a loop, and joining one needs
+  an invitation.
+
 ## Build 2026.10.26.69 (Monday, October 26, 2026)
 
 - Fixed email magic links landing on /sign-in. The live Magic Link template

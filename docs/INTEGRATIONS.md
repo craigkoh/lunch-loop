@@ -40,8 +40,10 @@ password field and the app never calls a password sign-in. The Email provider
 stays enabled so `signInWithOtp` can create an account (`shouldCreateUser`
 true) and send the link.
 
-Custom SMTP uses the same Resend account as invitation mail. In Supabase
-Authentication → Emails → SMTP Settings:
+Production uses Resend custom SMTP for sign-in email, and the custom
+`/auth/confirm` Magic Link template is live (checked 2026-10-27 from a real
+magic link). Custom SMTP uses the same Resend account as invitation mail. In
+Supabase Authentication → Emails → SMTP Settings:
 
 - Enable custom SMTP.
 - Host `smtp.resend.com`, port `465`, username `resend`.
@@ -65,7 +67,7 @@ In Authentication → URL Configuration for the production project:
 The wildcard entries let a magic link return to the page the person was
 trying to open, such as `/join`. The app also sends `emailRedirectTo` to
 `/auth/callback` on that same origin, because Supabase's default template
-(used until custom SMTP unlocks custom templates) verifies at
+(which a project without custom SMTP, such as staging, still uses) verifies at
 `/auth/v1/verify` and then redirects there with `?code=`. That callback must
 be allowlisted exactly, or GoTrue drops the person on the Site URL after
 confirming the email and no session is created. Keep only those Lunch Loop
@@ -98,9 +100,9 @@ hash as a recovery token and a confirm-signup hash as a confirmation token.
 `type=email` finds either hash. `type=signup` finds only the confirmation
 hash, so a magic-link template must stay on `type=email`. Hosted projects
 need the markup pasted into the dashboard; the config file does not update
-production templates. Until custom SMTP is enabled, the dashboard keeps
-Supabase's default `{{ .ConfirmationURL }}` template. That link still signs
-the person in: `/auth/v1/verify` confirms the email, then Lunch Loop exchanges
+production templates. Production has both templates pasted in. A project
+without custom SMTP keeps Supabase's default `{{ .ConfirmationURL }}`
+template. That link still signs the person in: `/auth/v1/verify` confirms the email, then Lunch Loop exchanges
 the returned `?code=` at `/auth/callback`. If the code or an auth error lands
 on any other page, the proxy forwards it there. A `#access_token` fragment is
 finished in the browser, because the server never receives it. Disable
@@ -158,6 +160,20 @@ authority for billing: configure budgets in
 [Cloud Billing](https://console.cloud.google.com/billing) and quotas in
 [Google Maps Platform Quotas](https://console.cloud.google.com/google/maps-apis/quotas).
 
+Live settings (Google Cloud project `lunch-loop-505604`, set 2026-10-26):
+
+| Setting | Value |
+| --- | --- |
+| Places API (New) Autocomplete | 300 requests a day |
+| Places API (New) GetPlace (place details) | 300 requests a day |
+| Places API (New) SearchText | 300 requests a day |
+| Budget | “craigkoh monthly $10”, whole billing account, alerts at 50%, 90%, 100% |
+
+The daily quotas are the hard stop. The budget only sends alerts; it does not
+stop charges. One restaurant search can use a few Autocomplete requests while
+someone types, so 300 a day is roughly 40–60 searches across the whole site.
+Raise a quota only after real use gets close to it.
+
 ## Resend and inbound email
 
 Resend is optional. Without it, owners can still copy one-time invitation links
@@ -185,8 +201,9 @@ provider for these addresses, directing each to a private maintainer inbox:
 | support@lunchloop.app | Public support and legal-policy contact |
 | craig@lunchloop.app | Global Admin notification recipient |
 
-Use a provider such as ImprovMX or Google Workspace; verify delivery after MX
-changes. Keep the forwarding destination out of documentation and source
+Production forwards these with Porkbun email forwarding (MX
+`fwd1.porkbun.com` and `fwd2.porkbun.com`). Another provider such as ImprovMX
+or Google Workspace also works; verify delivery after MX changes. Keep the forwarding destination out of documentation and source
 control.
 
 ## Discord notifications
@@ -203,7 +220,8 @@ local date/time, and decision events are copied to the selected Discord channel.
 
 The optional donation is a public Stripe Payment Link. It is not a secret.
 Lunch Loop shows it only on `/support`, and only while `donations_enabled` is
-true. A new database leaves that switch off. The footer “Fuel the loop” link
+true. A new database leaves that switch off. Production has it on, with a
+live Stripe Payment Link. The footer “Fuel the loop” link
 and the note under a finished pick (a receipt, a one-liner, or a tip jar)
 follow the same switch and go to `/support` rather than straight to Stripe.
 Do not send a test payment. Stripe hosts the payment page. Lunch Loop does not

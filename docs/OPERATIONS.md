@@ -44,16 +44,43 @@ version numbers.
 At least monthly, review Global Admin feedback, suspended groups, invite
 requests, seven-day Places usage, provider errors, and Google Cloud budgets.
 
+A daily maintainer check runs about 8 AM Central. It treats the Vercel bot
+challenge (HTTP 429 to scripts) as up, reads Vercel logs for real errors, and
+warns when Google Places use nears the 300-a-day Google quota. It only sends
+a message when something needs attention.
+
 ## Security model
 
-### Bot protection on sign-in (added 2026-10-26)
+### Bot protection (added 2026-10-26)
 
 Email sign-in uses Cloudflare Turnstile (widget "Lunch Loop sign-in" on Craig's
 Cloudflare account, hostnames lunchloop.app and localhost). The site key is
 public and set in code or `NEXT_PUBLIC_TURNSTILE_SITE_KEY`. The secret key is
 stored only in Supabase Auth > Bot and Abuse Protection (CAPTCHA provider:
-Turnstile). Turn that on only after a deploy that sends `captchaToken`, or
-email sign-in fails. Google sign-in is not affected.
+Turnstile). Production enforces it: since build .68 a sign-in email request
+without a valid token gets `captcha_failed`. If it is ever turned off and on
+again, deploy the code that sends `captchaToken` first, or email sign-in
+fails. Google sign-in is not affected. On 2026-10-26, nine bot-created
+accounts from the earlier magic-link abuse were deleted; a private JSON copy
+of each was kept outside the repository first.
+
+The Vercel Firewall managed rule **Bot Protection** is on in **challenge**
+mode (since 2026-10-26). Browsers pass a quick check without noticing.
+`curl`, scripts, and uptime monitors get HTTP 429 with a challenge page; for
+a health check, a 429 from Vercel counts as up. Supabase, Stripe, and Resend
+call their own services, not lunchloop.app, so the challenge does not affect
+them. If a future webhook must call lunchloop.app, add a firewall bypass rule
+for that exact path first.
+
+Google Cloud project `lunch-loop-505604` caps Places API (New) at 300 requests
+a day each for Autocomplete, GetPlace, and SearchText (lowered from the
+75,000–175,000 defaults on 2026-10-26). That is the hard stop on cost: when it
+is reached, restaurant search stops until the next day. It is tighter than the
+in-app limits in Global Admin (250 per person and 1,500 per loop per day), so
+Google’s quota is the real ceiling. The billing account has a $10 monthly
+budget named “craigkoh monthly $10” with alerts at 50%, 90%, and 100%. It
+covers the whole billing account, and a budget only sends alerts; it does not
+stop charges.
 
 - Authentication uses Google or a one-time email magic link through Supabase
   Auth. Lunch Loop does not collect or store passwords. An email invitation
@@ -76,13 +103,17 @@ email sign-in fails. Google sign-in is not affected.
 - Google and Resend keys are server-only. The browser has the Supabase
   publishable key only; RLS protects its access. Local generated credentials in
   supabase/.temp/ are ignored by Git.
-- Anonymous visitors have no direct grants on public tables or RPC functions.
-  Signed-in client calls use only explicitly granted RPCs and RLS-scoped reads.
+- Anonymous visitors have no direct grants on public tables. The only RPC
+  they can call is `get_donations_enabled`, which returns one true/false
+  value so public pages can show or hide the donation link (verified
+  2026-10-27). Signed-in client calls use only explicitly granted RPCs and
+  RLS-scoped reads. Ten tables have RLS on with no policies on purpose; they
+  are reached only through those RPCs.
 - Durable per-person/per-loop Google Places limits are enforced before Google
   calls. Global Admin shows recent usage and can change limits.
 - The Vercel Firewall allows 60 requests per minute from each client IP on
-  paths under `/api/`. This custom rule was added on 2026-10-19. Before that
-  change the project firewall config was empty. The limit sits in front of
+  paths under `/api/`. This custom rule was added on 2026-10-19 and was still
+  active on 2026-10-27, alongside the Bot Protection rule above. The limit sits in front of
   the app and does not replace sign-in, same-origin checks, row-level
   security, or the Places limits.
 - A dependency audit on 2026-10-20 found 10 warnings (1 critical, 9 high) in
@@ -95,7 +126,10 @@ email sign-in fails. Google sign-in is not affected.
   eslint-config-next to Next 14 to silence them.
 - Re-run `npm audit` after the next dependency change. The in-memory helper
   in src/lib/rate-limit.ts is still unused. The live limit for `/api/` is the
-  Vercel Firewall rule above, plus sign-in and the Places limits.
+  Vercel Firewall rule above, plus sign-in and the Places limits. In the
+  database, `enforce_user_rate_limit` limits first-loop creation (2 an hour)
+  and new loops (3 an hour). Member invitations are bounded by open crew
+  seats. New-loop referral emails and feedback have no per-person limit yet.
 - Global Admin user lookup is a bounded private full-name/email search, not a
   browser-downloaded directory. Permanent loop deletion requires Global Admin
   authorization and the exact loop name; it is intended for test loops or a
@@ -145,7 +179,7 @@ running and its current CLI must be first on `PATH`. On this Mac use:
 Global Admin is database-assigned. It reviews groups, invite requests, feedback,
 usage limits, feedback state/priority, the optional Value for Value ask, and
 site-wide group-creation controls. A new database keeps `donations_enabled`
-off. Turning it on shows “Fuel the loop” in the footer, linking to `/support`,
+off. Production has it on (Stripe is live). Turning it on shows “Fuel the loop” in the footer, linking to `/support`,
 and shows a dismissible note on every finished pick: a receipt, a one-liner,
 or a tip jar. “Not now” hides that note for that pick only. Turning it off
 hides the footer link and every note, and `/support` says support isn’t open.
@@ -177,11 +211,12 @@ the reporter's history or data export.
 | Places usage spike | Lower limits in Global Admin, pause new loops if needed, check Google Cloud usage/quota/billing, and investigate activity. |
 | OAuth failure | Check the Supabase project for that deployment. Production rewrites `*.vercel.app` to lunchloop.app. A preview stays on its own host, so its staging allowlist must include that origin. Also check Google client config. |
 | Magic link signs in, then lands on /sign-in | Fixed in build .69. Auth logs show `POST /verify` 200 and a `Login` with `login_method=otp`, but the page ends at `/sign-in?error=signin`. Cause was `next={{ .RedirectTo }}` pointing at `/auth/callback`; `postAuthPath` in `src/lib/auth-redirect.ts` now unwraps it. A later 403 `otp_expired` on the same link is expected (one-time token). |
-| Magic link not arriving or signs in with no session | Check Supabase custom SMTP (Resend), the redirect allowlist for that project (it must include `/auth/callback`), the spam folder, and Supabase Auth logs. `email_confirmed_at` set with `last_sign_in_at` empty means `/auth/v1/verify` confirmed the address and the app never exchanged the returned `?code=`. The Magic Link template uses `/auth/confirm` with `type=email` once custom templates are unlocked. The Confirm signup template uses the same path with `type=signup`. Until then, the default `{{ .ConfirmationURL }}` link is handled at `/auth/callback`. |
+| Magic link not arriving or signs in with no session | Check Supabase custom SMTP (Resend), the redirect allowlist for that project (it must include `/auth/callback`), the spam folder, and Supabase Auth logs. `email_confirmed_at` set with `last_sign_in_at` empty means `/auth/v1/verify` confirmed the address and the app never exchanged the returned `?code=`. Production sends through Resend custom SMTP, and its Magic Link template links to `/auth/confirm` with `type=email`. The Confirm signup template uses the same path with `type=signup`. A project still on Supabase's default `{{ .ConfirmationURL }}` link (for example staging) is handled at `/auth/callback`. |
 | Feedback webhook failing | Confirm Vault secrets lunchloop_feedback_webhook_url and lunchloop_feedback_webhook_key exist, the site feedback-alert switch is on, and pg_net request logs. A missing secret skips the alert and leaves notified_at empty. The Resend fallback still sends and does not include the reporter email. |
 | Broken production release | Stop compounding changes, inspect Vercel/Supabase logs, and revert to a known good deployment if appropriate. |
 | Discord failure | Confirm webhook/channel/events, then inspect Supabase asynchronous HTTP records/logs. |
-| Data-loss concern | Stop destructive actions, preserve backups, use Supabase recovery/PITR where available, and validate restore outside production. |
+| Data-loss concern | Stop destructive actions and preserve backups. Production is on the Supabase Free plan, which has no point-in-time recovery or downloadable managed backups, so the latest manual dump is the restore point. Validate a restore outside production. |
+| Bot or abusive account | Check Supabase Auth logs. Save a private copy of the account rows, then delete the user in Supabase Authentication → Users (or ban it for a set time with the Auth admin API). Suspend any loop it owns in Global Admin. Lunch Loop has no in-app user ban. |
 
 ## Data handling
 

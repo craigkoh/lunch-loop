@@ -179,8 +179,10 @@ Create a fresh private backup before database or workflow changes:
 Backups may contain account information, sessions, and Discord configuration.
 Keep them private. Never restore over production as a test: restore into a new
 equivalent Supabase project, verify users/data/auth/integrations, then choose
-whether to switch traffic. Prefer Supabase managed backup/PITR for an incident
-in the existing project.
+whether to switch traffic. Production is on the Supabase Free plan, which has
+no point-in-time recovery and no downloadable managed backups, so these manual
+dumps are the only restore point. Take one before each database change and on
+a regular schedule.
 
 ## Sign-in callback essentials
 

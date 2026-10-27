@@ -6,8 +6,8 @@
 
 <p align="center">
   <a href="https://lunchloop.app"><img alt="Live app" src="https://img.shields.io/badge/Live%20app-lunchloop.app-f97316?style=for-the-badge" /></a>
-  <a href="https://lunchloop.app/whats-new"><img alt="Current build" src="https://img.shields.io/badge/Build-2026.10.23.65-9a3412?style=for-the-badge" /></a>
-  <a href="https://lunchloop.app/privacy"><img alt="Invite only" src="https://img.shields.io/badge/Access-invite--only-fff7ed?style=for-the-badge&amp;labelColor=f97316" /></a>
+  <a href="https://lunchloop.app/whats-new"><img alt="Current build" src="https://img.shields.io/badge/Build-2026.10.26.69-9a3412?style=for-the-badge" /></a>
+  <a href="https://lunchloop.app/privacy"><img alt="Private crews" src="https://img.shields.io/badge/Access-private--crews-fff7ed?style=for-the-badge&amp;labelColor=f97316" /></a>
 </p>
 
 <p align="center"><strong>The fun lunch loop for 2–6 friends.</strong><br />
@@ -64,8 +64,9 @@ each crew’s people, places, and history private to that crew.
 
 ## 🔐 Privacy and product boundaries
 
-Lunch Loop is invite-only today. A member can see only the Lunch Loops they
-belong to; database row-level security enforces that boundary server-side.
+Lunch Loops are private. A signed-in person can start their own loop, but
+joining someone else’s loop needs that owner’s invitation. A member can see
+only the Lunch Loops they belong to; database row-level security enforces that boundary server-side.
 Sign-in is Google (`openid`, `email`, and `profile`) or a one-time email
 link. Lunch Loop does not use passwords. Google is also used for optional
 place details—not Gmail, Drive, Calendar, contacts, or device location.
@@ -147,5 +148,5 @@ Created and maintained by [Craig Kohler](https://craigkohler.com).
 <p align="center">
   <a href="https://lunchloop.app"><strong>lunchloop.app</strong></a> ·
   <a href="https://craigkohler.com"><strong>craigkohler.com</strong></a> ·
-  <a href="https://lunchloop.app/whats-new"><strong>Build 2026.10.23.65</strong></a>
+  <a href="https://lunchloop.app/whats-new"><strong>Build 2026.10.26.69</strong></a>
 </p>

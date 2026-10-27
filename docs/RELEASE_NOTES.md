@@ -1,5 +1,21 @@
 # Release Notes
 
+## Build 2026.10.27.70 (Tuesday, October 27, 2026)
+
+- Privacy Policy (updated October 27, 2026) now lists Cloudflare Turnstile,
+  the human check on email sign-in, and Vercel bot protection. Both see
+  browser and network details such as IP address; Lunch Loop gets only a
+  pass/fail result.
+- “Start your own Lunch Loop” emails are limited to 4 per person per day,
+  using the same `enforce_user_rate_limit` check as loop creation. The 5th
+  try says “You can send up to 4 … invitations a day. Please try again
+  tomorrow.” A mistyped email does not use up a send. Migration
+  `20261027233839_limit_new_loop_referral_emails.sql` is on staging (tested:
+  4 succeed, the 5th is refused) and goes to production after merge.
+- Added a repeatable backup: `scripts/backup/export.sql` and
+  `scripts/backup/lunch-loop-backup.sh`. The first full copy was taken
+  October 27 (19 tables, 254 rows, 3 accounts).
+
 ## Docs update (Tuesday, October 27, 2026, no new build)
 
 Docs only. The live app is still build 2026.10.26.69.

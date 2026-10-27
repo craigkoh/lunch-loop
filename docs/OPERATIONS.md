@@ -127,9 +127,13 @@ stop charges.
 - Re-run `npm audit` after the next dependency change. The in-memory helper
   in src/lib/rate-limit.ts is still unused. The live limit for `/api/` is the
   Vercel Firewall rule above, plus sign-in and the Places limits. In the
-  database, `enforce_user_rate_limit` limits first-loop creation (2 an hour)
-  and new loops (3 an hour). Member invitations are bounded by open crew
-  seats. New-loop referral emails and feedback have no per-person limit yet.
+  database, `enforce_user_rate_limit` limits first-loop creation (2 an hour),
+  new loops (3 an hour), and “Start your own Lunch Loop” emails (4 a day per
+  person, from build .70; this also covers the My Loops “start another loop”
+  button, which uses the same invitation). Each new action name must also be
+  added to the `user_action_rate_limits_action_name_check` constraint.
+  Member invitations are bounded by open crew seats. Feedback has no
+  per-person limit yet.
 - Global Admin user lookup is a bounded private full-name/email search, not a
   browser-downloaded directory. Permanent loop deletion requires Global Admin
   authorization and the exact loop name; it is intended for test loops or a
@@ -157,6 +161,29 @@ stop charges.
 Global Admin growth controls, summary reports, and usage limits are live. Run
 lint and the production build before every release. Re-run the production
 dependency audit after dependency changes.
+
+## Database backups
+
+Production is on the Supabase Free plan, so there is no managed restore. The
+maintainer bot keeps its own copies on the box:
+
+1. Run `scripts/backup/export.sql` against production with the Supabase MCP
+   `execute_sql` tool, saving the result to a file. It only reads.
+2. Run `scripts/backup/lunch-loop-backup.sh <that file>` (a copy also lives at
+   `/workspace/lunch-loop-backup.sh`). It writes
+   `/workspace/lunchloop-backups/YYYYMMDD-HHMMSS/` with one JSON file per
+   table, `auth_users.json`, `migrations.json`, `counts.json`, and
+   `SHA256SUMS`, then checks that every row count matches, no public table is
+   missing from the query, and accounts and settings are not empty. It exits
+   non-zero on any problem. It keeps the newest 14 dated folders and deletes
+   older ones.
+3. When a migration adds a table, add it to `export.sql`.
+
+This is a data copy. The schema comes from `supabase/migrations/`. The folders
+hold user emails and the Discord webhook URL: keep them private, never commit
+them. The first copy with this script is `20261027-183749` (19 tables, 254
+rows, 3 accounts, 46 migrations). For a full `pg_dump`, use the Mac
+procedure in [Development](DEVELOPMENT.md#backup-and-restore).
 
 ## Home-screen startup recovery
 

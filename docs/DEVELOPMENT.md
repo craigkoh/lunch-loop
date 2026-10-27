@@ -181,8 +181,9 @@ Keep them private. Never restore over production as a test: restore into a new
 equivalent Supabase project, verify users/data/auth/integrations, then choose
 whether to switch traffic. Production is on the Supabase Free plan, which has
 no point-in-time recovery and no downloadable managed backups, so these manual
-dumps are the only restore point. Take one before each database change and on
-a regular schedule.
+dumps are the only restore point. Take one before each database change. The
+maintainer bot also keeps a rolling 14-copy data backup on its box; see
+[Operations](OPERATIONS.md#database-backups).
 
 ## Sign-in callback essentials
 

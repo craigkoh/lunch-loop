@@ -17,7 +17,7 @@ export const metadata: Metadata = {
   },
 };
 
-const updated = "October 23, 2026";
+const updated = "October 27, 2026";
 
 export default function PrivacyPage() {
   return (
@@ -82,6 +82,8 @@ export default function PrivacyPage() {
           <li><strong>Google:</strong> optional Google Sign-In, and Google Maps Platform, including Google Places and Google Maps.</li>
           <li><strong>Supabase:</strong> authentication (including one-time email links), database, and access-control services.</li>
           <li><strong>Vercel:</strong> application hosting, delivery, and operational logs.</li>
+          <li><strong>Cloudflare Turnstile:</strong> the human check on email sign-in. To tell people from bots, it sees technical details from your browser and network, such as your IP address, browser type, and how the page was loaded. Lunch Loop receives only a pass or fail token and does not store those details.</li>
+          <li><strong>Vercel bot protection:</strong> Vercel may briefly check your browser before a page loads to block automated traffic. It uses similar browser and network details.</li>
           <li><strong>Resend:</strong> invitation email, one-time sign-in links, and operational email when email delivery is enabled.</li>
           <li><strong>Maintainer feedback alerts:</strong> when the site switch is on, a new feedback report is sent to the operator’s notification bot. The alert includes the report, your display name, and a credit name only if you opted in. It does not include your email address. The destination address and access key stay in Supabase Vault and are not written into the app or this policy.</li>
           <li><strong>Discord:</strong> only when a loop owner voluntarily configures a Discord webhook.</li>

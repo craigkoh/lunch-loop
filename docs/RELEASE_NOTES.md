@@ -36,6 +36,9 @@ Interface fixes from the UI review:
 - The Start form has numbered steps: 1 Name it, 2 Pick the type, 3 Set the
   area.
 - `OPERATIONS.md` backup section starts with the exact routine steps.
+- Dev only: the CSP allows `'unsafe-eval'` in `npm run dev` so React can
+  rebuild call stacks. This removes the red “1 Issue” badge on every dev page.
+  Production CSP is unchanged (React never uses eval in production).
 
 ## Build 2026.10.27.70 (Tuesday, October 27, 2026)
 

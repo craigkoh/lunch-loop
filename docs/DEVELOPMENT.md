@@ -204,3 +204,13 @@ Run `npm run dev` and open `http://localhost:3000/dev/receipt`. It shows the
 receipt (a regular lunch and a first lunch), the tip jar, and the one-liner
 inside the orange hero, using fixture data. The page calls `notFound()` when
 `NODE_ENV` is `production`, so it is a 404 on lunchloop.app.
+
+## Dev overlay and CSP
+
+`next.config.ts` adds `'unsafe-eval'` to `script-src` only when `NODE_ENV` is
+`development`. React needs eval in dev to rebuild call stacks. Without it,
+every dev page shows a red “1 Issue” badge with “eval() is not supported in
+this environment”. Production CSP has no `'unsafe-eval'`. If the badge comes
+back, click it and read the error. It is a real problem, not this warning.
+For screenshots, hide the small “N” dev button by injecting
+`nextjs-portal{display:none}` in the browser script. Do not change the app.

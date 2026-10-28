@@ -48,6 +48,19 @@ rate limits and a hosted bot challenge.
 - A native iPhone wrapper only if the PWA has a real user-facing limitation.
 - Show real site stats (e.g. lunches decided) on /support and receipts once usage grows, as V4V proof.
 
+## Next PR (open list, added Oct 28, 2026)
+
+Items Craig has approved for the next batch. More may be added.
+
+- Rename "picked" to "won" (Chris's feedback). "Picked" reads like someone
+  chose the place for a list, but it means the place won a lunch. Shows in
+  the restaurant list, restaurant cards, and the details popup. Suggested:
+  "🏆 2 wins · last won Oct 21", "No wins yet", sorts "Most wins" /
+  "Fewest wins".
+- A button to view a report or summary of your loop.
+- A CSV download of loop data.
+- Keep the random facts sprinkled through the app (do not remove them).
+
 ## Backlog
 
 - Plate Loop is the live icon. The arrow is documented in

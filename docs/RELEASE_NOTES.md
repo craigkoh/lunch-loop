@@ -1,5 +1,45 @@
 # Release Notes
 
+## Build 2026.10.27.71 (Tuesday, October 27, 2026)
+
+Thank-you after a pick (Seth did not see the old receipt was asking for a tip):
+
+- Receipt is headed “Tip the loop?”, says “Lunch Loop is free. This is an
+  optional tip.”, and the button is “Tip the loop ($1–3)”. The tip jar shows
+  the same free line.
+- Receipt lines are now facts about that one lunch: places in the running,
+  vetoes, time to decide (`winner_recorded_at` − `started_at`), distance
+  from the loop’s home area, visit number, days since the last visit,
+  rating, cuisine, who picked, and Ads shown 0. Missing facts are left off.
+  The old crew counts, “Paid placements”, and VOID joke lines are gone. The
+  extra facts are read with the member’s own access (no migration), and only
+  when a receipt is shown.
+- Style is truly random (`Math.random`), picked once per lunch and saved on
+  the device: about 1 in 4 lunches show nothing; otherwise receipt,
+  one-liner, and tip jar are equally likely, never the same as the last one
+  shown. A 100,000-pick simulation gave 25/25/25/25% and no repeats.
+- Dev-only preview at `/dev/receipt` (404 in production).
+
+Interface fixes from the UI review:
+
+- Settings is split into tabs: Crew, Area & loops, Places, Owner tools
+  (owners only). The tab is kept in the URL hash.
+- Phones get a ☰ account menu instead of the row of header links.
+- “Put Lunch Loop on your phone” shows only on phones, never in the
+  installed app, and “Not now” hides it for good. The duplicate card on
+  Settings is gone.
+- New loops hide zero-count cards on Home (“No places yet” instead of
+  “0 places”).
+- “Use code” no longer wraps on the no-loop page.
+- “← Back to Lunch Loop” / “Back to Lunch Loop” is now “🏠 Home” everywhere.
+- More bottom padding (with the phone safe area) above the fixed tab bar.
+- The Start form has numbered steps: 1 Name it, 2 Pick the type, 3 Set the
+  area.
+- `OPERATIONS.md` backup section starts with the exact routine steps.
+- Dev only: the CSP allows `'unsafe-eval'` in `npm run dev` so React can
+  rebuild call stacks. This removes the red “1 Issue” badge on every dev page.
+  Production CSP is unchanged (React never uses eval in production).
+
 ## Build 2026.10.27.70 (Tuesday, October 27, 2026)
 
 - Privacy Policy (updated October 27, 2026) now lists Cloudflare Turnstile,
@@ -11,7 +51,9 @@
   try says “You can send up to 4 … invitations a day. Please try again
   tomorrow.” A mistyped email does not use up a send. Migration
   `20261027233839_limit_new_loop_referral_emails.sql` is on staging (tested:
-  4 succeed, the 5th is refused) and goes to production after merge.
+  4 succeed, the 5th is refused). Applied to production October 27 after a
+  fresh backup (`20261027-195710`); a rolled-back test there also allowed 4
+  and refused the 5th.
 - Added a repeatable backup: `scripts/backup/export.sql` and
   `scripts/backup/lunch-loop-backup.sh`. The first full copy was taken
   October 27 (19 tables, 254 rows, 3 accounts).

@@ -93,7 +93,7 @@ export function InstallGuide() {
           href="/"
           className="rounded-xl px-3 py-2 text-sm font-bold text-stone-700 transition hover:bg-orange-100"
         >
-          Back to Lunch Loop
+          🏠 Home
         </Link>
       </header>
 

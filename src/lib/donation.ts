@@ -1,25 +1,15 @@
 export const donationUrl = "https://donate.stripe.com/aFafZg58yg91fKIdyZ53O00";
 export const fuelLinkLabel = "Fuel the loop";
+export const tipAskLabel = "Tip the loop ($1–3)";
+export const tipFreeNote = "Lunch Loop is free. This is an optional tip.";
 
 const storagePrefix = "lunch-loop-v4v-nudge:";
 
 export const nudgeStyles = ["receipt", "line", "jar"] as const;
 export type NudgeStyle = (typeof nudgeStyles)[number];
 
-const nudgeWeights: Record<NudgeStyle, number> = {
-  receipt: 2,
-  line: 1,
-  jar: 1,
-};
-
-export const receiptJokes = [
-  "\"I don't care, you pick\"",
-  "Group chat spiral",
-  "Minutes of debate",
-  "Coin-flip lunch",
-  "\"Someone else choose\"",
-  "One more option",
-] as const;
+/** About 1 in 4 finished picks show no thank-you at all. */
+export const nudgeSkipChance = 0.25;
 
 export const oneLiners: { before: string; link: string; after: string }[] = [
   { before: "Lunch handled. If the loop gave you value, ", link: "send some back.", after: "" },
@@ -35,73 +25,111 @@ export const oneLiners: { before: string; link: string; after: string }[] = [
 export type PickNudgeRecord = {
   sessionId: string;
   dismissed: boolean;
+  /** null means this pick rolled "show nothing". */
   style: NudgeStyle | null;
   variant: number;
+  /** The last style actually shown, so a quiet pick does not reset the no-repeat rule. */
+  lastShown: NudgeStyle | null;
 };
 
+/** Facts about this one lunch. Missing values are null and their receipt line is left off. */
 export type PickNudgeFacts = {
   loopName: string;
   restaurantName: string;
   pickedOn: string;
-  memberCount: number;
-  closedLunchCount: number;
+  placesInRunning: number;
   vetoCount: number;
+  decideMinutes: number | null;
+  distanceMiles: number | null;
+  visitNumber: number | null;
+  daysSinceLastVisit: number | null;
+  rating: number | null;
+  cuisine: string | null;
+  pickedBy: string | null;
 };
 
 export type ReceiptLine = {
   label: string;
   value: string;
-  joke?: boolean;
 };
 
-export function hashNudge(userId: string, sessionId: string) {
-  let hash = 0;
-  const text = `${userId}:${sessionId}`;
-  for (let index = 0; index < text.length; index += 1) {
-    hash = (Math.imul(hash, 31) + text.charCodeAt(index)) >>> 0;
-  }
-  return hash;
-}
-
-/** Weighted pick. Receipt is half, the other two split the rest. Never repeats the previous style. */
-export function pickNudgeStyle(seed: number, previous: NudgeStyle | null): NudgeStyle {
+/**
+ * Truly random, decided once per lunch. About 1 in 4 shows nothing.
+ * Otherwise receipt, one-liner, and tip jar have equal odds, never the
+ * style shown last time.
+ */
+export function pickNudgeStyle(roll: number, previous: NudgeStyle | null): NudgeStyle | null {
+  if (roll < nudgeSkipChance) return null;
   const pool = previous ? nudgeStyles.filter((style) => style !== previous) : [...nudgeStyles];
-  const total = pool.reduce((sum, style) => sum + nudgeWeights[style], 0);
-  let cursor = seed % total;
-  for (const style of pool) {
-    cursor -= nudgeWeights[style];
-    if (cursor < 0) return style;
-  }
-  return pool[pool.length - 1];
+  const share = (roll - nudgeSkipChance) / (1 - nudgeSkipChance);
+  return pool[Math.min(pool.length - 1, Math.floor(share * pool.length))];
 }
 
-export function receiptLines(facts: PickNudgeFacts, variant: number): ReceiptLine[] {
-  const joke = receiptJokes[variant % receiptJokes.length];
-  return [
-    { label: "Crew members", value: String(facts.memberCount) },
-    { label: "Lunches closed", value: String(facts.closedLunchCount) },
-    { label: "Vetoes used", value: String(facts.vetoCount) },
-    { label: joke, value: "VOID", joke: true },
+export function formatDecideTime(minutes: number) {
+  if (minutes < 1) return "Under 1 min";
+  if (minutes < 60) return `${Math.round(minutes)} min`;
+  const hours = minutes / 60;
+  if (hours < 48) {
+    const whole = Math.floor(hours);
+    const rest = Math.round(minutes - whole * 60);
+    return rest ? `${whole} hr ${rest} min` : `${whole} hr`;
+  }
+  return `${Math.round(hours / 24)} days`;
+}
+
+export function milesBetween(
+  from: { lat: number; lng: number },
+  to: { lat: number; lng: number },
+) {
+  const radians = (value: number) => (value * Math.PI) / 180;
+  const earthMiles = 3958.8;
+  const dLat = radians(to.lat - from.lat);
+  const dLng = radians(to.lng - from.lng);
+  const a =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos(radians(from.lat)) * Math.cos(radians(to.lat)) * Math.sin(dLng / 2) ** 2;
+  return 2 * earthMiles * Math.asin(Math.sqrt(a));
+}
+
+export function receiptLines(facts: PickNudgeFacts): ReceiptLine[] {
+  const lines: (ReceiptLine | null)[] = [
+    { label: "Places in the running", value: String(facts.placesInRunning) },
+    { label: "Vetoes", value: String(facts.vetoCount) },
+    facts.decideMinutes === null ? null : { label: "Time to decide", value: formatDecideTime(facts.decideMinutes) },
+    facts.distanceMiles === null
+      ? null
+      : { label: "Distance", value: `${facts.distanceMiles < 10 ? facts.distanceMiles.toFixed(1) : Math.round(facts.distanceMiles)} mi` },
+    facts.visitNumber === null
+      ? null
+      : { label: "Visit", value: facts.visitNumber <= 1 ? "First time" : `#${facts.visitNumber}` },
+    facts.daysSinceLastVisit === null
+      ? null
+      : {
+          label: "Since last visit",
+          value: facts.daysSinceLastVisit < 1 ? "Same day" : `${facts.daysSinceLastVisit} ${facts.daysSinceLastVisit === 1 ? "day" : "days"}`,
+        },
+    facts.rating ? { label: "Rating", value: `${facts.rating.toFixed(1)} ★` } : null,
+    facts.cuisine ? { label: "Cuisine", value: facts.cuisine } : null,
+    facts.pickedBy ? { label: "Picked by", value: facts.pickedBy } : null,
     { label: "Ads shown", value: "0" },
-    { label: "Paid placements", value: "0" },
   ];
+  return lines.filter((line): line is ReceiptLine => line !== null);
 }
 
 export function decidePickNudge(
   saved: PickNudgeRecord | null,
-  userId: string,
   sessionId: string,
-): { visible: false } | { visible: true; style: NudgeStyle; variant: number } {
-  if (saved?.sessionId === sessionId && saved.dismissed) return { visible: false };
-  if (saved?.sessionId === sessionId && saved.style) {
-    return { visible: true, style: saved.style, variant: saved.variant };
+  random: () => number = Math.random,
+): { visible: false; record: PickNudgeRecord | null } | { visible: true; style: NudgeStyle; variant: number; record: PickNudgeRecord | null } {
+  if (saved?.sessionId === sessionId) {
+    if (saved.dismissed || !saved.style) return { visible: false, record: null };
+    return { visible: true, style: saved.style, variant: saved.variant, record: null };
   }
-  const seed = hashNudge(userId, sessionId);
-  return {
-    visible: true,
-    style: pickNudgeStyle(seed, saved?.style ?? null),
-    variant: seed % oneLiners.length,
-  };
+  const previous = saved?.lastShown ?? saved?.style ?? null;
+  const style = pickNudgeStyle(random(), previous);
+  const variant = Math.floor(random() * oneLiners.length);
+  const record: PickNudgeRecord = { sessionId, dismissed: false, style, variant, lastShown: style ?? previous };
+  return style ? { visible: true, style, variant, record } : { visible: false, record };
 }
 
 export function readPickNudge(userId: string): PickNudgeRecord | null {
@@ -116,6 +144,7 @@ export function readPickNudge(userId: string): PickNudgeRecord | null {
       dismissed: parsed.dismissed === true,
       style,
       variant: typeof parsed.variant === "number" ? parsed.variant : 0,
+      lastShown: nudgeStyles.includes(parsed.lastShown as NudgeStyle) ? (parsed.lastShown as NudgeStyle) : style,
     };
   } catch {
     return null;

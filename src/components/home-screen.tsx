@@ -573,6 +573,12 @@ export function HomeScreen() {
         new Date(a.created_at ?? 0).getTime() ||
       a.name.localeCompare(b.name),
   )[0];
+  // New loops have nothing to count yet, so zero-value cards stay hidden.
+  const freshPlaceCount = available.filter((restaurant) => restaurant.visit_count === 0).length;
+  const cuisineCount = available.length
+    ? new Set(available.map((restaurant) => restaurant.cuisine || "Restaurant")).size
+    : 0;
+  const loreCardCount = 1 + (freshPlaceCount > 0 ? 1 : 0) + (cuisineCount > 0 ? 1 : 0);
   const scheduleHasPassed = Boolean(
     current && new Date(current.scheduled_for) <= new Date(),
   );
@@ -1567,13 +1573,21 @@ export function HomeScreen() {
               <PickValueNudge
                 userId={context.userId}
                 sessionId={current.id}
-                facts={{
+                base={{
                   loopName: context.groupName,
+                  groupId: context.groupId,
                   restaurantName: winner?.name ?? "Today's pick",
+                  restaurantId: winner?.id ?? null,
+                  restaurantLat: winner?.lat ?? null,
+                  restaurantLng: winner?.lng ?? null,
+                  scheduledFor: current.scheduled_for,
                   pickedOn: receiptDate(current.scheduled_for, timeZone),
-                  memberCount,
-                  closedLunchCount: completedCount,
+                  placesInRunning: candidates.length,
                   vetoCount: vetoes.length,
+                  visitNumber: winner ? winner.visit_count : null,
+                  rating: winner?.rating ?? null,
+                  cuisine: winner?.cuisine ?? null,
+                  pickedBy: suggester?.display_name ?? null,
                 }}
               />
             </div>
@@ -1648,7 +1662,9 @@ export function HomeScreen() {
                 Lunch database
               </p>
               <p className="mt-2 text-xl font-black">
-                {restaurants.length} places
+                {restaurants.length === 0
+                  ? "No places yet"
+                  : `${restaurants.length} ${restaurants.length === 1 ? "place" : "places"}`}
               </p>
               <p className="mt-1 text-sm text-orange-700">
                 Browse and sort every place →
@@ -1698,18 +1714,14 @@ export function HomeScreen() {
             <p className="mt-1 text-sm text-stone-500">
               Tap a card to explore the detail behind it.
             </p>
-            <div className="mt-3 grid gap-3 sm:grid-cols-3">
-              <Link
+            <div className={`mt-3 grid gap-3 ${loreCardCount >= 3 ? "sm:grid-cols-3" : loreCardCount === 2 ? "sm:grid-cols-2" : ""}`}>
+              {freshPlaceCount > 0 && <Link
                 href="/database?sort=never-visited"
                 className="rounded-2xl border border-orange-100 bg-white p-4 transition hover:ring-2 hover:ring-orange-300"
               >
                 <p className="text-2xl">🌱</p>
                 <p className="mt-2 text-xl font-black">
-                  {
-                    available.filter(
-                      (restaurant) => restaurant.visit_count === 0,
-                    ).length
-                  }
+                  {freshPlaceCount}
                 </p>
                 <p className="text-sm text-stone-500">
                   places waiting for a first visit
@@ -1717,20 +1729,14 @@ export function HomeScreen() {
                 <p className="mt-2 text-xs font-bold text-orange-700">
                   See fresh places →
                 </p>
-              </Link>
-              <Link
+              </Link>}
+              {cuisineCount > 0 && <Link
                 href="/stats#cuisine-popularity"
                 className="rounded-2xl border border-orange-100 bg-white p-4 transition hover:ring-2 hover:ring-orange-300"
               >
                 <p className="text-2xl">🍽️</p>
                 <p className="mt-2 text-xl font-black">
-                  {
-                    new Set(
-                      available.map(
-                        (restaurant) => restaurant.cuisine || "Restaurant",
-                      ),
-                    ).size
-                  }
+                  {cuisineCount}
                 </p>
                 <p className="text-sm text-stone-500">
                   different cuisines in the database
@@ -1738,7 +1744,7 @@ export function HomeScreen() {
                 <p className="mt-2 text-xs font-bold text-orange-700">
                   See cuisine stats →
                 </p>
-              </Link>
+              </Link>}
               {newestRestaurant ? (
                 <button
                   type="button"

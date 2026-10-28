@@ -18,6 +18,7 @@ const tabs = [
   { href: "/history", label: "History", emoji: "🗓️" },
   { href: "/stats", label: "Stats", emoji: "📊" },
 ];
+const installCardKey = "lunch-loop-install-card-dismissed";
 type MembershipNotification = {
   id: string;
   group_id: string;
@@ -33,6 +34,8 @@ export function AppFrame({ children }: { children: ReactNode }) {
   const [currentLoop, setCurrentLoop] = useState<LunchLoopSummary | null>(null);
   const [isGlobalAdmin, setIsGlobalAdmin] = useState(false);
   const [membershipNotifications, setMembershipNotifications] = useState<MembershipNotification[]>([]);
+  const [accountMenuOpen, setAccountMenuOpen] = useState(false);
+  const [showInstallCard, setShowInstallCard] = useState(false);
   const headerLoadInFlight = useRef(false);
   const userIdRef = useRef("");
   userIdRef.current = userId;
@@ -105,6 +108,21 @@ export function AppFrame({ children }: { children: ReactNode }) {
     });
     return () => listener.subscription.unsubscribe();
   }, []);
+  useEffect(() => {
+    // Phones only, never inside the installed app, and gone for good once dismissed.
+    const standalone =
+      window.matchMedia("(display-mode: standalone)").matches ||
+      (navigator as Navigator & { standalone?: boolean }).standalone === true;
+    const dismissed = window.localStorage.getItem(installCardKey) === "1";
+    setShowInstallCard(!standalone && !dismissed);
+  }, []);
+  useEffect(() => {
+    setAccountMenuOpen(false);
+  }, [pathname]);
+  function dismissInstallCard() {
+    window.localStorage.setItem(installCardKey, "1");
+    setShowInstallCard(false);
+  }
   function dismissPrompt() {
     if (!userId) return;
     dismissFeedbackPrompt(userId);
@@ -168,10 +186,22 @@ export function AppFrame({ children }: { children: ReactNode }) {
               </span>
               <span className="hidden sm:inline">Refresh</span>
             </button>
+            {account && (
+              <button
+                type="button"
+                onClick={() => setAccountMenuOpen((open) => !open)}
+                className="inline-flex min-h-9 items-center gap-1 rounded-xl bg-white px-3 py-2 text-xs font-black text-stone-700 shadow-sm ring-1 ring-stone-200 sm:hidden"
+                aria-expanded={accountMenuOpen}
+                aria-controls="phone-account-menu"
+                aria-label="Account menu"
+              >
+                <span className="text-base leading-none" aria-hidden="true">☰</span>
+              </button>
+            )}
           </div>
         </div>
         {account && (
-          <div className="mx-auto mt-2 flex max-w-5xl flex-wrap items-center justify-end gap-2 text-xs text-stone-500">
+          <div className="mx-auto mt-2 hidden max-w-5xl flex-wrap items-center justify-end gap-2 text-xs text-stone-500 sm:flex">
             <FeedbackBugLink page={feedbackPage} />
             <span className="max-w-40 truncate">Signed in as {account}</span>
             <Link href="/account" className="font-bold text-orange-700 underline">
@@ -183,6 +213,16 @@ export function AppFrame({ children }: { children: ReactNode }) {
             >
               Log out
             </button>
+          </div>
+        )}
+        {account && accountMenuOpen && (
+          <div id="phone-account-menu" className="mx-auto mt-2 max-w-5xl rounded-2xl border border-orange-100 bg-white p-3 text-sm shadow-lg sm:hidden">
+            <p className="truncate px-1 text-xs text-stone-500">Signed in as {account}</p>
+            <div className="mt-2 grid gap-1">
+              <Link href="/account" className="flex min-h-11 items-center rounded-xl px-3 font-black text-stone-800 hover:bg-orange-50">⚙️ Account settings</Link>
+              <FeedbackBugLink page={feedbackPage} className="flex min-h-11 items-center rounded-xl px-3 font-black text-stone-800 hover:bg-orange-50" />
+              <button type="button" onClick={() => void signOut()} className="flex min-h-11 items-center rounded-xl px-3 text-left font-black text-stone-800 hover:bg-orange-50">🚪 Log out</button>
+            </div>
           </div>
         )}
         {account && currentLoop && (
@@ -229,16 +269,19 @@ export function AppFrame({ children }: { children: ReactNode }) {
           </div>
         )}
       </header>
-      <main className="mx-auto w-full max-w-5xl px-4 pb-24 pt-5 md:px-6 md:pb-8">
+      <main className="mx-auto w-full max-w-5xl px-4 pb-[calc(7rem+env(safe-area-inset-bottom))] pt-5 md:px-6 md:pb-8">
         {children}
       </main>
-      {account && pathname !== "/settings" && (
-        <aside className="mx-auto mb-7 flex w-[calc(100%-2rem)] max-w-[calc(64rem-2rem)] flex-wrap items-center justify-between gap-4 rounded-3xl border border-orange-100 bg-white px-5 py-4 shadow-sm md:w-[calc(100%-3rem)] md:max-w-[calc(64rem-3rem)] md:px-6">
+      {account && showInstallCard && (
+        <aside className="mx-auto mb-7 w-[calc(100%-2rem)] rounded-3xl border border-orange-100 bg-white px-5 py-4 shadow-sm md:hidden">
           <div>
             <p className="text-sm font-black">Put Lunch Loop on your phone</p>
             <p className="mt-1 text-sm text-stone-600">The orange icon is one tap away whenever a good lunch idea hits.</p>
           </div>
-          <Link href="/install" className="rounded-xl bg-orange-500 px-4 py-3 text-sm font-black text-white">📲 Install app</Link>
+          <div className="mt-3 flex items-center gap-2">
+            <Link href="/install" className="whitespace-nowrap rounded-xl bg-orange-500 px-4 py-3 text-sm font-black text-white">📲 Install app</Link>
+            <button type="button" onClick={dismissInstallCard} className="inline-flex min-h-11 items-center px-2 text-xs font-bold text-stone-600 underline">Not now</button>
+          </div>
         </aside>
       )}
       <nav
@@ -264,7 +307,7 @@ export function AppFrame({ children }: { children: ReactNode }) {
           })}
         </div>
       </nav>
-      <footer className="mx-auto max-w-5xl px-4 pb-28 pt-5 text-center text-xs leading-5 text-stone-500 md:px-6 md:pb-5">
+      <footer className="mx-auto max-w-5xl px-4 pb-[calc(7.5rem+env(safe-area-inset-bottom))] pt-5 text-center text-xs leading-5 text-stone-500 md:px-6 md:pb-5">
         <OperatorCredit />
         <FuelTheLoopLink />
         <p>

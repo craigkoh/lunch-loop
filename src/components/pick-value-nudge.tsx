@@ -4,46 +4,100 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import {
   decidePickNudge,
+  milesBetween,
   oneLiners,
   readPickNudge,
   receiptLines,
+  tipAskLabel,
+  tipFreeNote,
   type NudgeStyle,
   type PickNudgeFacts,
   writePickNudge,
 } from "@/lib/donation";
 import { createClient, hasSupabaseEnv } from "@/lib/supabase/client";
 
+/** What the home screen already knows about the finished pick. */
+export type PickNudgeBase = Omit<PickNudgeFacts, "decideMinutes" | "distanceMiles" | "daysSinceLastVisit"> & {
+  groupId: string;
+  restaurantId: string | null;
+  restaurantLat: number | null;
+  restaurantLng: number | null;
+  scheduledFor: string;
+};
+
+const dayMs = 86_400_000;
+
+/** Reads the few extra per-lunch facts a receipt needs. Only runs when a receipt is shown. */
+async function loadReceiptFacts(base: PickNudgeBase, sessionId: string): Promise<PickNudgeFacts> {
+  const supabase = createClient();
+  const [sessionResult, groupResult, previousResult] = await Promise.all([
+    supabase.from("lunch_sessions").select("started_at, winner_recorded_at").eq("id", sessionId).maybeSingle(),
+    supabase.from("groups").select("home_lat, home_lng").eq("id", base.groupId).maybeSingle(),
+    base.restaurantId
+      ? supabase
+          .from("lunch_sessions")
+          .select("scheduled_for")
+          .eq("group_id", base.groupId)
+          .eq("final_restaurant_id", base.restaurantId)
+          .eq("status", "completed")
+          .neq("id", sessionId)
+          .lt("scheduled_for", base.scheduledFor)
+          .order("scheduled_for", { ascending: false })
+          .limit(1)
+          .maybeSingle()
+      : Promise.resolve({ data: null }),
+  ]);
+  const session = sessionResult.data as { started_at: string | null; winner_recorded_at: string | null } | null;
+  const group = groupResult.data as { home_lat: number | null; home_lng: number | null } | null;
+  const previous = previousResult.data as { scheduled_for: string } | null;
+  const decideMinutes =
+    session?.started_at && session.winner_recorded_at
+      ? Math.max(0, (new Date(session.winner_recorded_at).getTime() - new Date(session.started_at).getTime()) / 60_000)
+      : null;
+  const distanceMiles =
+    group?.home_lat != null && group.home_lng != null && base.restaurantLat != null && base.restaurantLng != null
+      ? milesBetween({ lat: group.home_lat, lng: group.home_lng }, { lat: base.restaurantLat, lng: base.restaurantLng })
+      : null;
+  const daysSinceLastVisit = previous
+    ? Math.max(0, Math.round((new Date(base.scheduledFor).getTime() - new Date(previous.scheduled_for).getTime()) / dayMs))
+    : null;
+  return { ...base, decideMinutes, distanceMiles, daysSinceLastVisit };
+}
+
 export function PickValueNudge({
   userId,
   sessionId,
-  facts,
+  base,
 }: {
   userId: string;
   sessionId: string;
-  facts: PickNudgeFacts;
+  base: PickNudgeBase;
 }) {
-  const [choice, setChoice] = useState<{ style: NudgeStyle; variant: number } | null>(null);
+  const [choice, setChoice] = useState<{ style: NudgeStyle; variant: number; facts: PickNudgeFacts } | null>(null);
+  const baseKey = JSON.stringify(base);
 
   useEffect(() => {
     if (!hasSupabaseEnv()) return;
     const supabase = createClient();
+    const facts = JSON.parse(baseKey) as PickNudgeBase;
     let cancelled = false;
     void (async () => {
       try {
         const { data, error } = await supabase.rpc("get_donations_enabled");
         if (cancelled || error || data !== true) return;
-        const saved = readPickNudge(userId);
-        const decision = decidePickNudge(saved, userId, sessionId);
+        const decision = decidePickNudge(readPickNudge(userId), sessionId);
+        if (decision.record) writePickNudge(userId, decision.record);
         if (!decision.visible) return;
-        if (!saved || saved.sessionId !== sessionId || saved.style !== decision.style) {
-          writePickNudge(userId, {
-            sessionId,
-            dismissed: false,
-            style: decision.style,
-            variant: decision.variant,
-          });
-        }
-        if (!cancelled) setChoice({ style: decision.style, variant: decision.variant });
+        const full =
+          decision.style === "receipt"
+            ? await loadReceiptFacts(facts, sessionId).catch(() => ({
+                ...facts,
+                decideMinutes: null,
+                distanceMiles: null,
+                daysSinceLastVisit: null,
+              }))
+            : { ...facts, decideMinutes: null, distanceMiles: null, daysSinceLastVisit: null };
+        if (!cancelled) setChoice({ style: decision.style, variant: decision.variant, facts: full });
       } catch {
         if (!cancelled) setChoice(null);
       }
@@ -51,7 +105,7 @@ export function PickValueNudge({
     return () => {
       cancelled = true;
     };
-  }, [sessionId, userId]);
+  }, [sessionId, userId, baseKey]);
 
   if (!choice) return null;
 
@@ -62,11 +116,12 @@ export function PickValueNudge({
       dismissed: true,
       style: saved?.style ?? choice?.style ?? null,
       variant: saved?.variant ?? choice?.variant ?? 0,
+      lastShown: choice?.style ?? saved?.lastShown ?? null,
     });
     setChoice(null);
   }
 
-  return <PickNudgeView style={choice.style} variant={choice.variant} facts={facts} onDismiss={dismiss} />;
+  return <PickNudgeView style={choice.style} variant={choice.variant} facts={choice.facts} onDismiss={dismiss} />;
 }
 
 export function PickNudgeView({
@@ -80,7 +135,7 @@ export function PickNudgeView({
   facts: PickNudgeFacts;
   onDismiss: () => void;
 }) {
-  if (style === "receipt") return <LunchReceipt facts={facts} variant={variant} onDismiss={onDismiss} />;
+  if (style === "receipt") return <LunchReceipt facts={facts} onDismiss={onDismiss} />;
   if (style === "jar") return <TipJarNote onDismiss={onDismiss} />;
   const line = oneLiners[variant % oneLiners.length];
   return (
@@ -99,20 +154,18 @@ export function PickNudgeView({
 
 function LunchReceipt({
   facts,
-  variant,
   onDismiss,
 }: {
   facts: PickNudgeFacts;
-  variant: number;
   onDismiss: () => void;
 }) {
-  const lines = receiptLines(facts, variant);
+  const lines = receiptLines(facts);
   return (
-    <section className="lunch-receipt-sheet w-full" aria-label="Value for value">
+    <section className="lunch-receipt-sheet w-full" aria-labelledby="lunch-receipt-ask">
       <div className="lunch-receipt px-3 pb-2 pt-3 text-center">
-        <p className="text-sm font-black tracking-[0.22em]" style={{ color: "var(--receipt-accent)" }}>
-          LUNCH LOOP
-        </p>
+        <h2 id="lunch-receipt-ask" className="text-xl font-black leading-7" style={{ color: "var(--receipt-accent)" }}>
+          Tip the loop?
+        </h2>
         <p className="mt-1 text-xs leading-5 [overflow-wrap:anywhere]" style={{ color: "var(--receipt-muted)" }}>
           {facts.loopName} · {facts.pickedOn}
         </p>
@@ -128,30 +181,22 @@ function LunchReceipt({
           {lines.map((line) => (
             <li key={line.label} className="flex items-baseline justify-between gap-3">
               <span className="min-w-0 [overflow-wrap:anywhere]">{line.label}</span>
-              <span className="shrink-0 font-bold tabular-nums" style={{ color: line.joke ? "var(--receipt-accent)" : "var(--receipt-ink)" }}>
+              <span className="min-w-0 text-right font-bold tabular-nums [overflow-wrap:anywhere]" style={{ color: "var(--receipt-ink)" }}>
                 {line.value}
               </span>
             </li>
           ))}
         </ul>
         <div className="my-2 border-t border-dashed" style={{ borderColor: "var(--receipt-rule)" }} />
-        <div className="flex items-baseline justify-between gap-3 text-sm font-bold">
-          <span>DECISION FEE</span>
-          <span className="tabular-nums">$0.00</span>
-        </div>
-        <div className="mt-1 flex items-baseline justify-between gap-3 text-sm font-black" style={{ color: "var(--receipt-accent)" }}>
-          <span>VALUE RECEIVED</span>
-          <span>You decide</span>
-        </div>
+        <p className="text-sm font-bold leading-5" style={{ color: "var(--receipt-ink)" }}>
+          {tipFreeNote}
+        </p>
         <Link
           href="/support"
           className="lunch-receipt-button mt-3 inline-flex min-h-11 w-full items-center justify-center rounded-full px-4 py-2.5 text-sm font-black"
         >
-          Fuel the loop
+          {tipAskLabel}
         </Link>
-        <p className="mt-3 text-xs" style={{ color: "var(--receipt-muted)" }}>
-          Thank you for eating with us!
-        </p>
         <DismissButton onDismiss={onDismiss} tone="receipt" />
       </div>
       <div className="lunch-receipt-zigzag" aria-hidden="true" />
@@ -167,6 +212,7 @@ function TipJarNote({ onDismiss }: { onDismiss: () => void }) {
         <Link href="/support" className="font-black text-orange-800 underline decoration-orange-400 underline-offset-2">
           Tip the loop?
         </Link>
+        <span className="mt-0.5 block text-xs text-stone-600">{tipFreeNote}</span>
       </p>
       <DismissButton onDismiss={onDismiss} />
     </div>

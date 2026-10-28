@@ -34,7 +34,7 @@ export default async function SupportPage() {
             <span>Lunch Loop</span>
           </Link>
           <Link href="/" className="inline-flex min-h-11 items-center rounded-xl bg-white px-3 text-sm font-black text-stone-700 shadow-sm ring-1 ring-orange-100">
-            Back to Lunch Loop
+            🏠 Home
           </Link>
         </div>
       </header>

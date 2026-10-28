@@ -164,6 +164,15 @@ dependency audit after dependency changes.
 
 ## Database backups
 
+**Routine (do this before every production migration, and weekly):**
+
+1. Supabase MCP `execute_sql` on project `hajjtehptkacsvsytbvv` with the
+   query `$file:/workspace/lunch-loop/scripts/backup/export.sql` and
+   `write_to_file: true`. Note the file path it returns.
+2. `/workspace/lunch-loop-backup.sh <that file>`
+3. It must print `OK /workspace/lunchloop-backups/<date-time> (size)`.
+   Anything else: stop and do not migrate.
+
 Production is on the Supabase Free plan, so there is no managed restore. The
 maintainer bot keeps its own copies on the box:
 
@@ -182,7 +191,8 @@ maintainer bot keeps its own copies on the box:
 This is a data copy. The schema comes from `supabase/migrations/`. The folders
 hold user emails and the Discord webhook URL: keep them private, never commit
 them. The first copy with this script is `20261027-183749` (19 tables, 254
-rows, 3 accounts, 46 migrations). For a full `pg_dump`, use the Mac
+rows, 3 accounts, 46 migrations). The copy before build .70’s migration is
+`20261027-195710`. For a full `pg_dump`, use the Mac
 procedure in [Development](DEVELOPMENT.md#backup-and-restore).
 
 ## Home-screen startup recovery
@@ -207,8 +217,9 @@ Global Admin is database-assigned. It reviews groups, invite requests, feedback,
 usage limits, feedback state/priority, the optional Value for Value ask, and
 site-wide group-creation controls. A new database keeps `donations_enabled`
 off. Production has it on (Stripe is live). Turning it on shows “Fuel the loop” in the footer, linking to `/support`,
-and shows a dismissible note on every finished pick: a receipt, a one-liner,
-or a tip jar. “Not now” hides that note for that pick only. Turning it off
+and can show a dismissible note on a finished pick: a receipt, a one-liner,
+or a tip jar, picked at random (about 1 in 4 picks show nothing, never the
+same style twice in a row). “Not now” hides that note for that pick only. Turning it off
 hides the footer link and every note, and `/support` says support isn’t open.
 The Stripe Payment Link lives only on that page. It does not change restaurant
 selection. Do not send a test payment from the Payment Link.

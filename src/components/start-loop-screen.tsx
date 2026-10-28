@@ -97,15 +97,20 @@ export function StartLoopScreen() {
             <Link href="/settings" className="mt-5 inline-flex min-h-11 items-center rounded-xl bg-orange-500 px-5 py-3 text-sm font-black text-white">Set up my crew →</Link>
           </div>
         ) : (
-          <form onSubmit={start} className="mt-6 space-y-4">
+          <form onSubmit={start} className="mt-6 space-y-6">
+            <div className="space-y-4">
+            <StepHeading number={1} title="Name it" />
             <label className="block text-sm font-black">Your name
               <input required value={displayName} onChange={(event) => setDisplayName(event.target.value)} maxLength={50} placeholder="What your crew calls you" className="mt-2 w-full rounded-xl border border-orange-200 px-3 py-3 text-base font-normal outline-none focus:ring-2 focus:ring-orange-300" />
             </label>
             <label className="block text-sm font-black">Lunch Loop name
               <input required value={groupName} onChange={(event) => setGroupName(event.target.value)} maxLength={80} placeholder="Example: Downtown Lunch Crew" className="mt-2 w-full rounded-xl border border-orange-200 px-3 py-3 text-base font-normal outline-none focus:ring-2 focus:ring-orange-300" />
             </label>
+            </div>
             <fieldset>
-              <legend className="text-sm font-black">What kind of Lunch Loop is this?</legend>
+              <legend className="sr-only">What kind of Lunch Loop is this?</legend>
+              <StepHeading number={2} title="Pick the type" />
+              <p className="mt-2 text-sm font-black" aria-hidden="true">What kind of Lunch Loop is this?</p>
               <p className="mt-1 text-sm text-stone-600">Both types have the same private places, picks, vetoes, history, and stats.</p>
               <div className="mt-3 grid gap-3 sm:grid-cols-2">
                 <label className={"cursor-pointer rounded-2xl border p-4 transition " + (loopType === "standing" ? "border-orange-500 bg-orange-50 ring-2 ring-orange-200" : "border-orange-100 bg-white")}>
@@ -123,7 +128,8 @@ export function StartLoopScreen() {
               </div>
             </fieldset>
             <div>
-              <p className="text-sm font-black">Where does your crew eat?</p>
+              <StepHeading number={3} title="Set the area" />
+              <p className="mt-2 text-sm font-black">Where does your crew eat?</p>
               <p className="mt-1 text-sm text-stone-600">Set the center and radius for the private restaurant database you’re about to create.</p>
               <div className="mt-3"><LoopAreaPicker value={homeArea} onChange={setHomeArea} disabled={busy} /></div>
             </div>
@@ -151,10 +157,19 @@ export function StartLoopScreen() {
   return <main className="grid min-h-dvh place-items-center bg-[#fffaf3] p-4">
     <div className="w-full max-w-4xl">
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-        <Link href="/" className="inline-flex text-sm font-black text-orange-700 underline">← Back to Lunch Loop</Link>
+        <Link href="/" className="inline-flex text-sm font-black text-orange-700 underline">🏠 Home</Link>
         {signedIn && <FeedbackBugLink page={currentPath} />}
       </div>
       {setupCard}
     </div>
   </main>;
+}
+
+function StepHeading({ number, title }: { number: number; title: string }) {
+  return (
+    <div className={`flex items-center gap-3 ${number > 1 ? "border-t border-orange-100 pt-5" : ""}`}>
+      <span className="grid size-8 shrink-0 place-items-center rounded-full bg-orange-500 text-sm font-black text-white">{number}</span>
+      <span className="text-xs font-black uppercase tracking-widest text-orange-700">Step {number} of 3 · {title}</span>
+    </div>
+  );
 }

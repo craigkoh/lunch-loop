@@ -57,9 +57,10 @@ rate limits and a hosted bot challenge.
 ## Respectful monetization
 
 Never bias restaurant selection. The first step is live: a public Value for
-Value page, a small “Fuel the loop” footer link, and a note on every finished
-pick. The note is a paper receipt about half the time, and otherwise a
-one-liner or a tip jar, never the same style twice in a row. On a wide
+Value page, a small “Fuel the loop” footer link, and a random note on a finished
+pick: about 1 in 4 picks show nothing, and otherwise a paper receipt, a
+one-liner, or a tip jar with equal odds, never the same style twice in a
+row. Each one says plainly that it is an optional tip. On a wide
 screen the note sits beside the result. On a phone it stacks under the
 result. “Not now” hides it for that pick. There is no pop-up. A new database keeps `donations_enabled`
 off until a site admin turns it on. Production has it on, with a live

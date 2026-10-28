@@ -28,6 +28,19 @@ function changeText(change: ReleaseChange) {
 
 const releases: { build: string; changes: ReleaseChange[] }[] = [
   {
+    build: "2026.10.27.71",
+    changes: [
+      "The thank-you after a pick now clearly says it’s an optional tip: “Tip the loop?”, with a “Tip the loop ($1–3)” button.",
+      "The receipt shows facts about that lunch: places in the running, vetoes, time to decide, distance, visit number, days since your last visit, rating, cuisine, and who picked.",
+      "The thank-you style is now random each lunch, and about 1 in 4 lunches show nothing at all.",
+      "Settings is split into tabs: Crew, Area & loops, Places, and Owner tools.",
+      "On phones, your account links are tucked into a ☰ menu at the top.",
+      "The “Put Lunch Loop on your phone” card shows only on phones, and “Not now” hides it for good.",
+      "Cleaner new loops: zero-count cards are hidden, and the Start form has numbered steps.",
+      "Small fixes: “Use code” no longer wraps, “Back to Lunch Loop” is now “Home”, and pages leave room above the bottom tabs.",
+    ],
+  },
+  {
     build: "2026.10.27.70",
     changes: [
       "The Privacy Policy now names the sign-in human check (Cloudflare Turnstile) and Vercel’s bot check.",

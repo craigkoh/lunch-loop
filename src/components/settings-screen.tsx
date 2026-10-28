@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { AppFrame, EmptyState } from "./app-frame";
 import {
@@ -89,7 +88,55 @@ const discordEvents = [
   },
 ];
 
+type SettingsTab = "crew" | "area" | "places" | "owner";
+const settingsTabs: { id: SettingsTab; label: string; emoji: string }[] = [
+  { id: "crew", label: "Crew", emoji: "👥" },
+  { id: "area", label: "Area & loops", emoji: "🌎" },
+  { id: "places", label: "Places", emoji: "🍽️" },
+  { id: "owner", label: "Owner tools", emoji: "🛠️" },
+];
+
+function SettingsTabs({
+  active,
+  onChange,
+  showOwnerTools,
+}: {
+  active: SettingsTab;
+  onChange: (tab: SettingsTab) => void;
+  showOwnerTools: boolean;
+}) {
+  return (
+    <nav aria-label="Settings sections" className="mt-5 -mx-1 overflow-x-auto px-1 pb-1">
+      <div className="flex w-max gap-2 rounded-2xl bg-white p-1.5 shadow-sm ring-1 ring-orange-100">
+        {settingsTabs
+          .filter((tab) => tab.id !== "owner" || showOwnerTools)
+          .map((tab) => (
+            <button
+              key={tab.id}
+              type="button"
+              aria-pressed={active === tab.id}
+              onClick={() => onChange(tab.id)}
+              className={`inline-flex min-h-11 items-center gap-1.5 whitespace-nowrap rounded-xl px-3 text-sm font-black transition ${active === tab.id ? "bg-orange-500 text-white" : "text-stone-700 hover:bg-orange-50"}`}
+            >
+              <span aria-hidden="true">{tab.emoji}</span>
+              {tab.label}
+            </button>
+          ))}
+      </div>
+    </nav>
+  );
+}
+
 export function SettingsScreen() {
+  const [settingsTab, setSettingsTabState] = useState<SettingsTab>("crew");
+  useEffect(() => {
+    const fromHash = window.location.hash.replace("#", "") as SettingsTab;
+    if (settingsTabs.some((tab) => tab.id === fromHash)) setSettingsTabState(fromHash);
+  }, []);
+  function setSettingsTab(tab: SettingsTab) {
+    setSettingsTabState(tab);
+    window.history.replaceState(null, "", `#${tab}`);
+  }
   const [context, setContext] = useState<GroupContext | null>(null);
   const [members, setMembers] = useState<DirectoryMember[]>([]);
   const [restaurants, setRestaurants] = useState<RestaurantWithContributor[]>([]);
@@ -715,13 +762,6 @@ export function SettingsScreen() {
       <p className="mt-2 text-stone-600">
         Manage your crew, invitations, search area, and Lunch Database.
       </p>
-      <aside className="mt-5 flex flex-wrap items-center justify-between gap-4 rounded-3xl border border-orange-100 bg-white px-5 py-4 shadow-sm">
-        <div>
-          <p className="text-sm font-black">Put Lunch Loop on your phone</p>
-          <p className="mt-1 text-sm text-stone-600">The orange Lunch Loop icon is one tap away whenever a good restaurant idea hits.</p>
-        </div>
-        <Link href="/install" className="rounded-xl bg-orange-500 px-4 py-3 text-sm font-black text-white">📲 Install app</Link>
-      </aside>
       {loading ? (
         <p className="mt-6 text-sm font-semibold text-stone-500">
           Loading group settings…
@@ -733,6 +773,8 @@ export function SettingsScreen() {
       ) : (
         context && (
           <>
+            <SettingsTabs active={settingsTab} onChange={setSettingsTab} showOwnerTools={context.role === "owner"} />
+            {settingsTab === "crew" && <>
             <section className="mt-6 overflow-hidden rounded-3xl bg-gradient-to-br from-orange-500 via-orange-500 to-amber-500 p-5 text-white shadow-[0_18px_36px_rgba(249,115,22,0.18)]">
               <div className="flex items-start gap-3">
                 <span className="grid size-11 shrink-0 place-items-center rounded-2xl bg-white/20 text-2xl" aria-hidden="true">👋</span>
@@ -786,16 +828,6 @@ export function SettingsScreen() {
               )}
               {context.role === "owner" && (memberInvitations.length > 0 || shareableInvitations.length > 0) && <div className="mt-5 border-t border-white/25 pt-4"><h3 className="font-black">Crew invitations</h3><div className="mt-3 space-y-2">{shareableInvitations.slice(0, 6).map((invite) => <div key={invite.id} className="flex flex-wrap items-center justify-between gap-2 rounded-xl bg-white/15 px-3 py-2 text-sm"><span className="min-w-0 truncate"><strong>{invite.invite_label || "Unnamed friend"}</strong> · shareable code · <span className="font-bold">{invite.status}</span>{invite.status === "pending" ? ` · expires ${new Date(invite.expires_at).toLocaleDateString()}` : ""}</span>{invite.status === "pending" && <button disabled={saving} onClick={() => void revokeShareableInvite(invite)} className="font-bold text-white underline">Revoke</button>}</div>)}{memberInvitations.slice(0, 8).map((invite) => <div key={invite.id} className="flex flex-wrap items-center justify-between gap-2 rounded-xl bg-white/15 px-3 py-2 text-sm"><span className="min-w-0 truncate">{invite.recipient_email} · <span className="font-bold">{invite.status}</span></span>{invite.status === "pending" && <button disabled={saving} onClick={() => void revokeMemberInvite(invite)} className="font-bold text-white underline">Revoke</button>}</div>)}</div></div>}
             </section>
-            <section className="mt-7 rounded-3xl bg-white p-5 shadow-sm">
-              <div className="flex items-start gap-3"><span className="grid size-10 place-items-center rounded-2xl bg-orange-100 text-xl" aria-hidden="true">🌎</span><div><p className="text-xs font-bold uppercase tracking-widest text-orange-600">Your search area</p>
-              <h2 className="mt-1 text-xl font-black">Where does {context.groupName} eat?</h2></div></div>
-              <p className="mt-2 text-sm text-stone-600">Every Lunch Loop has its own home location and search radius. The shared restaurant database stays separate, even when another crew uses Lunch Loop in a different city.</p>
-              {context.role === "owner" ? <>
-                <div className="mt-4"><LoopAreaPicker value={homeArea} onChange={setHomeArea} disabled={saving} /></div>
-                <button type="button" disabled={saving || !homeArea.label || homeArea.lat === null || homeArea.lng === null || !homeArea.timeZone} onClick={() => void saveHomeArea()} className="mt-4 rounded-xl bg-orange-500 px-4 py-3 text-sm font-black text-white disabled:opacity-60">{saving ? "Saving…" : "Save search area and time zone"}</button>
-              </> : <div className="mt-4 rounded-2xl bg-orange-50 p-4 text-sm text-stone-700"><strong>{homeArea.label || "Home area not set yet"}</strong>{homeArea.label ? ` · ${homeArea.radiusMiles} mile search radius` : ". Ask the Lunch Loop owner to set it before adding places."}</div>}
-            </section>
-            {loops.length > 1 && <section className="mt-7 rounded-3xl bg-white p-5 shadow-sm"><div className="flex items-start gap-3"><span className="grid size-10 place-items-center rounded-2xl bg-orange-100 text-xl" aria-hidden="true">🧭</span><div><h2 className="text-lg font-black">Your Lunch Loops</h2><p className="mt-1 text-sm text-stone-500">Each loop keeps its own people, places, and stats. Choose which active loop you’re using now.</p></div></div><div className="mt-4 space-y-2">{loops.map((loop) => <div key={loop.group_id} className="flex flex-wrap items-center justify-between gap-3 rounded-2xl bg-stone-50 p-3"><div><p className="font-black">{loop.group_name} {loop.active && <span className="ml-1 text-xs text-orange-700">Current</span>}</p><p className="text-xs text-stone-500">{loop.role} · {loop.member_count}/6 people · {loop.status}</p></div>{loop.status === "active" && !loop.active && <button disabled={saving} onClick={() => void switchLoop(loop)} className="rounded-xl bg-orange-600 px-3 py-2 text-sm font-black text-white">Switch to this loop</button>}</div>)}</div></section>}
             <section className="mt-7 rounded-3xl bg-white p-5 shadow-sm">
               <div className="flex items-end justify-between gap-3">
                 <div>
@@ -903,6 +935,58 @@ export function SettingsScreen() {
                 </button>
               )}
             </section>
+            </>}
+            {settingsTab === "area" && <>
+            <section className="mt-7 rounded-3xl bg-white p-5 shadow-sm">
+              <div className="flex items-start gap-3"><span className="grid size-10 place-items-center rounded-2xl bg-orange-100 text-xl" aria-hidden="true">🌎</span><div><p className="text-xs font-bold uppercase tracking-widest text-orange-600">Your search area</p>
+              <h2 className="mt-1 text-xl font-black">Where does {context.groupName} eat?</h2></div></div>
+              <p className="mt-2 text-sm text-stone-600">Every Lunch Loop has its own home location and search radius. The shared restaurant database stays separate, even when another crew uses Lunch Loop in a different city.</p>
+              {context.role === "owner" ? <>
+                <div className="mt-4"><LoopAreaPicker value={homeArea} onChange={setHomeArea} disabled={saving} /></div>
+                <button type="button" disabled={saving || !homeArea.label || homeArea.lat === null || homeArea.lng === null || !homeArea.timeZone} onClick={() => void saveHomeArea()} className="mt-4 rounded-xl bg-orange-500 px-4 py-3 text-sm font-black text-white disabled:opacity-60">{saving ? "Saving…" : "Save search area and time zone"}</button>
+              </> : <div className="mt-4 rounded-2xl bg-orange-50 p-4 text-sm text-stone-700"><strong>{homeArea.label || "Home area not set yet"}</strong>{homeArea.label ? ` · ${homeArea.radiusMiles} mile search radius` : ". Ask the Lunch Loop owner to set it before adding places."}</div>}
+            </section>
+            {loops.length > 1 && <section className="mt-7 rounded-3xl bg-white p-5 shadow-sm"><div className="flex items-start gap-3"><span className="grid size-10 place-items-center rounded-2xl bg-orange-100 text-xl" aria-hidden="true">🧭</span><div><h2 className="text-lg font-black">Your Lunch Loops</h2><p className="mt-1 text-sm text-stone-500">Each loop keeps its own people, places, and stats. Choose which active loop you’re using now.</p></div></div><div className="mt-4 space-y-2">{loops.map((loop) => <div key={loop.group_id} className="flex flex-wrap items-center justify-between gap-3 rounded-2xl bg-stone-50 p-3"><div><p className="font-black">{loop.group_name} {loop.active && <span className="ml-1 text-xs text-orange-700">Current</span>}</p><p className="text-xs text-stone-500">{loop.role} · {loop.member_count}/6 people · {loop.status}</p></div>{loop.status === "active" && !loop.active && <button disabled={saving} onClick={() => void switchLoop(loop)} className="rounded-xl bg-orange-600 px-3 py-2 text-sm font-black text-white">Switch to this loop</button>}</div>)}</div></section>}
+            </>}
+            {settingsTab === "places" && <>
+            <section className="mt-7">
+              <div>
+                <h2 className="text-lg font-black">🍽️ Lunch database</h2>
+                <p className="mt-1 text-sm text-stone-500">
+                  {context.role === "owner"
+                    ? "Search, filter, and sort the same database the crew uses. You can also retire a place or remove an accidental entry."
+                    : "Search, filter, and sort the shared restaurant database. Only the owner can retire or remove places."}
+                </p>
+              </div>
+              <RestaurantDatabaseBrowser
+                restaurants={restaurants}
+                timeZone={homeArea.timeZone}
+                actions={
+                  context.role === "owner"
+                    ? (restaurant) => (
+                        <div className="flex flex-wrap gap-2">
+                          <button
+                            type="button"
+                            onClick={() => void toggleNeverAgain(restaurant)}
+                            className={`rounded-lg px-3 py-2 text-sm font-bold ${restaurant.never_again ? "bg-emerald-50 text-emerald-700" : "bg-amber-50 text-amber-800"}`}
+                          >
+                            {restaurant.never_again ? "Restore" : "Never again"}
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => void deleteRestaurant(restaurant)}
+                            className="rounded-lg bg-rose-50 px-3 py-2 text-sm font-bold text-rose-700"
+                          >
+                            Remove
+                          </button>
+                        </div>
+                      )
+                    : undefined
+                }
+              />
+            </section>
+            </>}
+            {settingsTab === "owner" && context.role === "owner" && <>
             {context.role === "owner" && (
               <section className="mt-7 rounded-3xl border border-indigo-100 bg-indigo-50/60 p-5 shadow-sm">
                 <p className="text-xs font-bold uppercase tracking-widest text-indigo-700">
@@ -1054,42 +1138,7 @@ export function SettingsScreen() {
                 <p className="mt-3 text-xs leading-5 text-amber-900">Archiving pauses access and starts a 30-day recovery window. Permanent deletion is deliberately unavailable until that window ends.</p>
               </section>
             )}
-            <section className="mt-7">
-              <div>
-                <h2 className="text-lg font-black">🍽️ Lunch database</h2>
-                <p className="mt-1 text-sm text-stone-500">
-                  {context.role === "owner"
-                    ? "Search, filter, and sort the same database the crew uses. You can also retire a place or remove an accidental entry."
-                    : "Search, filter, and sort the shared restaurant database. Only the owner can retire or remove places."}
-                </p>
-              </div>
-              <RestaurantDatabaseBrowser
-                restaurants={restaurants}
-                timeZone={homeArea.timeZone}
-                actions={
-                  context.role === "owner"
-                    ? (restaurant) => (
-                        <div className="flex flex-wrap gap-2">
-                          <button
-                            type="button"
-                            onClick={() => void toggleNeverAgain(restaurant)}
-                            className={`rounded-lg px-3 py-2 text-sm font-bold ${restaurant.never_again ? "bg-emerald-50 text-emerald-700" : "bg-amber-50 text-amber-800"}`}
-                          >
-                            {restaurant.never_again ? "Restore" : "Never again"}
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => void deleteRestaurant(restaurant)}
-                            className="rounded-lg bg-rose-50 px-3 py-2 text-sm font-bold text-rose-700"
-                          >
-                            Remove
-                          </button>
-                        </div>
-                      )
-                    : undefined
-                }
-              />
-            </section>
+            </>}
           </>
         )
       )}

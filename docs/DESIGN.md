@@ -37,8 +37,15 @@ program.
 - **Value for Value.** The app is free. There are no ads and no paid
   placements. If support is turned on, a finished pick can leave a quiet
   thank-you. A couple of bucks is plenty. Ignoring it is a complete response.
-- **Honest.** Counts on a receipt are real (crew size, lunches closed, vetoes)
-  or a joke marked VOID. Never invent a statistic to make the ask feel earned.
+- **Honest.** Every number on a receipt is a real fact about that one lunch
+  (places in the running, vetoes, time to decide, distance, visit number,
+  days since the last visit, rating, cuisine, who picked). A fact we do not
+  have is left off, not shown as 0. Never invent a statistic to make the ask
+  feel earned.
+- **Clear ask.** A thank-you must read as a tip request at first glance. Seth
+  did not see that the old receipt was asking for anything. The receipt and
+  the tip jar now say “Tip the loop?” and “Lunch Loop is free. This is an
+  optional tip.”
 - **Light, not cute-for-its-own-sake.** One plate, one orange, short sentences.
   Emoji are seasoning (a meal, a party popper), not the layout.
 - **Private.** A crew’s restaurants, names, and decisions stay with that crew.
@@ -286,7 +293,7 @@ row at least 44px tall when it is the only action in that row (`min-h-11`).
 Destructive: `bg-rose-600` or `bg-rose-700`, white label, same radius and
 height. Never orange.
 
-The receipt’s “Fuel the loop” button is a pill (`rounded-full`) on the receipt
+The receipt’s “Tip the loop ($1–3)” button is a pill (`rounded-full`) on the receipt
 colors, not an orange-500 button. That is deliberate: white on `#F97316` fails
 contrast, and the pill belongs to the slip.
 
@@ -313,14 +320,25 @@ Receipt:
   rules `#E7D3C4`, border `#F0C9A0`.
 - Torn bottom is a sibling with a zigzag `clip-path`, so the orange hero
   shows through the teeth.
-- Line items wrap. Joke values are the word VOID, not a fake number.
-- Decision fee is `$0.00` because that is the fee.
+- Top line is the heading “Tip the loop?” (`text-xl font-black`, accent).
+  Then loop name and date, then TODAY’S PICK and the restaurant.
+- Line items (`receiptLines` in `src/lib/donation.ts`), in this order:
+  Places in the running, Vetoes, Time to decide, Distance (crow-flies miles
+  from the loop’s home area), Visit (“First time” or `#N`), Since last visit,
+  Rating, Cuisine, Picked by, Ads shown 0. A line with no data is dropped.
+  No joke lines, no crew-wide counts that read 0 or 1 on a new loop.
+- Under the lines: “Lunch Loop is free. This is an optional tip.” Then the
+  pill button “Tip the loop ($1–3)” to `/support`, then “Not now”.
+- Line items wrap. Values may wrap too (`overflow-wrap: anywhere`).
+- Preview it locally at `/dev/receipt` (fixture data; production returns
+  404).
 
 One-liner: a white chip, `rounded-2xl`, `text-sm text-stone-800`, the link in
 `font-black text-orange-800` with an orange underline. “Not now” sits on the
 same row and wraps under the sentence when the column is narrow.
 
-Tip jar: the same white chip, a small mason-jar drawing, and “Tip the loop?”.
+Tip jar: the same white chip, a small mason-jar drawing, “Tip the loop?”, and
+under it the small line “Lunch Loop is free. This is an optional tip.”
 The coin drops once (`.lunch-coin`). `prefers-reduced-motion` sets that
 animation to none and hides the coin.
 
@@ -336,18 +354,46 @@ animation to none and hides the coin.
   `h-11`.
 - Errors: `role="alert"`, `rounded-xl bg-rose-50`, `text-sm font-bold text-rose-700` or `text-rose-800`.
 - Success: `role="status"`, `rounded-xl bg-emerald-50`, emerald text.
+- A long form with distinct parts uses numbered steps: an orange circle with
+  the number and “STEP 1 OF 3 · NAME IT” in small caps (`StepHeading` in
+  `start-loop-screen.tsx`). The Start form has three: Name it, Pick the type,
+  Set the area.
+- A button next to a field never wraps its label (`whitespace-nowrap
+  shrink-0`), for example “Use code”.
+- Hide stat cards that would only say 0 on a new loop. Show one useful next
+  step instead (for example “Add a first place”).
 
 ### Navigation
 
 Signed-in primary nav is the bottom bar: `fixed` on small screens,
 `md:sticky`, with `pb-[max(0.5rem,env(safe-area-inset-bottom))]` so the home
-indicator does not cover the tabs. The main column uses `pb-24` on small
-screens so the last card clears the bar.
+indicator does not cover the tabs. The main column pads the bottom on small
+screens (`calc(7rem + env(safe-area-inset-bottom))`) and the footer
+`calc(7.5rem + …)`, so the last card and the footer links clear the bar on
+phones with a home indicator.
+
+On phones (under 640px) the header shows a ☰ button (`aria-label="Account
+menu"`). It opens a panel with “Signed in as …”, Account settings,
+Feedback / Report a bug, and Log out, each a 44px row. From 640px the same
+links sit in one row under the header, as before. The menu closes on
+navigation.
+
+The “Put Lunch Loop on your phone” card shows only under 768px, never inside
+the installed app (`display-mode: standalone`), and has “Not now”, which
+hides it for good on that device (`lunch-loop-install-card-dismissed` in
+localStorage).
+
+Settings is split into tabs: 👥 Crew (invitations and crew order), 🌎 Area &
+loops, 🍽️ Places, and 🛠️ Owner tools (Discord, export, archive; owners
+only). Tabs are buttons with `aria-pressed`, at least 44px tall, and the
+row scrolls sideways on a narrow phone. The tab is kept in the URL hash
+(`/settings#places`).
 
 Tabs are `text-[10px] font-bold` with an emoji. Active tab is `bg-orange-100 text-orange-800`.
 
 Public pages have a simple header: plate emoji in an orange rounded tile, the
-words Lunch Loop, and one action on the right (Sign in, or Back).
+words Lunch Loop, and one action on the right (Sign in, or 🏠 Home). The link
+back to the app always says “Home”, not “Back to Lunch Loop”.
 
 ### Footer
 
@@ -485,9 +531,15 @@ Short, warm, specific. Say what the person can do. Do not sell.
 
 ### Support, specifically
 
-The nudge is a thank-you, not a checkout. “Fuel the loop” is the link. The
-receipt can be playful (VOID lines, “Thank you for eating with us!”) because
-it is clearly a paper slip with a $0.00 fee. The `/support` page is plainer:
+The nudge is a thank-you, not a checkout, but it must be obvious that it is
+asking for a tip. The receipt and tip jar say “Tip the loop?” and “Lunch Loop
+is free. This is an optional tip.” The button names the size of the ask:
+“Tip the loop ($1–3)”.
+
+Which style shows is random, picked once when the lunch is decided and saved
+for that lunch on that device: about 1 in 4 lunches show nothing, and
+otherwise receipt, one-liner, and tip jar have equal odds, never the same
+style as the last one shown (`pickNudgeStyle` in `src/lib/donation.ts`). The `/support` page is plainer:
 what the project is, that a couple of bucks is plenty, that it is not
 tax-deductible, and a button to Stripe that opens in a new tab.
 

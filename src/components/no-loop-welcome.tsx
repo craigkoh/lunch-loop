@@ -83,9 +83,9 @@ export function NoLoopWelcome() {
                 autoCapitalize="characters"
                 autoCorrect="off"
                 placeholder="M7KQ-2R9D-XP"
-                className="w-full rounded-xl border border-stone-300 bg-white px-3 py-3 font-mono text-sm font-bold tracking-widest outline-none focus:border-orange-400 focus:ring-2 focus:ring-orange-100"
+                className="w-full min-w-0 flex-1 rounded-xl border border-stone-300 bg-white px-3 py-3 font-mono text-sm font-bold tracking-widest outline-none focus:border-orange-400 focus:ring-2 focus:ring-orange-100"
               />
-              <button disabled={!code.trim()} className="rounded-xl bg-orange-500 px-5 py-3 text-sm font-black text-white disabled:opacity-50">
+              <button disabled={!code.trim()} className="shrink-0 whitespace-nowrap rounded-xl bg-orange-500 px-5 py-3 text-sm font-black text-white disabled:opacity-50">
                 Use code
               </button>
             </form>
@@ -94,7 +94,7 @@ export function NoLoopWelcome() {
           {error && <p role="alert" className="mt-5 rounded-2xl bg-rose-50 p-4 text-sm font-semibold text-rose-800">{error}</p>}
 
           <div className="mt-6 flex flex-wrap items-center justify-between gap-3 border-t border-stone-100 pt-5 text-sm">
-            <Link href="/" className="font-bold text-orange-700 underline">← Back to Lunch Loop</Link>
+            <Link href="/" className="font-bold text-orange-700 underline">🏠 Home</Link>
             <div className="flex flex-wrap items-center gap-3"><FeedbackBugLink page="/" /><Link href="/account" className="font-bold text-orange-700 underline">Account settings</Link><button type="button" onClick={() => void signOut()} className="font-bold text-stone-600 underline">Use a different account</button></div>
           </div>
         </div>

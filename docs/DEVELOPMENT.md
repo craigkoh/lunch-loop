@@ -197,3 +197,10 @@ uses the same path with `type=signup`. Supabase's default template, which is
 what staging sends until custom SMTP is turned on, instead returns `?code=`
 to /auth/callback. See [Integrations](INTEGRATIONS.md) before changing
 identity configuration.
+
+## Previewing the pick thank-you
+
+Run `npm run dev` and open `http://localhost:3000/dev/receipt`. It shows the
+receipt (a regular lunch and a first lunch), the tip jar, and the one-liner
+inside the orange hero, using fixture data. The page calls `notFound()` when
+`NODE_ENV` is `production`, so it is a 404 on lunchloop.app.

@@ -28,6 +28,13 @@ function changeText(change: ReleaseChange) {
 
 const releases: { build: string; changes: ReleaseChange[] }[] = [
   {
+    build: "2026.10.27.70",
+    changes: [
+      "The Privacy Policy now names the sign-in human check (Cloudflare Turnstile) and Vercel’s bot check.",
+      "Each person can send up to 4 “Start your own Lunch Loop” invitations a day, to keep spam out of inboxes.",
+    ],
+  },
+  {
     build: "2026.10.26.69",
     changes: ["Fixed email sign-in links sending you back to the sign-in page instead of logging you in."],
   },

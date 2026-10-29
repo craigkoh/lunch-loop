@@ -58,7 +58,13 @@ Items Craig has approved for the next batch. More may be added.
   "🏆 2 wins · last won Oct 21", "No wins yet", sorts "Most wins" /
   "Fewest wins".
 - A button to view a report or summary of your loop.
-- A CSV download of loop data.
+- A CSV download of loop data. Rules: export only our own data (lunch dates,
+  winners, vetoes, suggesters, win counts) plus a Google Maps link per place.
+  Do not export Google place details (names, addresses, ratings, phone, hours)
+  because of Google Maps Platform terms. Members of that loop only, no emails,
+  daily per-person limit, escape spreadsheet formulas, update the privacy page.
+- Before the CSV work: check that what we already store from Google Places
+  follows Google's caching rules, and report to Craig.
 - Keep the random facts sprinkled through the app (do not remove them).
 
 ## Backlog

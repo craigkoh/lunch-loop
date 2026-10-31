@@ -85,7 +85,7 @@ export function GroupSetup() {
 
   return (
     <section className="mt-7 rounded-3xl border border-orange-200 bg-white p-5 shadow-sm">
-      <p className="text-xs font-bold uppercase tracking-widest text-orange-600">
+      <p className="text-xs font-bold text-orange-600">
         Private crews
       </p>
       <h2 className="mt-1 text-lg font-black">Join a crew or create your own</h2>

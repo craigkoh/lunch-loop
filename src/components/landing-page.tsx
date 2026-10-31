@@ -43,7 +43,7 @@ export function LandingPage() {
 
       <section className="mx-auto grid max-w-6xl gap-10 px-4 pb-14 pt-7 sm:px-6 sm:pb-20 lg:grid-cols-[1.05fr_0.95fr] lg:items-center lg:px-8 lg:pb-28 lg:pt-16">
         <div>
-          <p className="inline-flex items-center gap-2 rounded-full bg-orange-100 px-3 py-1.5 text-xs font-black uppercase tracking-widest text-orange-800">
+          <p className="inline-flex items-center gap-2 rounded-full bg-orange-100 px-3 py-1.5 text-xs font-black text-orange-800">
             <span aria-hidden="true">🍽️</span> Private crews, simple starts
           </p>
           <h1 className="mt-5 max-w-3xl text-5xl font-black leading-[0.98] tracking-[-0.055em] text-orange-950 sm:text-6xl lg:text-7xl">
@@ -114,7 +114,7 @@ export function LandingPage() {
                 ))}
               </div>
               <div className="mt-5 rounded-2xl bg-emerald-50 p-4 text-emerald-950">
-                <p className="text-xs font-black uppercase tracking-wider text-emerald-700">
+                <p className="text-xs font-blackr text-emerald-700">
                   The simple rule
                 </p>
                 <p className="mt-1 text-sm font-bold">

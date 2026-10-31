@@ -48,7 +48,7 @@ export function NoLoopWelcome() {
         <div className="relative overflow-hidden bg-orange-500 px-6 py-8 text-white sm:px-9 sm:py-10">
           <div className="absolute -right-5 -top-8 text-9xl opacity-20" aria-hidden="true">🍟</div>
           <p className="relative text-sm font-black uppercase tracking-[0.18em] text-orange-100">Welcome to Lunch Loop</p>
-          <h1 className="relative mt-2 max-w-xl text-3xl font-black tracking-tight sm:text-4xl">
+          <h1 className="relative mt-2 max-w-xl text-[28px] font-bold leading-tight tracking-tight md:text-[36px] sm:text-4xl">
             We’re glad you found us! 👋
           </h1>
           <p className="relative mt-3 max-w-xl text-orange-50">
@@ -65,7 +65,7 @@ export function NoLoopWelcome() {
             <p className="mt-6 text-sm font-semibold text-stone-500">Checking your sign-in…</p>
           ) : (
             <div className="mt-6 rounded-3xl border border-orange-100 bg-orange-50 p-5">
-              <p className="text-xs font-black uppercase tracking-widest text-orange-700">Start your own crew</p>
+              <p className="text-xs font-black text-orange-700">Start your own crew</p>
               <h2 className="mt-2 text-xl font-black">Make a Lunch Loop for your crew</h2>
               <p className="mt-2 text-sm leading-6 text-stone-600">Pick a name, set the home area, and invite the people you eat with. Each crew has its own restaurant list and lunch history.</p>
               <Link href="/start" className="mt-4 inline-flex rounded-xl bg-orange-500 px-4 py-3 text-sm font-black text-white">Create a Lunch Loop →</Link>

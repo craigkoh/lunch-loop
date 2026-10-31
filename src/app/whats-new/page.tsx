@@ -28,6 +28,20 @@ function changeText(change: ReleaseChange) {
 
 const releases: { build: string; changes: ReleaseChange[] }[] = [
   {
+    build: "2026.10.31.73",
+    changes: [
+      "A fresh, calmer look across every page: clean white cards, one orange accent, and dark mode everywhere. It looks the same whether you are a member, an owner, or an admin.",
+      "Where things moved: the bottom bar is now Home, Places, History, and Stats. Add place lives inside Places. Tap your initials (top right on a phone, bottom left on a bigger screen) for My Loops, Loop settings, Loop report, Account, Feedback, What’s New, and Log out.",
+      "Owner-only tools now sit in an “Owner” section in Loop settings. Owners can also mark a place “Never again” (or bring it back) right from its details.",
+      "Each round shows a simple progress line: Picks → Vetoes → Winner.",
+      "Little celebrations: cards for your loop’s 10th, 25th, and 50th lunch, the one-year anniversary, a place’s first win, and a new friend’s first lunch. Dismiss one and it stays gone for you.",
+      "Feedback now has one home in the menu (plus an “Ideas?” link on the Loop report). Under “My feedback”, each note shows where it is: Received → Looking at it → Planned → Live.",
+      "Pages refresh on their own when you come back to the app, so the Refresh button is gone.",
+      "Avatars are initials, place cards are one short line (“🏆 2 wins”), and the install card no longer hides behind the bottom bar.",
+      "Behind the scenes, Lunch Loop now keeps a private activity log of loop events for future reports. Only site admins can read it, and it never copies notes or veto reasons. The Privacy Policy explains it.",
+    ],
+  },
+  {
     build: "2026.10.30.72",
     changes: [
       "“Picked” is now “won” when a place won a lunch: “🏆 2 wins · last won Oct 21”, “No wins yet”, and sorts like “Most wins” and “Fewest wins”. (Thanks, Chris!)",

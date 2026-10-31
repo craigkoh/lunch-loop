@@ -152,7 +152,51 @@ Hidden meaning: LL, Lunch Loop, is the lunch tray.
 This is the most literal of the three, and it still reads as LL at 32px. It
 is also the busiest, and it no longer looks like the plate. It stays a study.
 
+## Design tokens (build .73, Oct 31, 2026)
+
+The app look follows mockup D: calm, Things-inspired, white cards on a light
+gray page, and **orange as the only accent**. Every color, radius, and shadow
+lives in one file, `src/styles/tokens.css`, as `--ll-*` CSS variables with a
+light set and a dark set (`:root[data-theme="dark"]`). A future Expo app
+should copy these values rather than invent new ones.
+
+| Token | Light | Dark | Use |
+| --- | --- | --- | --- |
+| `--ll-accent` | `#F97316` | `#F97316` | Progress bars, active tab, small accents. Never under white text. |
+| `--ll-accent-strong` | `#C2410C` | `#FB923C` | Buttons with a label (white on `#C2410C` is 5.2:1; dark ink on `#FB923C`), links, eyebrows. |
+| `--ll-bg` | `#F7F7F8` | `#000000` | Page. |
+| `--ll-surface` | `#FFFFFF` | `#1C1C1E` | Cards, sheets, the tab bar. |
+| `--ll-text` | `#1C1C1E` | `#F5F5F7` | Body and titles. |
+| `--ll-text-muted` | `#6E6E73` | | Second lines, captions. |
+| Radii | 10 / 14 / 20 / 24 px | | Small controls / buttons / cards / sheets. |
+
+Tailwind reads them through `@theme` (`bg-surface`, `text-muted`,
+`text-accent-strong`, `bg-accent-soft`, `divide-line`, …). The older stone,
+amber, emerald, violet, and indigo classes are remapped onto the neutral
+palette, so a leftover class still looks calm. A leftover full-orange panel
+can wear `.ll-calm` to become a plain card.
+
+Shared pieces live in `src/components/ui/`: `Card`, `ListCard`,
+`SectionTitle`, `PageHeader`, `Button`/`ButtonLink`, `Avatar` (initials,
+never emoji), `ProgressLine` (Picks → Vetoes → Winner, and Received →
+Looking at it → Planned → Live for feedback), and `Badge`.
+
+The frame (`app-frame.tsx`) is the same for every role: a slim phone header
+(logo, loop switcher, initials avatar) and a 4-tab bar (Home, Places, History,
+Stats); a sidebar on iPad and desktop. The avatar menu holds My Loops, Loop
+settings, Loop report, Account, Feedback, What’s New, a quiet Fuel the loop
+(only when donations are on), an Admin group for site admins, and Log out.
+The footer is one line: Build · Privacy · Terms. Owner tools are an “Owner”
+section in Loop settings, not a different layout.
+
+Place cards are one short line (“Mexican · 🏆 2 wins”). Lunch lore is one
+quiet line on Home. Milestone cards (10th/25th/50th lunch, one-year
+anniversary, a place’s first win, a new member’s first lunch) show one at a
+time and can be dismissed.
+
 ## Color
+
+The table below is the earlier brand palette. In the app, use the tokens above.
 
 The orange is the brand. Cream is the paper. Stone is the ink. Do not add a
 second brand hue.
@@ -467,8 +511,9 @@ Almost none.
 
 `data-theme="dark"` on the document element remaps the common utilities
 (`.bg-white`, `.text-stone-*`, `.text-orange-*`, borders) in `globals.css`.
-It does **not** remap `bg-orange-500` or `text-white`. The orange hero stays
-orange.
+Since build .73 the base colors come from the dark token set in
+`src/styles/tokens.css`; Home no longer has an orange hero. Buttons with a
+label use `#FB923C` with dark ink in dark mode.
 
 Prefer those utilities for ordinary cards so dark mode comes along. Do not
 set a one-off hex on a card unless it is a special surface.

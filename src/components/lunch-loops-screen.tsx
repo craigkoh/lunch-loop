@@ -96,8 +96,8 @@ export function LunchLoopsScreen() {
   return <AppFrame>
     <div className="flex flex-wrap items-start justify-between gap-4">
       <div>
-        <p className="text-sm font-bold uppercase tracking-widest text-orange-600">Your Lunch Loops</p>
-        {currentLoop ? <Link href="/" className="mt-1 inline-block text-3xl font-black text-stone-900 underline decoration-orange-300 underline-offset-4">{currentLoop.group_name}</Link> : <h1 className="mt-1 text-3xl font-black">Start your first Lunch Loop</h1>}
+        <p className="text-sm font-medium text-accent-strong">Your Lunch Loops</p>
+        {currentLoop ? <Link href="/" className="mt-1 inline-block text-3xl font-black text-stone-900 underline decoration-orange-300 underline-offset-4">{currentLoop.group_name}</Link> : <h1 className="mt-1 text-[28px] font-bold leading-tight tracking-tight md:text-[36px]">Start your first Lunch Loop</h1>}
         <p className="mt-2 max-w-2xl text-stone-600">Each Lunch Loop keeps its own people, home area, restaurant database, picks, and stats.</p>
       </div>
       {!loading && currentLoop && (
@@ -108,15 +108,15 @@ export function LunchLoopsScreen() {
     </div>
     {loading ? <p className="mt-6 text-sm font-semibold text-stone-500">Loading your Lunch Loops…</p> : currentLoop ? <>
       <section className="mt-6 rounded-3xl bg-white p-5 shadow-sm">
-        <p className="text-xs font-bold uppercase tracking-widest text-orange-600">Switch Lunch Loops</p>
+        <p className="text-xs font-bold text-orange-600">Switch Lunch Loops</p>
         <h2 className="mt-1 text-xl font-black">{loops.length === 1 ? "This is your Lunch Loop" : "Choose the crew you’re using now"}</h2>
         <p className="mt-1 text-sm leading-6 text-stone-600">{loops.length === 1 ? "When you create or join another Lunch Loop, it will appear here." : "Each crew has a separate restaurant list, lunch history, and settings. Switching never combines them."}</p>
         <div className="mt-4 grid gap-3 lg:grid-cols-2">
           {loops.filter((loop) => loop.status === "active").map((loop) => <LoopSwitcherCard key={loop.group_id} loop={loop} isCurrent={loop.group_id === currentLoop.group_id} busy={busy} onSwitch={switchLoop} />)}
         </div>
       </section>
-      <section className="mt-6 overflow-hidden rounded-3xl bg-gradient-to-br from-orange-500 to-orange-600 p-5 text-white shadow-xl shadow-orange-200">
-        <p className="text-xs font-bold uppercase tracking-widest text-orange-100">Current Lunch Loop</p>
+      <section className="ll-calm mt-6 overflow-hidden rounded-[var(--ll-radius-lg)] p-5">
+        <p className="text-xs font-bold text-orange-100">Current Lunch Loop</p>
         <div className="mt-2 flex flex-wrap items-start justify-between gap-4"><div><h2 className="text-2xl font-black">{currentLoop.group_name}</h2><p className="mt-1 text-sm text-orange-50">Owned by {currentLoop.owner_display_name ?? "your crew"} · {currentLoop.member_count}/6 people</p></div><div className="flex gap-2"><span className="rounded-full bg-white/20 px-3 py-1 text-xs font-black text-white">{currentLoop.loop_type === "occasion" ? "✨ Occasion" : "🔁 Standing"}</span><span className="rounded-full bg-white/20 px-3 py-1 text-xs font-black text-white">{currentLoop.role === "owner" ? "👑 Owner" : "👤 Member"}</span></div></div>
         <p className="mt-4 max-w-2xl text-sm leading-6 text-orange-50">{currentLoop.loop_type === "occasion" ? "A special-night crew. There is no automatic handoff: whoever starts the next outing makes that night’s picks." : "A recurring crew. Once a meal is closed, the next person in the saved order gets the next round of picks."}</p>
         <div className="mt-5 grid gap-3 sm:grid-cols-3"><Info label="Home area" value={currentLoop.home_label ? currentLoop.home_label.split("·")[0] : "Needs setup"} /><Info label="Search radius" value={currentLoop.search_radius_miles ? currentLoop.search_radius_miles + " miles" : "Needs setup"} /><Info label="Crew size" value={currentLoop.member_count + " of 6 people"} /></div>

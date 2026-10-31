@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRefreshOnFocus } from "@/lib/use-refresh-on-focus";
 import { useEffect, useState } from "react";
 import { AppFrame, EmptyState } from "./app-frame";
 import { RestaurantCard } from "./restaurant-card";
@@ -25,6 +26,9 @@ export function HistoryScreen() {
   const [error, setError] = useState("");
   const [detail, setDetail] = useState<HistoryItem | null>(null);
 
+  // Fresh data when the app comes back into view (no Refresh button).
+  const [reloadKey, setReloadKey] = useState(0);
+  useRefreshOnFocus(() => setReloadKey((key) => key + 1));
   useEffect(() => {
     async function load() {
       try {
@@ -125,14 +129,14 @@ export function HistoryScreen() {
       }
     }
     void load();
-  }, []);
+  }, [reloadKey]);
 
   return (
     <AppFrame>
-      <p className="text-sm font-bold uppercase tracking-widest text-orange-600">
+      <p className="text-sm font-medium text-accent-strong">
         The record
       </p>
-      <h1 className="mt-1 text-3xl font-black tracking-tight">Lunch history</h1>
+      <h1 className="mt-1 text-[28px] font-bold leading-tight tracking-tight md:text-[36px]">History</h1>
       <p className="mt-2 text-stone-600">
         Every winner, suggester, and friendly veto in one spot.
       </p>
@@ -167,7 +171,7 @@ export function HistoryScreen() {
                   >
                     <div className="flex flex-wrap items-start justify-between gap-2">
                       <div>
-                        <p className="text-xs font-bold uppercase tracking-wide text-stone-400">
+                        <p className="text-xs font-bold text-stone-400">
                           {new Date(round.scheduled_for).toLocaleDateString(
                             undefined,
                             {
@@ -210,7 +214,7 @@ export function HistoryScreen() {
           </section>
           <section className="mt-8">
             <div className="mb-3">
-              <p className="text-xs font-bold uppercase tracking-wide text-rose-600">
+              <p className="text-xs font-bold text-rose-600">
                 Retired from the rotation
               </p>
               <h2 className="text-lg font-black">Never again</h2>

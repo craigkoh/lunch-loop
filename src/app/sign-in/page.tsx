@@ -169,10 +169,10 @@ function SignInScreen() {
     <main className="grid min-h-dvh place-items-center bg-[#fffaf3] p-4">
       <section className="w-full max-w-md rounded-3xl bg-white p-7 shadow-xl shadow-orange-100">
         <div className="text-4xl">🍽️</div>
-        <p className="mt-4 text-sm font-bold uppercase tracking-widest text-orange-600">
+        <p className="mt-4 text-sm font-medium text-accent-strong">
           Lunch Loop
         </p>
-        <h1 className="mt-1 text-3xl font-black">Join your lunch crew</h1>
+        <h1 className="mt-1 text-[28px] font-bold leading-tight tracking-tight md:text-[36px]">Join your lunch crew</h1>
         <p className="mt-2 text-stone-600">
           Continue with Google, or use a one-time email link—no passwords to remember.
         </p>
@@ -228,7 +228,7 @@ function SignInScreen() {
           </form>
         )}
         <div ref={captchaBox} className="mt-4 flex min-h-[65px] justify-center" aria-label="Quick human check" />
-        <div className="my-5 flex items-center gap-3 text-xs font-bold uppercase tracking-widest text-stone-400">
+        <div className="my-5 flex items-center gap-3 text-xs font-bold text-stone-400">
           <span className="h-px flex-1 bg-stone-200" />
           or
           <span className="h-px flex-1 bg-stone-200" />

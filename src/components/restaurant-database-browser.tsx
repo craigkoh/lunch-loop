@@ -162,7 +162,11 @@ export function RestaurantDatabaseBrowser({
   emptyChildren = "Add a restaurant to give the crew something to choose from.",
   actions,
   timeZone,
+  canManage = false,
+  onNeverAgainChange,
 }: {
+  canManage?: boolean;
+  onNeverAgainChange?: (restaurant: Restaurant, neverAgain: boolean) => void;
   restaurants: RestaurantWithContributor[];
   initialSort?: RestaurantSort;
   emptyTitle?: string;
@@ -262,7 +266,7 @@ export function RestaurantDatabaseBrowser({
         {visibleRestaurants.length === 1 ? "" : "s"}
       </p>
       {visibleRestaurants.length ? (
-        <div className="mt-3 space-y-3">
+        <div className="mt-3 space-y-2">
           {pageRestaurants.map((restaurant) => (
             <RestaurantCard
               key={restaurant.id}
@@ -288,6 +292,11 @@ export function RestaurantDatabaseBrowser({
             {emptyChildren}
           </EmptyState>
         </div>
+      )}
+      {visibleRestaurants.length > 0 && (
+        <p className="mt-3 text-[11px] text-subtle">
+          Place information from <span translate="no">Google Maps</span>
+        </p>
       )}
       {visibleRestaurants.length > placesPerPage && (
         <nav className="mt-5 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-orange-100 bg-orange-50 px-3 py-3" aria-label="Lunch database pages">
@@ -317,6 +326,15 @@ export function RestaurantDatabaseBrowser({
         onClose={() => setDetailRestaurant(null)}
         addedBy={detailRestaurant?.profiles?.display_name}
         timeZone={timeZone}
+        canManage={canManage}
+        onNeverAgainChange={
+          onNeverAgainChange
+            ? (place, neverAgain) => {
+                onNeverAgainChange(place, neverAgain);
+                setDetailRestaurant((current) => (current && current.id === place.id ? { ...current, never_again: neverAgain } : current));
+              }
+            : undefined
+        }
       />
     </>
   );

@@ -17,7 +17,7 @@ export const metadata: Metadata = {
   },
 };
 
-const updated = "October 30, 2026";
+const updated = "October 31, 2026";
 
 export default function PrivacyPage() {
   return (
@@ -49,6 +49,8 @@ export default function PrivacyPage() {
           <li><strong>Area information:</strong> a loop owner’s chosen city/area center, search radius, and time zone. Lunch Loop does not ask for or use your device’s precise GPS location.</li>
           <li><strong>Restaurant information:</strong> place names, addresses, maps, hours, ratings, phone numbers, categories, and place identifiers returned by Google Maps Platform when a member searches or adds a place.</li>
           <li><strong>Service and security information:</strong> limited request, device, browser, IP/log, and error information processed by the companies that host and protect Lunch Loop.</li>
+          <li><strong>Loop activity log:</strong> a behind-the-scenes record of loop events—a round was started, picks or the meal time changed, a veto was cast, a winner was recorded, a round was finished or cancelled, a place was added or marked never again, someone joined or left, and when the loop report was viewed or its CSV downloaded. Each entry stores the event type, the time, and the related loop, round, place, and member identifiers. It does not copy veto reasons, notes, or other free text. Only Lunch Loop site administrators can read it; loop members, including owners, cannot. We use it for support and to build future reporting features.</li>
+          <li><strong>Celebration cards:</strong> when you dismiss a milestone card (like a 10th lunch), we remember that you dismissed it so it does not come back.</li>
           <li><strong>Optional communications:</strong> invitation email delivery information and, if a loop owner enables it, Discord webhook configuration and the chosen Lunch Loop event messages.</li>
         </ul>
       </LegalSection>
@@ -111,6 +113,7 @@ export default function PrivacyPage() {
         <p>We keep account and active-loop information while it is needed to provide Lunch Loop. A loop owner can export, transfer, or archive a loop. Archived loops have a 30-day recovery window before permanent deletion becomes available. Invitations expire after 14 days unless they are accepted, revoked, or otherwise closed.</p>
         <p><strong>Leaving a loop is not the same as deleting an account.</strong> A member may ask the loop owner to remove them from a loop, or contact us for help. Removal ends future access to that loop, but past contributions—such as the display name attached to restaurant additions, picks, vetoes, and history—may remain in that loop’s historical record. Removing a member does not automatically delete their Lunch Loop account or information associated with other loops.</p>
         <p><strong>Personal-data export and account deletion are currently handled through support, not self-service buttons.</strong> To request account information or account deletion, email <a className="font-bold text-orange-700 underline" href="mailto:support@lunchloop.app">support@lunchloop.app</a>. Before processing a request, we will explain how it affects any solo-owned loops, shared loops, active decisions, and ownership responsibilities. We are reviewing a clear, friend-readable export and self-service deletion experience before making either available.</p>
+        <p>The loop activity log is deleted when its loop is permanently deleted. When an account is deleted, its identifiers are cleared from activity entries and its dismissed celebration cards are deleted.</p>
         <p>Your feedback submissions are deleted with your account. We retain only basic security and usage records that are reasonably needed for support, safety, and service operations.</p>
       </LegalSection>
 

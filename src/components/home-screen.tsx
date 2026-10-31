@@ -10,6 +10,11 @@ import {
   type ReactNode,
 } from "react";
 import { AppFrame } from "./app-frame";
+import { Avatar } from "./ui/avatar";
+import { Card, ListCard, SectionTitle } from "./ui/card";
+import { ProgressLine } from "./ui/progress-line";
+import { MilestoneCard } from "./milestone-card";
+import { winsLine } from "@/lib/wins";
 import { GroupSetup } from "./group-setup";
 import { NoLoopWelcome } from "./no-loop-welcome";
 import { RestaurantDetailsDialog } from "./restaurant-details-dialog";
@@ -61,6 +66,16 @@ function formatLunchTime(value: string, timeZone = "America/Chicago") {
     month: "short",
     day: "numeric",
     year: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+    timeZone,
+  }).format(new Date(value));
+}
+function formatShortLunchTime(value: string, timeZone = "America/Chicago") {
+  return new Intl.DateTimeFormat(undefined, {
+    weekday: "short",
+    month: "short",
+    day: "numeric",
     hour: "numeric",
     minute: "2-digit",
     timeZone,
@@ -578,7 +593,22 @@ export function HomeScreen() {
   const cuisineCount = available.length
     ? new Set(available.map((restaurant) => restaurant.cuisine || "Restaurant")).size
     : 0;
-  const loreCardCount = 1 + (freshPlaceCount > 0 ? 1 : 0) + (cuisineCount > 0 ? 1 : 0);
+  // Home keeps places to one short line each; details live in the loop report.
+  const topPlaces = [...available]
+    .sort((a, b) => b.visit_count - a.visit_count || a.name.localeCompare(b.name))
+    .slice(0, 4);
+  // One quiet lunch-lore line, picked at random on each visit.
+  const [loreSeed] = useState(() => Math.random());
+  const loreOptions: { text: string; href?: string }[] = [
+    ...(freshPlaceCount > 0
+      ? [{ text: `🌱 Lunch lore: ${freshPlaceCount} ${freshPlaceCount === 1 ? "place is" : "places are"} still waiting for a first win.`, href: "/database?sort=never-visited" }]
+      : []),
+    ...(cuisineCount > 1 ? [{ text: `🍽️ Lunch lore: ${cuisineCount} different cuisines on your list.`, href: "/stats#cuisine-popularity" }] : []),
+    ...(newestRestaurant ? [{ text: `✨ Lunch lore: newest on the list is ${newestRestaurant.name}.` }] : []),
+    ...(favorite && favorite.visit_count > 1 ? [{ text: `🏆 Lunch lore: ${favorite.name} has won ${favorite.visit_count} times.` }] : []),
+    ...(lastLunch ? [{ text: `🗓️ Lunch lore: last time, the crew went to ${lastLunch.restaurant.name}.` }] : []),
+  ];
+  const loreLine = loreOptions.length ? loreOptions[Math.floor(loreSeed * loreOptions.length)] : null;
   const scheduleHasPassed = Boolean(
     current && new Date(current.scheduled_for) <= new Date(),
   );
@@ -907,10 +937,10 @@ export function HomeScreen() {
     actionLabel: string;
     onSave: () => void;
   }) => (
-    <div className="mt-5 rounded-2xl bg-orange-950/15 p-4">
+    <div className="mt-5 rounded-2xl bg-stone-50 p-4">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div>
-          <p className="text-xs font-bold uppercase tracking-widest text-orange-100">
+          <p className="text-xs font-bold text-stone-500">
             Build your short list
           </p>
           <h2 className="mt-1 text-lg font-black">
@@ -994,16 +1024,16 @@ export function HomeScreen() {
         {busy ? "Working…" : actionLabel}
       </button>
       {hasClosedSelection && (
-        <p className="mt-2 text-xs font-bold text-amber-100">
+        <p className="mt-2 text-xs font-bold text-rose-700">
           Remove or replace the place that is closed at the planned {mealName}{" "}
           time before continuing.
         </p>
       )}
       <div className="mt-4">
-        <p className="text-xs font-bold uppercase tracking-widest text-orange-100">
+        <p className="text-xs font-bold text-stone-500">
           Smart selection help
         </p>
-        <p className="mt-1 text-xs text-orange-50">
+        <p className="mt-1 text-xs text-stone-500">
           {remainingSelectionCount
             ? `Keep your current picks and fill the remaining ${remainingSelectionCount} spot${remainingSelectionCount === 1 ? "" : "s"} with one of these options.`
             : "Your selection is complete. Remove a place to use a smart option."}{" "}
@@ -1079,7 +1109,7 @@ export function HomeScreen() {
         </div>
         {remainingSelectionCount > 0 &&
           smartFillPlaces.length < remainingSelectionCount && (
-            <p className="mt-2 text-xs font-bold text-amber-100">
+            <p className="mt-2 text-xs font-bold text-rose-700">
               Only {smartFillPlaces.length} more place
               {smartFillPlaces.length === 1 ? " is" : "s are"} open at the
               planned {mealName} time with these filters. Clear a filter or
@@ -1089,7 +1119,7 @@ export function HomeScreen() {
       </div>
       <div className="mt-5">
         <div className="flex flex-wrap items-center justify-between gap-2">
-          <p className="text-xs font-bold uppercase tracking-widest text-orange-100">
+          <p className="text-xs font-bold text-stone-500">
             Find a restaurant
           </p>
           <button
@@ -1137,7 +1167,7 @@ export function HomeScreen() {
           <p className="text-sm font-black">
             {search ? "Search results" : "Browse your database"}
           </p>
-          <span className="text-xs font-bold text-orange-100">
+          <span className="text-xs font-bold text-stone-500">
             {allMatchingPlaces.length} matching place
             {allMatchingPlaces.length === 1 ? "" : "s"}
           </span>
@@ -1159,7 +1189,7 @@ export function HomeScreen() {
             return (
               <article
                 key={restaurant.id}
-                className={`flex min-w-0 items-start justify-between gap-3 rounded-xl border px-3 py-3 text-stone-900 ${selected ? "border-orange-300 bg-orange-100" : "border-white/70 bg-white"}`}
+                className={`flex min-w-0 items-start justify-between gap-3 rounded-xl border px-3 py-3 text-stone-900 ${selected ? "border-orange-300 bg-orange-100" : "border-stone-200 bg-white"}`}
               >
                 <button
                   type="button"
@@ -1192,13 +1222,13 @@ export function HomeScreen() {
           })}
         </div>
         {matchingPlaces.length === 0 && (
-          <p className="mt-3 rounded-xl bg-white/15 px-3 py-3 text-sm text-orange-50">
+          <p className="mt-3 rounded-xl bg-stone-50 px-3 py-3 text-sm text-stone-500">
             No active places match those filters. Clear a filter or add a new
             place above.
           </p>
         )}
         {allMatchingPlaces.length > placesPerSelectionPage && (
-          <nav className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-2xl bg-white/15 px-3 py-3" aria-label="Restaurant selection pages">
+          <nav className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-2xl bg-stone-50 px-3 py-3" aria-label="Restaurant selection pages">
             <button
               type="button"
               onClick={() => setBrowsePage((page) => Math.max(1, page - 1))}
@@ -1207,7 +1237,7 @@ export function HomeScreen() {
             >
               ← Previous
             </button>
-            <span className="text-xs font-bold text-orange-50">
+            <span className="text-xs font-bold text-stone-500">
               Places {(currentBrowsePage - 1) * placesPerSelectionPage + 1}–{Math.min(currentBrowsePage * placesPerSelectionPage, allMatchingPlaces.length)} of {allMatchingPlaces.length}
             </span>
             <button
@@ -1225,39 +1255,29 @@ export function HomeScreen() {
   );
   const renderRoundProgress = () =>
     current?.status === "active" ? (
-      <section className="mt-5 rounded-2xl border border-white/30 bg-white/15 p-4">
+      <section className="mt-4 rounded-[var(--ll-radius-lg)] bg-surface p-5 shadow-[var(--ll-shadow-card)]">
         <div className="flex flex-wrap items-center justify-between gap-2">
           <div>
-            <p className="text-xs font-bold uppercase tracking-widest text-orange-100">
+            <p className="text-xs font-medium text-stone-500">
               The {mealName} decision, live
             </p>
-            <h2 className="mt-1 text-lg font-black">
+            <h2 className="mt-1 text-[17px] font-semibold">
               {survivorRestaurants.length} of {memberCount} picks still standing
             </h2>
           </div>
-          <span className="rounded-full bg-white px-3 py-1 text-xs font-black text-orange-800">
-            🎲 Pick → ✂️ veto → 🏆 {mealName}
-          </span>
         </div>
-        <div className="mt-3 flex flex-wrap gap-2">
-          {survivorRestaurants.map((restaurant) => (
-            <button
-              key={restaurant.id}
-              type="button"
-              onClick={() => setDetailRestaurant(restaurant)}
-              className="max-w-full rounded-xl bg-white px-3 py-2 text-left text-sm font-bold text-stone-900"
-            >
-              <span className="block">🍽️ {restaurant.name}</span>
-              <span className="mt-1 block text-xs font-semibold text-stone-500">
-                {availabilityFor(restaurant).label} ·{" "}
-                {restaurant.added_by
-                  ? `added by ${memberNameById.get(restaurant.added_by) ?? "a crew member"}`
-                  : "added by a crew member"}
-              </span>
-            </button>
+        <p className="mt-2 text-sm text-stone-500">
+          Still standing:{" "}
+          {survivorRestaurants.map((restaurant, index) => (
+            <span key={restaurant.id}>
+              {index > 0 ? " · " : ""}
+              <button type="button" onClick={() => setDetailRestaurant(restaurant)} className="font-medium text-stone-900 hover:underline">
+                {restaurant.name}
+              </button>
+            </span>
           ))}
-        </div>
-        <div className="mt-4 border-t border-white/25 pt-3">
+        </p>
+        <div className="mt-4 border-t border-stone-200 pt-3">
           <p className="text-sm font-bold">
             {pendingVetoers.length
               ? `Still holding a veto: ${pendingVetoers.map((member) => member.display_name).join(", ")}`
@@ -1271,7 +1291,7 @@ export function HomeScreen() {
               return (
                 <span
                   key={member.user_id}
-                  className={`rounded-full px-3 py-1 text-xs font-bold ${used ? "bg-emerald-100 text-emerald-900" : "bg-amber-100 text-amber-950"}`}
+                  className={`rounded-full px-3 py-1 text-xs font-bold ${used ? "bg-stone-100 text-stone-600" : "bg-orange-50 text-orange-800"}`}
                 >
                   {used ? "✓" : "⏳"} {member.display_name}{" "}
                   {used ? "vetoed" : "is up"}
@@ -1280,7 +1300,7 @@ export function HomeScreen() {
             })}
           </div>
         </div>
-        <p className="mt-3 text-xs text-orange-50">
+        <p className="mt-3 text-xs text-stone-500">
           {suggester?.display_name ?? "The suggester"} made the original picks.
           Each other friend gets one veto; the last restaurant standing wins.
         </p>
@@ -1288,13 +1308,14 @@ export function HomeScreen() {
     ) : null;
   const renderScheduleEditor = () =>
     current ? (
-      <div className="mx-auto w-full max-w-xl rounded-2xl bg-white p-4 text-stone-900 shadow-sm sm:mx-0">
-        <p className="text-xs font-bold uppercase tracking-widest text-orange-600">
-          {mealNameTitle} time · anyone in the crew can update
-        </p>
-        <p className="mt-1 text-xl font-black">
-          {formatLunchTime(current.scheduled_for, timeZone)}
-        </p>
+      <details className="group mt-4 w-full rounded-[var(--ll-radius-lg)] bg-surface p-5 text-stone-900 shadow-[var(--ll-shadow-card)]">
+        <summary className="flex cursor-pointer list-none items-center justify-between gap-3">
+          <span>
+            <span className="block text-xs text-stone-500">{mealNameTitle} time · anyone in the crew can update</span>
+            <span className="mt-0.5 block text-[15px] font-semibold">{formatLunchTime(current.scheduled_for, timeZone)}</span>
+          </span>
+          <span className="text-sm font-medium text-accent-strong group-open:hidden">Change</span>
+        </summary>
         <div className="mx-auto mt-4 grid w-full max-w-[18rem] min-w-0 gap-3 sm:max-w-none sm:grid-cols-2">
           <label className="w-full min-w-0 text-left text-sm font-bold">
             {mealNameTitle} date
@@ -1329,15 +1350,15 @@ export function HomeScreen() {
             {busy ? "Saving…" : `Update ${mealName} time`}
           </button>
         </div>
-      </div>
+      </details>
     ) : null;
   const renderCloseLoopPanel = () =>
     current?.status === "chosen" ? (
-      <div className="rounded-2xl border border-white/30 bg-white/15 p-4">
+      <div className="rounded-2xl border border-stone-200 bg-stone-50 p-4">
         <p className="text-sm font-bold">
           {isOccasion ? "Ready to wrap up this occasion?" : "Ready to hand off the next round?"}
         </p>
-        <p className="mt-1 text-sm text-orange-50">
+        <p className="mt-1 text-sm text-stone-500">
           {isOccasion
             ? "Closing records this visit. The restaurant list stays here, and any crew member can start the next occasion when ready."
             : "Closing records this visit and hands the next picks to the next person in order."}
@@ -1404,7 +1425,7 @@ export function HomeScreen() {
         : `Set the ${mealName} time, make your picks, and the group can begin vetoing right here.`;
       heroAction = (
         <>
-          <div className="mx-auto mt-5 grid w-full max-w-[18rem] min-w-0 gap-3 rounded-2xl bg-white/15 p-4 sm:mx-0 sm:max-w-xl sm:grid-cols-2">
+          <div className="mx-auto mt-5 grid w-full max-w-[18rem] min-w-0 gap-3 rounded-2xl bg-stone-50 p-4 sm:mx-0 sm:max-w-xl sm:grid-cols-2">
             <label className="w-full min-w-0 text-left text-sm font-bold">
               {mealNameTitle} date
               <input
@@ -1414,7 +1435,7 @@ export function HomeScreen() {
                   scheduleDraftDirty.current = true;
                   setLunchDate(event.target.value);
                 }}
-                className="date-time-input mt-1 block h-11 w-full min-w-0 max-w-full rounded-xl border border-white/40 bg-white px-3 text-base text-stone-900"
+                className="date-time-input mt-1 block h-11 w-full min-w-0 max-w-full rounded-xl border border-stone-200 bg-white px-3 text-base text-stone-900"
               />
             </label>
             <label className="w-full min-w-0 text-left text-sm font-bold">
@@ -1426,7 +1447,7 @@ export function HomeScreen() {
                   scheduleDraftDirty.current = true;
                   setLunchTime(event.target.value);
                 }}
-                className="date-time-input mt-1 block h-11 w-full min-w-0 max-w-full rounded-xl border border-white/40 bg-white px-3 text-base text-stone-900"
+                className="date-time-input mt-1 block h-11 w-full min-w-0 max-w-full rounded-xl border border-stone-200 bg-white px-3 text-base text-stone-900"
               />
             </label>
           </div>
@@ -1469,51 +1490,41 @@ export function HomeScreen() {
       heroTitle = `Veto one of ${suggester?.display_name ?? "the picker"}’s choices`;
       heroCopy = `${suggester?.display_name ?? "The picker"} made these picks. Choose the one place you do not want today; they do not get a veto this round.`;
       heroAction = (
-        <div className="mt-5 grid gap-3 sm:grid-cols-2">
+        <ListCard className="mt-1">
           {survivors.map((candidate) => {
             const restaurant = restaurants.find(
               (place) => place.id === candidate.restaurant_id,
             );
             if (!restaurant) return null;
             const availability = availabilityFor(restaurant);
+            const hoursKnown = availability.label !== "Hours unavailable";
             return (
-              <article
-                key={candidate.id}
-                className="rounded-2xl bg-white p-4 text-stone-900 shadow-sm"
-              >
+              <li key={candidate.id} className="flex items-center gap-3 px-5 py-4">
                 <button
                   type="button"
                   onClick={() => setDetailRestaurant(restaurant)}
-                  className="w-full text-left"
+                  className="min-w-0 flex-1 text-left"
                 >
-                  <p className="text-lg font-black">{restaurant.name}</p>
-                  <p className="mt-1 text-sm text-stone-500">
-                    {restaurant.address}
-                  </p>
-                  <p
-                    className={`mt-2 text-xs font-bold ${availability.isOpen ? "text-emerald-700" : "text-rose-700"}`}
-                  >
-                    {availability.label}
-                  </p>
-                  <div className="mt-1">{restaurantFacts(restaurant)}</div>
-                </button>
-                <div className="mt-3 flex items-center justify-between gap-2">
-                  <span className="text-xs font-bold text-orange-700">
-                    {restaurant.cuisine || "Restaurant"}
+                  <span className="block truncate text-[15px] font-semibold">{restaurant.name}</span>
+                  <span className="mt-0.5 block truncate text-sm text-muted">
+                    {[restaurant.cuisine || "Restaurant", winsLine(restaurant.visit_count), hoursKnown ? availability.label : null]
+                      .filter(Boolean)
+                      .join(" · ")}
                   </span>
-                  <button
-                    type="button"
-                    disabled={busy}
-                    onClick={() => void veto(candidate)}
-                    className="rounded-xl bg-rose-600 px-3 py-2 text-sm font-black text-white disabled:opacity-60"
-                  >
-                    Veto this
-                  </button>
-                </div>
-              </article>
+                </button>
+                <button
+                  type="button"
+                  disabled={busy}
+                  onClick={() => void veto(candidate)}
+                  aria-label={`Veto ${restaurant.name}`}
+                  className="shrink-0 rounded-full border border-stone-200 px-4 py-2 text-sm font-semibold text-stone-800 hover:border-rose-300 hover:text-rose-700 disabled:opacity-60"
+                >
+                  ✂️ Veto
+                </button>
+              </li>
             );
           })}
-        </div>
+        </ListCard>
       );
     }
   }
@@ -1527,7 +1538,7 @@ export function HomeScreen() {
       <button
         type="button"
         onClick={() => winner && setDetailRestaurant(winner)}
-        className="mt-5 w-full rounded-2xl bg-emerald-50 p-4 text-left text-stone-900 transition hover:bg-emerald-100 focus:outline-none focus:ring-2 focus:ring-white"
+        className="mt-5 w-full rounded-2xl bg-emerald-50 p-4 text-left text-stone-900 transition hover:bg-emerald-100 focus:outline-none focus:ring-2 focus:ring-orange-300"
         aria-label={winner ? `View details for ${winner.name}` : undefined}
       >
         <p className="text-4xl">🎉🍽️🎉</p>
@@ -1549,21 +1560,42 @@ export function HomeScreen() {
 
   return (
     <AppFrame>
-      <section
-        className={`relative overflow-hidden rounded-3xl bg-orange-500 text-white shadow-lg shadow-orange-200 ${chosen ? "p-4 sm:p-6" : "p-6"}`}
-      >
-        {chosen ? null : (
-          <div className="absolute -right-8 -top-6 text-9xl opacity-20">🍟</div>
-        )}
+      <header className="mb-6">
+        <p className="text-sm font-medium text-accent-strong">{heroEyebrow}</p>
+        <h1 className="mt-1 max-w-3xl break-words text-[28px] font-bold leading-tight tracking-tight [overflow-wrap:anywhere] md:text-[36px]">
+          {heroTitle}
+        </h1>
+        <p className="mt-2 max-w-xl text-[15px] leading-6 text-muted">{heroCopy}</p>
+      </header>
+      {current && context && (
+        <Card className="mb-4">
+          <div className="flex items-center justify-between gap-3 text-sm">
+            <span className="shrink-0 font-medium">{isOccasion ? "This occasion" : `${mealNameTitle} round`}</span>
+            <span className="truncate text-subtle">{formatShortLunchTime(current.scheduled_for, timeZone)}</span>
+          </div>
+          <div className="mt-4 flex items-center gap-3">
+            <div className="flex -space-x-2">
+              {members.slice(0, 6).map((member) => (
+                <Avatar
+                  key={member.user_id}
+                  name={member.display_name}
+                  highlight={member.user_id === current.suggester_id}
+                  className="ring-2 ring-[var(--ll-surface)]"
+                />
+              ))}
+            </div>
+            <ProgressLine
+              className="flex-1"
+              steps={["Picks", "Vetoes", "Winner"]}
+              current={current.status === "chosen" ? 3 : vetoes.length > 0 ? 2 : candidates.length > 0 ? 1 : 0}
+              label={`${mealNameTitle} progress`}
+            />
+          </div>
+        </Card>
+      )}
+      {(heroAction || current || message || (error && context)) && <div>
         <div className={chosen ? "pick-layout relative" : "relative"}>
           <div className={chosen ? "pick-main min-w-0" : undefined}>
-            <p className="text-sm font-bold uppercase tracking-widest text-orange-100">
-              {heroEyebrow}
-            </p>
-            <h1 className="mt-1 max-w-3xl break-words text-3xl font-black tracking-tight [overflow-wrap:anywhere]">
-              {heroTitle}
-            </h1>
-            <p className="mt-3 max-w-2xl text-orange-50">{heroCopy}</p>
             {heroAction}
           </div>
           {chosen && context?.userId && current?.id ? (
@@ -1618,7 +1650,7 @@ export function HomeScreen() {
             )}
           </div>
         </div>
-      </section>
+      </div>}
       {loading ? (
         <div className="mt-6 rounded-2xl bg-white p-5 text-sm text-stone-600 shadow-sm">
           <p className="font-semibold">{slowLoading ? "Still connecting to your Lunch Loop…" : "Loading your Lunch Loop…"}</p>
@@ -1626,7 +1658,7 @@ export function HomeScreen() {
         </div>
       ) : error && !context ? (
         <section className="mt-6 rounded-3xl border border-rose-100 bg-white p-5 shadow-sm">
-          <p className="text-xs font-bold uppercase tracking-widest text-rose-700">Connection check</p>
+          <p className="text-xs font-bold text-rose-700">Connection check</p>
           <h2 className="mt-1 text-xl font-black">Your Lunch Loop could not load yet</h2>
           <p className="mt-2 text-sm leading-6 text-stone-600">{error}</p>
           <div className="mt-4 flex flex-wrap gap-3"><button type="button" onClick={retryHomeLoad} className="rounded-xl bg-orange-500 px-4 py-3 text-sm font-black text-white">Try again</button><button type="button" onClick={() => window.location.reload()} className="rounded-xl border border-orange-200 bg-white px-4 py-3 text-sm font-black text-orange-800">Refresh page</button></div>
@@ -1635,7 +1667,7 @@ export function HomeScreen() {
         <>
           <GroupSetup />
           <section className="mt-5 rounded-3xl bg-white p-5 shadow-sm">
-            <p className="text-xs font-bold uppercase tracking-widest text-orange-600">
+            <p className="text-xs font-bold text-orange-600">
               Getting started
             </p>
             <h2 className="mt-1 text-xl font-black">
@@ -1651,132 +1683,45 @@ export function HomeScreen() {
         </>
       ) : (
         <>
-          <section className="mt-5 grid gap-3 sm:grid-cols-2">
-            <Link
-              href="/database"
-              className="rounded-2xl bg-white p-4 shadow-sm transition hover:ring-2 hover:ring-orange-300"
-            >
-              <p className="text-xs font-bold uppercase tracking-wide text-stone-400">
-                Lunch database
-              </p>
-              <p className="mt-2 text-xl font-black">
-                {restaurants.length === 0
-                  ? "No places yet"
-                  : `${restaurants.length} ${restaurants.length === 1 ? "place" : "places"}`}
-              </p>
-              <p className="mt-1 text-sm text-orange-700">
-                Browse and sort every place →
-              </p>
-            </Link>
-            {lastLunch ? (
-              <button
-                type="button"
-                onClick={() => setDetailRestaurant(lastLunch.restaurant)}
-                className="rounded-2xl bg-white p-4 text-left shadow-sm transition hover:ring-2 hover:ring-orange-300"
-              >
-                <p className="text-xs font-bold uppercase tracking-wide text-stone-400">
-                  Last lunch
-                </p>
-                <p className="mt-2 text-xl font-black">
-                  {lastLunch.restaurant.name}
-                </p>
-                <p className="mt-1 text-sm text-stone-500">
-                  {formatLunchTime(lastLunch.scheduled_for, timeZone)}
-                </p>
-                <div className="mt-2">
-                  {restaurantFacts(lastLunch.restaurant)}
-                </div>
-                <p className="mt-3 text-xs font-bold text-orange-700">
-                  View details and map →
-                </p>
-              </button>
-            ) : (
-              <div className="rounded-2xl bg-white p-4 shadow-sm">
-                <p className="text-xs font-bold uppercase tracking-wide text-stone-400">
-                  Last lunch
-                </p>
-                <p className="mt-2 text-xl font-black">No lunch yet</p>
-                <p className="mt-1 text-sm text-stone-500">
-                  Your first decision is next
-                </p>
-              </div>
-            )}
-          </section>
-          <section className="mt-7">
-            <p className="text-xs font-bold uppercase tracking-wide text-orange-600">
-              Lunch lore
+          <MilestoneCard groupId={context.groupId} userId={context.userId} refreshKey={completedCount} />
+          <SectionTitle
+            className="mt-8"
+            title="Places"
+            action={restaurants.length > 0 ? <Link href="/database" className="text-sm font-medium text-accent-strong">See all {restaurants.length}</Link> : undefined}
+          />
+          {topPlaces.length > 0 ? (
+            <ListCard className="mt-3">
+              {topPlaces.map((restaurant) => (
+                <li key={restaurant.id}>
+                  <button
+                    type="button"
+                    onClick={() => setDetailRestaurant(restaurant)}
+                    className="flex w-full items-center gap-3 px-5 py-4 text-left hover:bg-surface-muted"
+                  >
+                    <span className="min-w-0 flex-1 truncate text-[15px] font-medium">{restaurant.name}</span>
+                    <span className="shrink-0 text-sm text-muted">{winsLine(restaurant.visit_count)}</span>
+                    <span className="text-stone-300" aria-hidden="true">›</span>
+                  </button>
+                </li>
+              ))}
+            </ListCard>
+          ) : (
+            <p className="mt-3 text-sm text-muted">No places yet. Add a few favorites to get the loop rolling.</p>
+          )}
+          <Link
+            href="/add-place"
+            className="mt-3 flex w-full items-center justify-center rounded-[var(--ll-radius-md)] border border-dashed border-stone-300 py-3 text-sm font-medium text-muted md:hidden"
+          >
+            ＋ Add place
+          </Link>
+          {loreLine && (
+            <p className="mt-8 text-center text-sm text-subtle">
+              {loreLine.href ? <Link href={loreLine.href} className="hover:text-ink">{loreLine.text}</Link> : loreLine.text}
             </p>
-            <h2 className="mt-1 text-xl font-black">
-              Little facts from your list
-            </h2>
-            <p className="mt-1 text-sm text-stone-500">
-              Tap a card to explore the detail behind it.
-            </p>
-            <div className={`mt-3 grid gap-3 ${loreCardCount >= 3 ? "sm:grid-cols-3" : loreCardCount === 2 ? "sm:grid-cols-2" : ""}`}>
-              {freshPlaceCount > 0 && <Link
-                href="/database?sort=never-visited"
-                className="rounded-2xl border border-orange-100 bg-white p-4 transition hover:ring-2 hover:ring-orange-300"
-              >
-                <p className="text-2xl">🌱</p>
-                <p className="mt-2 text-xl font-black">
-                  {freshPlaceCount}
-                </p>
-                <p className="text-sm text-stone-500">
-                  places waiting for a first win
-                </p>
-                <p className="mt-2 text-xs font-bold text-orange-700">
-                  See fresh places →
-                </p>
-              </Link>}
-              {cuisineCount > 0 && <Link
-                href="/stats#cuisine-popularity"
-                className="rounded-2xl border border-orange-100 bg-white p-4 transition hover:ring-2 hover:ring-orange-300"
-              >
-                <p className="text-2xl">🍽️</p>
-                <p className="mt-2 text-xl font-black">
-                  {cuisineCount}
-                </p>
-                <p className="text-sm text-stone-500">
-                  different cuisines in the database
-                </p>
-                <p className="mt-2 text-xs font-bold text-orange-700">
-                  See cuisine stats →
-                </p>
-              </Link>}
-              {newestRestaurant ? (
-                <button
-                  type="button"
-                  onClick={() => setDetailRestaurant(newestRestaurant)}
-                  className="rounded-2xl border border-orange-100 bg-white p-4 text-left transition hover:ring-2 hover:ring-orange-300 focus:outline-none focus:ring-2 focus:ring-orange-300"
-                >
-                  <p className="text-2xl">✨</p>
-                  <p className="mt-2 truncate text-xl font-black">
-                    {newestRestaurant.name}
-                  </p>
-                  <p className="text-sm text-stone-500">
-                    newest place added to the list
-                  </p>
-                  <p className="mt-2 text-xs font-bold text-orange-700">
-                    View details, map, and directions →
-                  </p>
-                </button>
-              ) : (
-                <Link
-                  href="/add-place"
-                  className="rounded-2xl border border-orange-100 bg-white p-4 transition hover:ring-2 hover:ring-orange-300"
-                >
-                  <p className="text-2xl">✨</p>
-                  <p className="mt-2 text-xl font-black">Add a first place</p>
-                  <p className="text-sm text-stone-500">
-                    Every good list starts somewhere
-                  </p>
-                  <p className="mt-2 text-xs font-bold text-orange-700">
-                    Add a place →
-                  </p>
-                </Link>
-              )}
-            </div>
-          </section>
+          )}
+          <p className="mt-1 text-center text-sm">
+            <Link href="/report" className="font-medium text-accent-strong">View loop report →</Link>
+          </p>
         </>
       )}
       <RestaurantDetailsDialog

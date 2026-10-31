@@ -1,0 +1,146 @@
+/*
+ * Lunch Loop design tokens — the one place to change the look.
+ *
+ * Calm, Things-style surfaces with Lunch Loop orange as the only accent.
+ * Every value here is a plain CSS variable so a future Expo app can copy the
+ * same names and numbers (see docs/DESIGN.md "Design tokens").
+ *
+ *   --ll-*        semantic tokens used by src/components/ui/*
+ *   @theme block  maps the tokens onto Tailwind so older markup
+ *                 (stone-*, amber-*, emerald-*, rounded-3xl, font-black …)
+ *                 picks up the same calm palette without a rewrite.
+ */
+
+:root {
+  /* Brand */
+  --ll-accent: #f97316;          /* logo tile, fills, icons, progress line */
+  --ll-accent-strong: #c2410c;   /* buttons with white text, links (5.2:1 on white) */
+  --ll-accent-ink: #9a3412;      /* small orange text on light orange */
+  --ll-accent-soft: #fff1e6;     /* active nav, chips, milestone circle */
+  --ll-on-accent: #ffffff;
+
+  /* Surfaces */
+  --ll-bg: #f7f7f8;
+  --ll-surface: #ffffff;
+  --ll-surface-muted: #f2f2f4;
+  --ll-border: rgb(0 0 0 / 0.07);
+  --ll-overlay: rgb(0 0 0 / 0.25);
+
+  /* Text */
+  --ll-text: #1c1c1e;
+  --ll-text-muted: #6e6e73;
+  --ll-text-subtle: #8e8e93;
+
+  /* Status (danger is rose, never orange) */
+  --ll-danger: #be123c;
+  --ll-danger-soft: #fff1f2;
+
+  /* Shape */
+  --ll-radius-sm: 10px;
+  --ll-radius-md: 14px;
+  --ll-radius-lg: 20px;
+  --ll-radius-sheet: 24px;
+  --ll-shadow-card: 0 1px 2px rgb(0 0 0 / 0.04), 0 4px 16px rgb(0 0 0 / 0.04);
+
+  /* Spacing: 4-point grid (Tailwind's default 0.25rem step). */
+  --ll-space: 4px;
+
+  /* Type */
+  --ll-font: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Inter, system-ui, sans-serif;
+  --ll-text-title: 32px;
+  --ll-text-body: 15px;
+  --ll-text-small: 13px;
+}
+
+:root[data-theme="dark"] {
+  --ll-accent: #f97316;
+  --ll-accent-strong: #fb923c;   /* links/buttons on dark use the lighter orange */
+  --ll-accent-ink: #fdba74;
+  --ll-accent-soft: rgb(249 115 22 / 0.16);
+  --ll-on-accent: #1c0d03;
+
+  --ll-bg: #000000;
+  --ll-surface: #1c1c1e;
+  --ll-surface-muted: #2c2c2e;
+  --ll-border: rgb(255 255 255 / 0.1);
+  --ll-overlay: rgb(0 0 0 / 0.55);
+
+  --ll-text: #f2f2f7;
+  --ll-text-muted: #a1a1a6;
+  --ll-text-subtle: #8e8e93;
+
+  --ll-danger: #fda4af;
+  --ll-danger-soft: rgb(244 63 94 / 0.14);
+  --ll-shadow-card: none;
+}
+
+@theme {
+  /* Semantic colors as Tailwind utilities: bg-surface, text-muted, bg-accent … */
+  --color-accent: var(--ll-accent);
+  --color-accent-strong: var(--ll-accent-strong);
+  --color-accent-ink: var(--ll-accent-ink);
+  --color-accent-soft: var(--ll-accent-soft);
+  --color-on-accent: var(--ll-on-accent);
+  --color-app: var(--ll-bg);
+  --color-surface: var(--ll-surface);
+  --color-surface-muted: var(--ll-surface-muted);
+  --color-line: var(--ll-border);
+  --color-ink: var(--ll-text);
+  --color-muted: var(--ll-text-muted);
+  --color-subtle: var(--ll-text-subtle);
+  --color-danger: var(--ll-danger);
+  --color-danger-soft: var(--ll-danger-soft);
+
+  /* Warm stone → calm neutral. */
+  --color-stone-50: #f7f7f8;
+  --color-stone-100: #f2f2f4;
+  --color-stone-200: #e5e5ea;
+  --color-stone-300: #d1d1d6;
+  --color-stone-400: #a1a1a6;
+  --color-stone-500: #6e6e73;
+  --color-stone-600: #545458;
+  --color-stone-700: #3a3a3c;
+  --color-stone-800: #2c2c2e;
+  --color-stone-900: #1c1c1e;
+  --color-stone-950: #111111;
+
+  /* Extra accents fold into orange (amber) or neutral (emerald/violet/indigo),
+     so orange stays the only accent. Rose stays for danger. */
+  --color-amber-50: #fff7ed;
+  --color-amber-100: #ffedd5;
+  --color-amber-200: #fed7aa;
+  --color-amber-400: #fb923c;
+  --color-amber-500: #f97316;
+  --color-amber-600: #ea580c;
+  --color-amber-700: #c2410c;
+  --color-amber-800: #9a3412;
+  --color-amber-900: #7c2d12;
+  --color-amber-950: #431407;
+  --color-emerald-50: #f2f2f4;
+  --color-emerald-100: #e5e5ea;
+  --color-emerald-200: #d1d1d6;
+  --color-emerald-300: #c7c7cc;
+  --color-emerald-600: #3a3a3c;
+  --color-emerald-700: #3a3a3c;
+  --color-emerald-800: #2c2c2e;
+  --color-emerald-900: #1c1c1e;
+  --color-emerald-950: #111111;
+  --color-violet-100: #f2f2f4;
+  --color-violet-900: #1c1c1e;
+  --color-indigo-50: #f2f2f4;
+  --color-indigo-100: #e5e5ea;
+  --color-indigo-200: #d1d1d6;
+  --color-indigo-300: #c7c7cc;
+  --color-indigo-600: #c2410c;
+  --color-indigo-700: #3a3a3c;
+  --color-indigo-800: #2c2c2e;
+
+  /* Calmer type and shape. */
+  --font-sans: var(--ll-font);
+  --font-weight-black: 700;
+  --font-weight-extrabold: 650;
+  --radius-xl: var(--ll-radius-md);
+  --radius-2xl: 16px;
+  --radius-3xl: var(--ll-radius-lg);
+  --shadow-sm: var(--ll-shadow-card);
+}

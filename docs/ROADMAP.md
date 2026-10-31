@@ -45,21 +45,29 @@ rate limits and a hosted bot challenge.
 - Google-compliant private database map: Google Map pins for the active group,
   synchronized with current filters/details.
 - Office/team administration after the core friend experience is proven.
-- A native iPhone wrapper only if the PWA has a real user-facing limitation.
 - Show real site stats (e.g. lunches decided) on /support and receipts once usage grows, as V4V proof.
 
 ## Next PR (open list, added Oct 28, 2026)
 
 Items Craig has approved for the next batch. More may be added.
 
-- Nothing open. Build 2026.10.30.72 (PR from `next-pr`) has the “won” wording, the Loop
-  report, the Google Places storage audit, and the loop CSV download.
+- Nothing open. Build 2026.10.31.73 (PR from `ui-refresh`) has the calm
+  redesign (mockup D), milestone cards, the feedback progress line, and the
+  private activity log. Build .72 had the “won” wording, the Loop report, the
+  Google Places storage audit, and the loop CSV download.
 - Keep the random facts sprinkled through the app (do not remove them).
 
 ## Backlog
 
-- UI cleanup: the header and footer are getting cluttered; simplify later
-  (Craig, Oct 30, 2026).
+- **HIGH: Native apps.** iPhone and iPad first, Android later. Plan: Expo
+  (React Native) sharing the design tokens in `src/styles/tokens.css` and the
+  same Supabase backend. The iPad layout follows the web sidebar; the phone
+  follows the 4-tab bar (Craig, Oct 30, 2026).
+- Custom profile pictures: let people pick an emoji or upload a photo instead
+  of initials. Uploads need a safe path (size and type limits, re-encoding,
+  moderation, private storage) before shipping (Craig, Oct 30, 2026).
+- Reports built on the activity log (`lunch_loop_activity`), keeping the app
+  light on data as Craig asked.
 - Google Places storage fix: stop keeping Google place details (name,
   address, phone, hours, rating, lat/lng) indefinitely. Keep the Place ID
   and our own data, and fetch details live or refresh within 30 days. Also

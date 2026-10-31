@@ -41,7 +41,39 @@ second policy. Take the checksummed backup in Backup and restore before any
 further database change. Do not repair migration history to different
 version numbers.
 
-At least monthly, review Global Admin feedback, suspended groups, invite
+### Migration version mismatch (noted Oct 31, 2026)
+
+Production records the loop CSV export migration as version
+`20261031010646`, but the repository file is
+`supabase/migrations/20261031005344_loop_csv_export.sql`. The SQL is the
+same; only the version number differs because the hosted tool assigned its
+own timestamp. A `supabase db push` would treat the repository file as new.
+Do not repair history blindly: either rename the repository file to the
+production version in a small PR, or mark it applied with
+`supabase migration repair` after a backup. Build .73 adds three migrations,
+applied and tested on staging only so far (staging recorded them as
+`20261031025332`, `20261031025529`, `20261031030009`, matching the file
+names):
+
+- `20261031025332_ui_refresh_activity_and_milestones.sql`: the private
+  `lunch_loop_activity` log (admin-only reads, append-only, written by
+  triggers and `record_loop_activity`), `log_loop_report_view`, the CSV
+  export logging, and `lunch_loop_milestone_dismissals`.
+- `20261031025529_ui_refresh_activity_account_deletion.sql`: lets account
+  deletion clear ids in the activity log.
+- `20261031030009_ui_refresh_milestone_facts.sql`:
+  `get_my_loop_milestone_facts`.
+
+Fixtures: `supabase/tests/activity-log-fixture.sql` and
+`supabase/tests/milestone-facts-fixture.sql` (run inside `begin … rollback`
+on staging). Take the pre-migration backup with the current `export.sql`
+(the new tables do not exist yet). Right after the production migration,
+add `lunch_loop_activity` and `lunch_loop_milestone_dismissals` to
+`scripts/backup/export.sql` (counts and rows); until then the backup script
+warns that they are missing.
+
+At least monthly, review Global Admin feedback (set each item’s status there;
+the sender sees it as Received → Looking at it → Planned → Live), suspended groups, invite
 requests, seven-day Places usage, provider errors, and Google Cloud budgets.
 
 A daily maintainer check runs about 8 AM Central. It treats the Vercel bot

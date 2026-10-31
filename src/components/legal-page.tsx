@@ -34,10 +34,10 @@ export function LegalPage({
         </div>
       </header>
       <article className="mx-auto max-w-4xl px-4 py-10 sm:px-6 sm:py-14">
-        <p className="text-sm font-black uppercase tracking-[0.18em] text-orange-600">
+        <p className="text-sm font-medium text-accent-strong">
           {eyebrow}
         </p>
-        <h1 className="mt-2 text-4xl font-black tracking-tight text-orange-950 sm:text-5xl">
+        <h1 className="mt-2 text-[28px] font-bold leading-tight tracking-tight md:text-[36px]">
           {title}
         </h1>
         <p className="mt-3 text-sm text-stone-500">Last updated: {updated}</p>

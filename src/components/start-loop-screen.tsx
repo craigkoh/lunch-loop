@@ -80,8 +80,8 @@ export function StartLoopScreen() {
   const setupCard = (
       <section className="w-full rounded-3xl bg-white p-6 shadow-xl shadow-orange-100 sm:p-8">
         <div className="text-4xl">🎉</div>
-        <p className="mt-4 text-sm font-bold uppercase tracking-widest text-orange-600">New Lunch Loop</p>
-        <h1 className="mt-1 text-3xl font-black">Build your Lunch Loop</h1>
+        <p className="mt-4 text-sm font-medium text-accent-strong">New Lunch Loop</p>
+        <h1 className="mt-1 text-[28px] font-bold leading-tight tracking-tight md:text-[36px]">Build your Lunch Loop</h1>
         <p className="mt-2 max-w-2xl text-stone-600">Choose its rhythm and home area, then invite up to five friends to share the restaurant list, picks, and vetoes.</p>
         {loading ? <p className="mt-6 text-sm font-semibold text-stone-500">Checking your secure sign-in…</p> : !signedIn ? (
           <Link href={`/sign-in?next=${encodeURIComponent(currentPath)}`} className="mt-6 inline-flex min-h-11 items-center rounded-xl bg-orange-500 px-5 py-3 text-sm font-black text-white">Sign in to continue →</Link>
@@ -142,8 +142,8 @@ export function StartLoopScreen() {
   if (signedIn && hasExistingLoop && isFirstLoop) {
     return <AppFrame>
       <div className="mx-auto max-w-4xl rounded-3xl bg-white p-7 shadow-xl shadow-orange-100">
-        <p className="text-sm font-bold uppercase tracking-widest text-orange-600">You’re already set up</p>
-        <h1 className="mt-1 text-3xl font-black">You already have a Lunch Loop</h1>
+        <p className="text-sm font-medium text-accent-strong">You’re already set up</p>
+        <h1 className="mt-1 text-[28px] font-bold leading-tight tracking-tight md:text-[36px]">You already have a Lunch Loop</h1>
         <p className="mt-3 leading-6 text-stone-600">Use My Lunch Loops to switch crews or create another loop, up to your current {ownedLoopLimit}-loop owner limit.</p>
         <Link href="/loops" className="mt-5 inline-flex min-h-11 items-center rounded-xl bg-orange-500 px-5 py-3 text-sm font-black text-white">Go to My Lunch Loops →</Link>
       </div>
@@ -169,7 +169,7 @@ function StepHeading({ number, title }: { number: number; title: string }) {
   return (
     <div className={`flex items-center gap-3 ${number > 1 ? "border-t border-orange-100 pt-5" : ""}`}>
       <span className="grid size-8 shrink-0 place-items-center rounded-full bg-orange-500 text-sm font-black text-white">{number}</span>
-      <span className="text-xs font-black uppercase tracking-widest text-orange-700">Step {number} of 3 · {title}</span>
+      <span className="text-xs font-black text-orange-700">Step {number} of 3 · {title}</span>
     </div>
   );
 }

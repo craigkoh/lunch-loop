@@ -3,6 +3,8 @@
 import { useEffect, useState } from "react";
 import { AppFrame } from "./app-frame";
 import { appInfo } from "@/lib/app-info";
+import { feedbackStatusLabel, feedbackStep, feedbackSteps } from "@/lib/feedback-status";
+import { ProgressLine } from "./ui/progress-line";
 import { suggestedDisplayName } from "@/lib/display-name";
 import { createClient } from "@/lib/supabase/client";
 
@@ -137,10 +139,10 @@ export function FeedbackScreen({ reportedPage = "" }: { reportedPage?: string })
 
   return (
     <AppFrame>
-      <p className="text-sm font-bold uppercase tracking-widest text-orange-600">
+      <p className="text-sm font-medium text-accent-strong">
         Help shape Lunch Loop
       </p>
-      <h1 className="mt-1 text-3xl font-black tracking-tight">Feedback</h1>
+      <h1 className="mt-1 text-[28px] font-bold leading-tight tracking-tight md:text-[36px]">Feedback</h1>
       <p className="mt-2 max-w-2xl text-stone-600">
         Found a rough edge or have a bright idea? Tell us what happened, what
         you expected, and what would make the loop better. Your signed-in
@@ -219,41 +221,59 @@ export function FeedbackScreen({ reportedPage = "" }: { reportedPage?: string })
       </form>
       {error && <p role="alert" className="mt-4 rounded-2xl bg-rose-50 px-4 py-3 text-sm font-semibold text-rose-700">{error}</p>}
       {message && <p role="status" className="mt-4 rounded-2xl bg-emerald-50 px-4 py-3 text-sm font-semibold text-emerald-800">{message}</p>}
-      <section className="mt-7 rounded-3xl bg-orange-500 p-5 text-white shadow-sm">
-        <h2 className="text-lg font-black">Your recent notes</h2>
-        <p className="mt-1 text-sm text-orange-50">This is your personal submission history—not the whole crew’s private feedback. When we ship a fix, you’ll see what changed here.</p>
-        {loading ? <p className="mt-4 text-sm text-orange-50">Loading your notes…</p> : items.length ? (
-          <div className="mt-4 space-y-2">
-            {items.slice(0, 8).map((item) => (
-              <article key={item.id} className="rounded-2xl bg-white/15 px-4 py-3">
-                <div className="flex flex-wrap justify-between gap-2"><strong>{item.title}</strong><span className="rounded-full bg-white/20 px-2 py-0.5 text-xs font-bold">{item.status.replaceAll("_", " ")}</span></div>
-                <p className="mt-1 text-xs text-orange-50">{item.kind} · {new Date(item.created_at).toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric", year: "numeric" })}</p>
-                {item.reporter_note && <div className="mt-3 rounded-xl bg-emerald-950/20 px-3 py-2 text-sm leading-6 text-white"><p className="text-xs font-black uppercase tracking-widest text-emerald-100">What changed</p><p className="mt-1 whitespace-pre-wrap">{item.reporter_note}</p></div>}
-                <div className="mt-3 rounded-xl bg-white/10 px-3 py-3">
-                  <label className="flex items-start gap-2 text-sm font-bold">
-                    <input
-                      type="checkbox"
-                      checked={creditDrafts[item.id]?.optIn ?? false}
-                      onChange={(event) => setCreditDrafts((current) => ({ ...current, [item.id]: { optIn: event.target.checked, name: current[item.id]?.name ?? item.credit_name ?? "" } }))}
-                      className="mt-1 size-4 accent-orange-500"
-                    />
-                    <span>Credit me by name in release notes if this ships</span>
-                  </label>
-                  <input
-                    value={creditDrafts[item.id]?.name ?? ""}
-                    maxLength={60}
-                    onChange={(event) => setCreditDrafts((current) => ({ ...current, [item.id]: { optIn: current[item.id]?.optIn ?? false, name: event.target.value } }))}
-                    className="mt-2 w-full rounded-xl border border-white/30 bg-white px-3 py-2 text-sm font-normal text-stone-900 outline-none"
-                    aria-label={`Credit name for ${item.title}`}
-                  />
-                  <button type="button" disabled={busy} onClick={() => void saveCredit(item)} className="mt-2 text-xs font-black text-white underline disabled:opacity-60">
-                    {creditDrafts[item.id]?.optIn ? "Save credit" : "Withdraw credit"}
-                  </button>
-                </div>
-              </article>
-            ))}
+      <section id="my-feedback" className="mt-8">
+        <h2 className="text-lg font-semibold tracking-tight">My feedback</h2>
+        <p className="mt-1 text-sm text-muted">Only your own notes. Each one moves along as we work on it.</p>
+        {loading ? <p className="mt-4 text-sm text-muted">Loading your notes…</p> : items.length ? (
+          <div className="mt-3 space-y-2">
+            {items.slice(0, 8).map((item) => {
+              const step = feedbackStep(item.status);
+              return (
+                <article key={item.id} className="rounded-[var(--ll-radius-lg)] bg-surface px-5 py-4 shadow-[var(--ll-shadow-card)]">
+                  <div className="flex flex-wrap items-baseline justify-between gap-2">
+                    <strong className="min-w-0 text-[15px] font-semibold">{item.title}</strong>
+                    <span className="text-xs text-subtle">{new Date(item.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}</span>
+                  </div>
+                  {step > 0 ? (
+                    <ProgressLine className="mt-3" steps={[...feedbackSteps]} current={step} label={`Status of ${item.title}`} />
+                  ) : (
+                    <p className="mt-2 text-sm text-muted">{feedbackStatusLabel(item.status)}</p>
+                  )}
+                  {item.reporter_note && (
+                    <div className="mt-3 rounded-[var(--ll-radius-md)] bg-stone-50 px-3 py-2 text-sm leading-6">
+                      <p className="text-xs font-semibold text-accent-strong">What changed</p>
+                      <p className="mt-1 whitespace-pre-wrap">{item.reporter_note}</p>
+                    </div>
+                  )}
+                  <details className="mt-3 text-sm">
+                    <summary className="cursor-pointer text-muted">Release-note credit{item.credit_opt_in ? " · on" : ""}</summary>
+                    <div className="mt-2">
+                      <label className="flex items-start gap-2">
+                        <input
+                          type="checkbox"
+                          checked={creditDrafts[item.id]?.optIn ?? false}
+                          onChange={(event) => setCreditDrafts((current) => ({ ...current, [item.id]: { optIn: event.target.checked, name: current[item.id]?.name ?? item.credit_name ?? "" } }))}
+                          className="mt-1 size-4 accent-orange-500"
+                        />
+                        <span>Credit me by name in release notes if this ships</span>
+                      </label>
+                      <input
+                        value={creditDrafts[item.id]?.name ?? ""}
+                        maxLength={60}
+                        onChange={(event) => setCreditDrafts((current) => ({ ...current, [item.id]: { optIn: current[item.id]?.optIn ?? false, name: event.target.value } }))}
+                        className="mt-2 w-full rounded-[var(--ll-radius-md)] border border-stone-200 bg-surface px-3 py-2 outline-none focus:ring-2 focus:ring-orange-300"
+                        aria-label={`Credit name for ${item.title}`}
+                      />
+                      <button type="button" disabled={busy} onClick={() => void saveCredit(item)} className="mt-2 text-sm font-medium text-accent-strong disabled:opacity-60">
+                        {creditDrafts[item.id]?.optIn ? "Save credit" : "Withdraw credit"}
+                      </button>
+                    </div>
+                  </details>
+                </article>
+              );
+            })}
           </div>
-        ) : <p className="mt-4 text-sm text-orange-50">No feedback sent yet. The first good idea can be yours.</p>}
+        ) : <p className="mt-4 text-sm text-muted">No feedback sent yet. The first good idea can be yours.</p>}
       </section>
     </AppFrame>
   );

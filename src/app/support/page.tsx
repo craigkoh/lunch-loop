@@ -40,9 +40,9 @@ export default async function SupportPage() {
       </header>
       <article className="mx-auto max-w-3xl px-4 py-10 sm:px-6 sm:py-14">
         {open ? (
-          <p className="text-sm font-black uppercase tracking-[0.18em] text-orange-600">Fuel the loop</p>
+          <p className="text-sm font-medium text-accent-strong">Fuel the loop</p>
         ) : null}
-        <h1 className={`text-4xl font-black tracking-tight text-orange-950 sm:text-5xl${open ? " mt-2" : ""}`}>
+        <h1 className={`text-[28px] font-bold leading-tight tracking-tight md:text-[36px]${open ? " mt-2" : ""}`}>
           Value for Value
         </h1>
         {open ? <SupportOpen /> : <SupportClosed />}

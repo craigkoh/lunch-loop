@@ -51,7 +51,7 @@ rate limits and a hosted bot challenge.
 
 Items Craig has approved for the next batch. More may be added.
 
-- Build 2026.10.31.75 (PR from `pr17-home-settings`): the new logged-out
+- Build 2026.10.31.75 (PR #17, live Oct 31, 2026): the new logged-out
   home page (built from the .74 mockup, simpler and shorter on phone), the
   calm style on every Settings tab and the Loop report, and Settings tabs
   that fit on a phone without scrolling sideways.

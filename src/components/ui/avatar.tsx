@@ -3,7 +3,7 @@ import { initialsFor } from "@/lib/initials";
 
 /** Initials in a neutral circle. Never an emoji (custom pictures are on the backlog). */
 export function Avatar({ name, size = "md", highlight = false, className }: { name: string; size?: "sm" | "md" | "lg"; highlight?: boolean; className?: string }) {
-  const sizes = { sm: "size-8 text-[11px]", md: "size-9 text-xs", lg: "size-12 text-sm" };
+  const sizes = { sm: "size-8 text-[12px]", md: "size-9 text-xs", lg: "size-12 text-sm" };
   return (
     <span
       aria-hidden="true"

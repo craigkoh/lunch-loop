@@ -78,9 +78,8 @@ export function StartLoopScreen() {
   const currentPath = `/start${token ? `?token=${encodeURIComponent(token)}` : ""}`;
   const isFirstLoop = !token;
   const setupCard = (
-      <section className="w-full rounded-3xl bg-white p-6 shadow-xl shadow-orange-100 sm:p-8">
-        <div className="text-4xl">🎉</div>
-        <p className="mt-4 text-sm font-medium text-accent-strong">New Lunch Loop</p>
+      <section className="w-full rounded-[var(--ll-radius-lg)] bg-surface p-6 shadow-[var(--ll-shadow-card)] sm:p-8">
+        <p className="text-sm font-medium text-accent-strong">New Lunch Loop 🎉</p>
         <h1 className="mt-1 text-[28px] font-bold leading-tight tracking-tight md:text-[36px]">Build your Lunch Loop</h1>
         <p className="mt-2 max-w-2xl text-stone-600">Choose its rhythm and home area, then invite up to five friends to share the restaurant list, picks, and vetoes.</p>
         {loading ? <p className="mt-6 text-sm font-semibold text-stone-500">Checking your secure sign-in…</p> : !signedIn ? (
@@ -141,35 +140,30 @@ export function StartLoopScreen() {
   );
   if (signedIn && hasExistingLoop && isFirstLoop) {
     return <AppFrame>
-      <div className="mx-auto max-w-4xl rounded-3xl bg-white p-7 shadow-xl shadow-orange-100">
+      <div className="rounded-[var(--ll-radius-lg)] bg-surface p-6 shadow-[var(--ll-shadow-card)] sm:p-8">
         <p className="text-sm font-medium text-accent-strong">You’re already set up</p>
         <h1 className="mt-1 text-[28px] font-bold leading-tight tracking-tight md:text-[36px]">You already have a Lunch Loop</h1>
-        <p className="mt-3 leading-6 text-stone-600">Use My Lunch Loops to switch crews or create another loop, up to your current {ownedLoopLimit}-loop owner limit.</p>
+        <p className="mt-2 text-[15px] leading-6 text-muted">Use My Lunch Loops to switch crews or create another loop, up to your current {ownedLoopLimit}-loop owner limit.</p>
         <Link href="/loops" className="mt-5 inline-flex min-h-11 items-center rounded-xl bg-orange-500 px-5 py-3 text-sm font-black text-white">Go to My Lunch Loops →</Link>
       </div>
     </AppFrame>;
   }
   if (signedIn && hasExistingLoop) {
     return <AppFrame>
-      <div className="mx-auto max-w-4xl">{setupCard}</div>
+      {setupCard}
     </AppFrame>;
   }
-  return <main className="grid min-h-dvh place-items-center bg-[#fffaf3] p-4">
-    <div className="w-full max-w-4xl">
-      <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-        <Link href="/" className="inline-flex text-sm font-black text-orange-700 underline">🏠 Home</Link>
-        {signedIn && <FeedbackBugLink page={currentPath} />}
-      </div>
-      {setupCard}
-    </div>
-  </main>;
+  return <AppFrame minimal>
+    {setupCard}
+    {signedIn && <div className="mt-4"><FeedbackBugLink page={currentPath} /></div>}
+  </AppFrame>;
 }
 
 function StepHeading({ number, title }: { number: number; title: string }) {
   return (
     <div className={`flex items-center gap-3 ${number > 1 ? "border-t border-orange-100 pt-5" : ""}`}>
       <span className="grid size-8 shrink-0 place-items-center rounded-full bg-orange-500 text-sm font-black text-white">{number}</span>
-      <span className="text-xs font-black text-orange-700">Step {number} of 3 · {title}</span>
+      <span className="text-sm font-medium text-accent-strong">Step {number} of 3 · {title}</span>
     </div>
   );
 }

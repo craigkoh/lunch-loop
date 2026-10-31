@@ -6,7 +6,7 @@
 
 <p align="center">
   <a href="https://lunchloop.app"><img alt="Live app" src="https://img.shields.io/badge/Live%20app-lunchloop.app-f97316?style=for-the-badge" /></a>
-  <a href="https://lunchloop.app/whats-new"><img alt="Current build" src="https://img.shields.io/badge/Build-2026.10.31.73-9a3412?style=for-the-badge" /></a>
+  <a href="https://lunchloop.app/whats-new"><img alt="Current build" src="https://img.shields.io/badge/Build-2026.10.31.74-9a3412?style=for-the-badge" /></a>
   <a href="https://lunchloop.app/privacy"><img alt="Private crews" src="https://img.shields.io/badge/Access-private--crews-fff7ed?style=for-the-badge&amp;labelColor=f97316" /></a>
 </p>
 
@@ -59,8 +59,8 @@ each crew’s people, places, and history private to that crew.
 - **Made to grow naturally.** Owner-managed invitations by email or short
   shareable code, multi-loop accounts, per-loop time zones and search areas,
   feedback, and a protected Global Admin view.
-- **Stats without pressure.** History, cuisine popularity, veto heat maps,
-  monthly recaps, picker win rates, and little facts as a crew’s story grows.
+- **Stats without pressure.** History, cuisine popularity, veto habits,
+  monthly recaps, who’s picked, and little facts as a crew’s story grows.
 
 ## 🔐 Privacy and product boundaries
 
@@ -148,5 +148,5 @@ Created and maintained by [Craig Kohler](https://craigkohler.com).
 <p align="center">
   <a href="https://lunchloop.app"><strong>lunchloop.app</strong></a> ·
   <a href="https://craigkohler.com"><strong>craigkohler.com</strong></a> ·
-  <a href="https://lunchloop.app/whats-new"><strong>Build 2026.10.31.73</strong></a>
+  <a href="https://lunchloop.app/whats-new"><strong>Build 2026.10.31.74</strong></a>
 </p>

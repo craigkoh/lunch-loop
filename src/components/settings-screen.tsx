@@ -774,19 +774,117 @@ export function SettingsScreen() {
           <>
             <SettingsTabs active={settingsTab} onChange={setSettingsTab} showOwnerTools={context.role === "owner"} />
             {settingsTab === "crew" && <>
-            <section className="ll-calm mt-6 overflow-hidden rounded-[var(--ll-radius-lg)] p-5">
+            <section className="mt-6 rounded-[var(--ll-radius-lg)] bg-surface p-5 shadow-[var(--ll-shadow-card)]">
+              <div className="flex items-end justify-between gap-3">
+                <div>
+                  <h2 className="text-[17px] font-semibold">{context.loopType === "occasion" ? "Occasion crew" : "Crew and pick order"}</h2>
+                  <p className="mt-1 text-sm leading-6 text-muted">
+                    {context.loopType === "occasion"
+                      ? `The owner makes the first occasion’s picks. After that, whoever starts an occasion makes that night’s picks. Each Lunch Loop supports up to six people (${members.length}/6).`
+                      : `This order decides whose turn it is to pick. Up to six people (${members.length}/6).`}
+                  </p>
+                </div>
+                {context.role === "owner" && (
+                  <span className="shrink-0 text-sm font-medium text-accent-strong">
+                    Owner controls
+                  </span>
+                )}
+              </div>
+              <p className="mt-3 text-sm leading-6 text-subtle">
+                Names here are for this Lunch Loop only. The account under each
+                name identifies the real member; only the owner sees everyone’s.
+              </p>
+              <ul className="mt-4 divide-y divide-line overflow-hidden rounded-[var(--ll-radius-md)] border border-line">
+                {members.map((member, index) => (
+                  <li key={member.user_id} className="px-4 py-3">
+                    <div className="flex items-center gap-3">
+                      <span className="grid size-8 shrink-0 place-items-center rounded-full bg-accent-soft text-sm font-semibold text-accent-ink">
+                        {index + 1}
+                      </span>
+                      {context.role === "owner" ? (
+                        <input
+                          value={member.display_name}
+                          onChange={(event) => updateName(index, event.target.value)}
+                          className="min-h-11 w-full min-w-0 flex-1 rounded-[var(--ll-radius-md)] border border-line bg-surface px-3 text-base"
+                          aria-label={`Lunch Loop name for member ${index + 1}`}
+                        />
+                      ) : (
+                        <p className="min-w-0 flex-1 truncate text-[15px] font-semibold">{member.display_name}</p>
+                      )}
+                    </div>
+                    <p className="mt-1.5 pl-11 text-sm leading-6 text-subtle [overflow-wrap:anywhere]">
+                      {member.account_email
+                        ? `${member.auth_provider === "google" ? "Google" : "Account"}: ${member.account_email}`
+                        : member.user_id === context.userId
+                          ? "Your account details are not available yet. Sign out and back in to refresh them."
+                          : "Account details are visible to the owner only."}
+                      {member.joined_at
+                        ? ` · Joined ${new Date(member.joined_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}`
+                        : ""}
+                    </p>
+                    {(member.role === "owner" || context.role === "owner") && (
+                      <div className="mt-1 flex items-center gap-1 pl-11">
+                        {member.role === "owner" && (
+                          <span className="mr-auto rounded-full bg-accent-soft px-2.5 py-0.5 text-sm font-medium text-accent-ink">Owner</span>
+                        )}
+                        {context.role === "owner" && (
+                          <div className="ml-auto flex items-center gap-1">
+                            {context.loopType === "standing" && <>
+                              <button
+                                onClick={() => moveMember(index, -1)}
+                                disabled={index === 0}
+                                className="grid size-10 place-items-center rounded-[var(--ll-radius-md)] text-[15px] text-muted hover:bg-surface-muted disabled:opacity-30"
+                                aria-label={`Move ${member.display_name} earlier`}
+                              >
+                                ↑
+                              </button>
+                              <button
+                                onClick={() => moveMember(index, 1)}
+                                disabled={index === members.length - 1}
+                                className="grid size-10 place-items-center rounded-[var(--ll-radius-md)] text-[15px] text-muted hover:bg-surface-muted disabled:opacity-30"
+                                aria-label={`Move ${member.display_name} later`}
+                              >
+                                ↓
+                              </button>
+                            </>}
+                            {member.user_id !== context.userId && (
+                              <button
+                                onClick={() => removeMember(index)}
+                                className="min-h-10 rounded-[var(--ll-radius-md)] px-3 text-sm font-medium text-rose-700 hover:bg-rose-50"
+                              >
+                                Remove
+                              </button>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </li>
+                ))}
+              </ul>
+              {context.role === "owner" && (
+                <button
+                  disabled={saving}
+                  onClick={saveRoster}
+                  className="mt-4 min-h-11 rounded-[var(--ll-radius-md)] bg-accent-strong px-4 text-[15px] font-semibold text-on-accent disabled:opacity-60"
+                >
+                  {saving ? "Saving…" : "Save roster"}
+                </button>
+              )}
+            </section>
+            <section className="ll-calm mt-4 overflow-hidden rounded-[var(--ll-radius-lg)] p-5">
               <div className="flex items-start gap-3">
                 <span className="grid size-11 shrink-0 place-items-center rounded-2xl bg-white/20 text-2xl" aria-hidden="true">👋</span>
                 <div>
                   <p className="text-xs font-bold text-orange-100">{context.groupName}</p>
-                  <h2 className="mt-1 text-xl font-black">Invite people, the easy way</h2>
+                  <h2 className="mt-1 text-xl font-black">Invite people</h2>
                 </div>
               </div>
-              <p className="mt-3 max-w-3xl text-sm leading-6 text-orange-50">Owners can invite a specific email address or create short shareable codes to text friends. An email invitation works when that person signs in with Google or a one-time email link for the same address. Every invite is single-use and expires after 14 days; anyone in the crew can also help a friend start an independent Lunch Loop.</p>
+              <p className="mt-3 max-w-3xl text-sm leading-6 text-orange-50">Invite by email, or make a short code to text. Each invite works once and expires after 14 days.</p>
               {context.role === "owner" ? <>
                 {knownPeople.length > 0 && <div className="mt-5 rounded-2xl bg-white/95 p-4 text-stone-900 shadow-sm">
                   <p className="text-sm font-black">Bring in someone from another Lunch Loop</p>
-                  <p className="mt-1 text-xs leading-5 text-stone-600">These are people you already share an active Lunch Loop with. Adding one makes them a member right away, copies their restaurant additions as fresh data, emails them, and shows a welcome message next time they open Lunch Loop. If a meal decision is underway, finish it first so the picks and vetoes stay fair.</p>
+                  <p className="mt-1 text-xs leading-5 text-stone-600">People you already share a Lunch Loop with. Adding one makes them a member right away and emails them. Finish any round underway first.</p>
                   <input value={knownPeopleSearch} onChange={(event) => setKnownPeopleSearch(event.target.value)} placeholder="Search name, email, or current Lunch Loop" className="mt-3 w-full rounded-xl border border-orange-200 bg-white px-3 py-3 text-sm outline-none focus:ring-2 focus:ring-orange-300" />
                   <div className="mt-3 max-h-64 space-y-2 overflow-y-auto pr-1">
                     {visibleKnownPeople.map((person) => <div key={person.user_id} className="flex flex-wrap items-center justify-between gap-3 rounded-xl bg-orange-50 px-3 py-3"><div className="min-w-0"><p className="font-black">{person.display_name}</p>{person.google_full_name && person.google_full_name !== person.display_name && <p className="text-xs text-orange-800">Google name: {person.google_full_name}</p>}<p className="truncate text-xs text-stone-600">{person.account_email ?? "Email unavailable"}</p><p className="mt-1 text-xs font-semibold text-stone-500">Also in {person.shared_loop_names.join(", ")}</p></div><button type="button" disabled={saving || availableInvitationCount === 0} onClick={() => void addKnownPerson(person)} className="shrink-0 rounded-xl bg-orange-500 px-3 py-2 text-sm font-black text-white disabled:opacity-60">{availableInvitationCount === 0 ? "No open spots" : "Add to this loop"}</button></div>)}
@@ -795,14 +893,14 @@ export function SettingsScreen() {
                 </div>}
                 <form onSubmit={sendMemberInvite} className="mt-4 rounded-2xl bg-white/95 p-4 text-stone-900 shadow-sm">
                   <label className="block text-sm font-black">Invite someone new to {context.groupName}
-                    <span className="mt-1 block text-xs font-normal text-stone-600">There are {members.length}/6 crew spots filled and {pendingInvitationCount} held by active invitations. You can send an invite anytime; if a meal decision is underway, they can join after it is closed.</span>
+                    <span className="mt-1 block text-xs font-normal text-stone-600">{members.length}/6 spots filled · {pendingInvitationCount} held by invitations. If a round is underway, they join after it closes.</span>
                     <input required type="email" value={memberInviteEmail} onChange={(event) => setMemberInviteEmail(event.target.value)} placeholder="friend@example.com" className="mt-3 w-full rounded-xl bg-white px-3 py-3 text-sm font-normal text-stone-900 outline-none focus:ring-2 focus:ring-orange-300" />
                   </label>
                   <button disabled={saving || availableInvitationCount === 0} className="mt-3 rounded-xl bg-orange-500 px-4 py-3 text-sm font-black text-white disabled:opacity-60">{availableInvitationCount === 0 ? "No open crew spots" : saving ? "Creating invite…" : "Send one-time invite"}</button>
                 </form>
                 <div className="mt-4 rounded-2xl border border-orange-200 bg-orange-50 p-4 text-stone-900 shadow-sm">
                   <p className="text-sm font-black">No email handy?</p>
-                  <p className="mt-1 text-xs leading-5 text-stone-600">Create a separate short code and link for each open crew spot. Add a private name so you can remember who each one is for. The first signed-in person to use a code joins this Lunch Loop after any current meal decision is closed.</p>
+                  <p className="mt-1 text-xs leading-5 text-stone-600">Make a one-time code and link to text. The first person to use it joins.</p>
                   <label className="mt-3 block text-xs font-bold text-stone-700">Who is this for? <span className="font-normal text-stone-500">Optional—only the owner sees this note.</span>
                     <input value={shareableInviteLabel} onChange={(event) => setShareableInviteLabel(event.target.value)} maxLength={80} placeholder="e.g. Jamie" className="mt-2 w-full rounded-xl border border-orange-200 bg-white px-3 py-3 text-sm font-normal text-stone-900 outline-none focus:ring-2 focus:ring-orange-300" />
                   </label>
@@ -826,113 +924,6 @@ export function SettingsScreen() {
                 </div>
               )}
               {context.role === "owner" && (memberInvitations.length > 0 || shareableInvitations.length > 0) && <div className="mt-5 border-t border-white/25 pt-4"><h3 className="font-black">Crew invitations</h3><div className="mt-3 space-y-2">{shareableInvitations.slice(0, 6).map((invite) => <div key={invite.id} className="flex flex-wrap items-center justify-between gap-2 rounded-xl bg-white/15 px-3 py-2 text-sm"><span className="min-w-0 truncate"><strong>{invite.invite_label || "Unnamed friend"}</strong> · shareable code · <span className="font-bold">{invite.status}</span>{invite.status === "pending" ? ` · expires ${new Date(invite.expires_at).toLocaleDateString()}` : ""}</span>{invite.status === "pending" && <button disabled={saving} onClick={() => void revokeShareableInvite(invite)} className="font-bold text-white underline">Revoke</button>}</div>)}{memberInvitations.slice(0, 8).map((invite) => <div key={invite.id} className="flex flex-wrap items-center justify-between gap-2 rounded-xl bg-white/15 px-3 py-2 text-sm"><span className="min-w-0 truncate">{invite.recipient_email} · <span className="font-bold">{invite.status}</span></span>{invite.status === "pending" && <button disabled={saving} onClick={() => void revokeMemberInvite(invite)} className="font-bold text-white underline">Revoke</button>}</div>)}</div></div>}
-            </section>
-            <section className="mt-7 rounded-3xl bg-white p-5 shadow-sm">
-              <div className="flex items-end justify-between gap-3">
-                <div>
-                  <h2 className="text-lg font-black">👥 {context.loopType === "occasion" ? "Occasion crew" : "Crew and pick order"}</h2>
-                  <p className="mt-1 text-sm text-stone-500">
-                    {context.loopType === "occasion"
-                      ? `The owner makes the first occasion’s picks. After that, whoever starts an occasion makes that night’s picks. Each Lunch Loop supports up to six people (${members.length}/6).`
-                      : `This order determines whose turn it is to suggest. Each Lunch Loop supports up to six people (${members.length}/6).`}
-                  </p>
-                </div>
-                {context.role === "owner" && (
-                  <span className="text-xs font-bold text-orange-700">
-                    Owner controls
-                  </span>
-                )}
-              </div>
-              <p className="mt-4 rounded-2xl bg-orange-50 px-3 py-2 text-xs leading-5 text-stone-600">
-                These are names for this Lunch Loop only—they do not change
-                anyone’s account name or their name in another Lunch Loop. The
-                signed-in account beneath each person identifies the
-                actual member; only the owner can see everyone’s account.
-              </p>
-              <div className="mt-4 space-y-2">
-                {members.map((member, index) => (
-                  <div
-                    key={member.user_id}
-                    className="flex items-start gap-2 rounded-2xl border border-stone-100 p-2"
-                  >
-                    <span className="grid size-8 shrink-0 place-items-center rounded-lg bg-orange-100 text-sm font-black text-orange-800">
-                      {index + 1}
-                    </span>
-                    <div className="min-w-0 flex-1">
-                      {context.role === "owner" ? (
-                        <input
-                          value={member.display_name}
-                          onChange={(event) =>
-                            updateName(index, event.target.value)
-                          }
-                          className="w-full rounded-xl border border-orange-200 px-3 py-2.5"
-                          aria-label={`Lunch Loop name for member ${index + 1}`}
-                        />
-                      ) : (
-                        <p className="px-3 py-2.5 font-bold">
-                          {member.display_name}
-                        </p>
-                      )}
-                      <p className="mt-1 px-1 text-xs leading-5 text-stone-500">
-                        {member.account_email
-                          ? `${member.auth_provider === "google" ? "Google account" : "Account"}: ${member.account_email}`
-                          : member.user_id === context.userId
-                            ? "Your account details are not available yet. Sign out and back in to refresh them."
-                            : "Account details are visible to the group owner only."}
-                        {member.joined_at
-                          ? ` · Joined ${new Date(member.joined_at).toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric", year: "numeric" })}`
-                          : ""}
-                      </p>
-                    </div>
-                    <div className="flex shrink-0 flex-col items-end gap-1">
-                      {member.role === "owner" && (
-                        <span className="rounded-full bg-amber-100 px-2 py-0.5 text-xs font-black text-amber-900">
-                          👑 Owner
-                        </span>
-                      )}
-                      {context.role === "owner" && (
-                        <div className="flex gap-1">
-                          {context.loopType === "standing" && <>
-                            <button
-                              onClick={() => moveMember(index, -1)}
-                              disabled={index === 0}
-                              className="rounded-lg px-2 py-2 text-sm font-bold disabled:opacity-30"
-                              aria-label={`Move ${member.display_name} earlier`}
-                            >
-                              ↑
-                            </button>
-                            <button
-                              onClick={() => moveMember(index, 1)}
-                              disabled={index === members.length - 1}
-                              className="rounded-lg px-2 py-2 text-sm font-bold disabled:opacity-30"
-                              aria-label={`Move ${member.display_name} later`}
-                            >
-                              ↓
-                            </button>
-                          </>}
-                          {member.user_id !== context.userId && (
-                            <button
-                              onClick={() => removeMember(index)}
-                              className="rounded-lg px-2 py-2 text-sm font-bold text-rose-700"
-                            >
-                              Remove
-                            </button>
-                          )}
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                ))}
-              </div>
-              {context.role === "owner" && (
-                <button
-                  disabled={saving}
-                  onClick={saveRoster}
-                  className="mt-4 rounded-xl bg-orange-600 px-4 py-3 text-sm font-black text-white disabled:opacity-60"
-                >
-                  {saving ? "Saving…" : "Save roster"}
-                </button>
-              )}
             </section>
             </>}
             {settingsTab === "area" && <>

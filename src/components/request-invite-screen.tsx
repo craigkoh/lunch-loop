@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { AuthShell, authCardClass } from "./ui/auth-shell";
 import { useEffect, useState } from "react";
 import { createClient, hasSupabaseEnv } from "@/lib/supabase/client";
 import { FeedbackBugLink } from "./feedback-bug-link";
@@ -113,21 +114,15 @@ export function RequestInviteScreen() {
   }
 
   return (
-    <main className="grid min-h-dvh place-items-center bg-[#fffaf3] p-4">
-      <section className="w-full max-w-xl rounded-[2rem] bg-white p-6 shadow-xl shadow-orange-100 ring-1 ring-orange-100 sm:p-8">
-        <Link
-          href="/"
-          className="inline-flex items-center gap-2 text-sm font-black text-orange-800"
-        >
-          <span aria-hidden="true">←</span> Lunch Loop
-        </Link>
-        <p className="mt-7 text-xs font-black uppercase tracking-[0.18em] text-orange-600">
+    <AuthShell wide>
+      <section className={authCardClass}>
+        <p className="text-sm font-medium text-accent-strong">
           Invite-only early access
         </p>
-        <h1 className="mt-2 text-[28px] font-bold leading-tight tracking-tight md:text-[36px] sm:text-4xl">
+        <h1 className="mt-1 text-[28px] font-bold leading-tight tracking-tight md:text-[36px]">
           Request a Lunch Loop invite
         </h1>
-        <p className="mt-3 max-w-lg text-sm leading-6 text-stone-600">
+        <p className="mt-2 max-w-lg text-[15px] leading-6 text-muted">
           We ask you to sign in first so this request is attached to
           a real Lunch Loop account—not an open email form that gets buried in
           spam. This does not create a group or add you to one.
@@ -218,6 +213,6 @@ export function RequestInviteScreen() {
           </p>
         )}
       </section>
-    </main>
+    </AuthShell>
   );
 }

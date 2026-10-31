@@ -10,6 +10,7 @@ import {
   type ReactNode,
 } from "react";
 import { AppFrame } from "./app-frame";
+import { cn } from "@/lib/cn";
 import { Avatar } from "./ui/avatar";
 import { Card, ListCard, SectionTitle } from "./ui/card";
 import { ProgressLine } from "./ui/progress-line";
@@ -593,10 +594,6 @@ export function HomeScreen() {
   const cuisineCount = available.length
     ? new Set(available.map((restaurant) => restaurant.cuisine || "Restaurant")).size
     : 0;
-  // Home keeps places to one short line each; details live in the loop report.
-  const topPlaces = [...available]
-    .sort((a, b) => b.visit_count - a.visit_count || a.name.localeCompare(b.name))
-    .slice(0, 4);
   // One quiet lunch-lore line, picked at random on each visit.
   const [loreSeed] = useState(() => Math.random());
   const loreOptions: { text: string; href?: string }[] = [
@@ -742,7 +739,7 @@ export function HomeScreen() {
       ? memberNameById.get(restaurant.added_by)
       : null;
     return (
-      <span className="mt-1 block break-words text-xs leading-5 text-stone-500">
+      <span className="mt-1 block break-words text-sm leading-6 text-subtle">
         {restaurant.visit_count > 0
           ? `🏆 ${restaurant.visit_count} ${restaurant.visit_count === 1 ? "win" : "wins"}${restaurant.last_visited_at ? ` · last won ${shortDate(restaurant.last_visited_at, timeZone)}` : ""}`
           : "No wins yet"}{" "}
@@ -1306,18 +1303,18 @@ export function HomeScreen() {
         </p>
       </section>
     ) : null;
-  const renderScheduleEditor = () =>
+  const renderScheduleEditor = (flat = false) =>
     current ? (
-      <details className="group mt-4 w-full rounded-[var(--ll-radius-lg)] bg-surface p-5 text-stone-900 shadow-[var(--ll-shadow-card)]">
+      <details className={cn("group w-full", flat ? "px-5 py-4" : "rounded-[var(--ll-radius-lg)] bg-surface p-5 shadow-[var(--ll-shadow-card)]")}>
         <summary className="flex cursor-pointer list-none items-center justify-between gap-3">
-          <span>
-            <span className="block text-xs text-stone-500">{mealNameTitle} time · anyone in the crew can update</span>
-            <span className="mt-0.5 block text-[15px] font-semibold">{formatLunchTime(current.scheduled_for, timeZone)}</span>
+          <span className="min-w-0">
+            <span className="block text-sm text-muted">{mealNameTitle} time</span>
+            <span className="mt-0.5 block text-[15px] font-semibold">{formatShortLunchTime(current.scheduled_for, timeZone)}</span>
           </span>
           <span className="text-sm font-medium text-accent-strong group-open:hidden">Change</span>
         </summary>
         <div className="mx-auto mt-4 grid w-full max-w-[18rem] min-w-0 gap-3 sm:max-w-none sm:grid-cols-2">
-          <label className="w-full min-w-0 text-left text-sm font-bold">
+          <label className="w-full min-w-0 text-left text-sm font-medium">
             {mealNameTitle} date
             <input
               type="date"
@@ -1326,10 +1323,10 @@ export function HomeScreen() {
                 scheduleDraftDirty.current = true;
                 setLunchDate(event.target.value);
               }}
-              className="date-time-input mt-1 block h-11 w-full min-w-0 max-w-full rounded-xl border border-orange-200 px-3 text-base"
+              className="date-time-input mt-1 block h-11 w-full min-w-0 max-w-full rounded-[var(--ll-radius-md)] border border-line bg-surface px-3 text-base"
             />
           </label>
-          <label className="w-full min-w-0 text-left text-sm font-bold">
+          <label className="w-full min-w-0 text-left text-sm font-medium">
             {mealNameTitle} time
             <input
               type="time"
@@ -1338,42 +1335,50 @@ export function HomeScreen() {
                 scheduleDraftDirty.current = true;
                 setLunchTime(event.target.value);
               }}
-              className="date-time-input mt-1 block h-11 w-full min-w-0 max-w-full rounded-xl border border-orange-200 px-3 text-base"
+              className="date-time-input mt-1 block h-11 w-full min-w-0 max-w-full rounded-[var(--ll-radius-md)] border border-line bg-surface px-3 text-base"
             />
           </label>
           <button
             type="button"
             disabled={busy}
             onClick={() => void saveSchedule()}
-            className="mx-auto w-full rounded-xl bg-orange-500 px-4 py-3 text-sm font-black text-white disabled:opacity-60 sm:col-span-2 sm:mx-0 sm:max-w-xs"
+            className="mx-auto min-h-11 w-full rounded-[var(--ll-radius-md)] bg-accent-strong px-4 text-[15px] font-semibold text-on-accent disabled:opacity-60 sm:col-span-2 sm:mx-0 sm:max-w-xs"
           >
             {busy ? "Saving…" : `Update ${mealName} time`}
           </button>
         </div>
       </details>
     ) : null;
-  const renderCloseLoopPanel = () =>
+  /** After a win: one grouped card with the lunch time and the hand-off. */
+  const renderWhatsNext = () =>
     current?.status === "chosen" ? (
-      <div className="rounded-2xl border border-stone-200 bg-stone-50 p-4">
-        <p className="text-sm font-bold">
-          {isOccasion ? "Ready to wrap up this occasion?" : "Ready to hand off the next round?"}
-        </p>
-        <p className="mt-1 text-sm text-stone-500">
-          {isOccasion
-            ? "Closing records this visit. The restaurant list stays here, and any crew member can start the next occasion when ready."
-            : "Closing records this visit and hands the next picks to the next person in order."}
-        </p>
-        <button
-          type="button"
-          disabled={busy || !scheduleHasPassed}
-          onClick={() => void closeLoop()}
-          className="mt-3 rounded-xl bg-orange-500 px-4 py-3 text-sm font-black text-white disabled:cursor-not-allowed disabled:opacity-45"
-        >
-          {scheduleHasPassed
-            ? isOccasion ? "Finish this occasion →" : "Close the loop →"
-            : `Available after ${formatLunchTime(current.scheduled_for, timeZone)}`}
-        </button>
-      </div>
+      <section className="mt-4">
+        <SectionTitle title="What’s next" />
+        <ListCard className="mt-3">
+          <li>{renderScheduleEditor(true)}</li>
+          <li className="flex flex-col gap-3 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
+            <div className="min-w-0">
+              <p className="text-[15px] font-semibold">
+                {isOccasion ? "Wrap up this occasion" : "Hand off the next round"}
+              </p>
+              <p className="mt-0.5 text-sm leading-6 text-muted">
+                {isOccasion
+                  ? "Closing records this visit. Anyone can start the next occasion."
+                  : "Closing records this visit and passes the picks along."}
+                {!scheduleHasPassed ? ` Opens after ${formatShortLunchTime(current.scheduled_for, timeZone)}.` : ""}
+              </p>
+            </div>
+            <button
+              type="button"
+              disabled={busy || !scheduleHasPassed}
+              onClick={() => void closeLoop()}
+              className="min-h-11 shrink-0 whitespace-nowrap rounded-[var(--ll-radius-md)] bg-accent-strong px-5 text-[15px] font-semibold text-on-accent disabled:cursor-not-allowed disabled:opacity-45"
+            >
+              {isOccasion ? "Finish occasion" : "Close the loop"}
+            </button>
+          </li>
+        </ListCard>
+      </section>
     ) : null;
 
   let heroEyebrow =
@@ -1535,22 +1540,31 @@ export function HomeScreen() {
       ? `Enjoy ${mealName}, then finish this occasion. Any crew member can start another one whenever the next night out comes around.`
       : `Enjoy ${mealName}, then close the loop so the next person can make the next set of picks.`;
     heroAction = (
-      <button
-        type="button"
-        onClick={() => winner && setDetailRestaurant(winner)}
-        className="mt-5 w-full rounded-2xl bg-emerald-50 p-4 text-left text-stone-900 transition hover:bg-emerald-100 focus:outline-none focus:ring-2 focus:ring-orange-300"
-        aria-label={winner ? `View details for ${winner.name}` : undefined}
-      >
-        <p className="text-4xl">🎉🍽️🎉</p>
-        <p className="mt-2 break-words text-lg font-black">
-          {winner?.name ?? "The final choice"}
-        </p>
-        <p className="mt-1 break-words text-sm text-stone-600">{winner?.address}</p>
-        {winner && <div className="mt-2">{restaurantFacts(winner)}</div>}
-        <p className="mt-3 text-xs font-bold text-emerald-800">
-          Tap for restaurant details and map →
-        </p>
-      </button>
+      <section className="mb-4 rounded-[var(--ll-radius-lg)] bg-surface text-ink shadow-[var(--ll-shadow-card)]">
+        <div className="px-5 pt-5">
+          <ProgressLine
+            steps={["Picks", "Vetoes", "Winner"]}
+            current={3}
+            label={`${mealNameTitle} progress`}
+          />
+        </div>
+        <button
+          type="button"
+          onClick={() => winner && setDetailRestaurant(winner)}
+          className="block w-full rounded-b-[var(--ll-radius-lg)] px-5 pb-5 pt-4 text-left transition hover:bg-surface-muted focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-300"
+          aria-label={winner ? `View details for ${winner.name}` : undefined}
+        >
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-accent-soft px-3 py-1 text-sm font-medium text-accent-ink">
+            🎉 Today’s winner
+          </span>
+          <span className="mt-3 block break-words text-[20px] font-semibold leading-tight tracking-tight">
+            {winner?.name ?? "The final choice"}
+          </span>
+          {winner?.address ? <span className="mt-1 block break-words text-[15px] text-muted">{winner.address}</span> : null}
+          {winner && restaurantFacts(winner)}
+          <span className="mt-3 block text-sm font-medium text-accent-strong">Details &amp; map →</span>
+        </button>
+      </section>
     );
   }
 
@@ -1567,7 +1581,7 @@ export function HomeScreen() {
         </h1>
         <p className="mt-2 max-w-xl text-[15px] leading-6 text-muted">{heroCopy}</p>
       </header>
-      {current && context && (
+      {current && context && current.status !== "chosen" && (
         <Card className="mb-4">
           <div className="flex items-center justify-between gap-3 text-sm">
             <span className="shrink-0 font-medium">{isOccasion ? "This occasion" : `${mealNameTitle} round`}</span>
@@ -1587,19 +1601,19 @@ export function HomeScreen() {
             <ProgressLine
               className="flex-1"
               steps={["Picks", "Vetoes", "Winner"]}
-              current={current.status === "chosen" ? 3 : vetoes.length > 0 ? 2 : candidates.length > 0 ? 1 : 0}
+              current={vetoes.length > 0 ? 2 : candidates.length > 0 ? 1 : 0}
               label={`${mealNameTitle} progress`}
             />
           </div>
         </Card>
       )}
-      {(heroAction || current || message || (error && context)) && <div>
-        <div className={chosen ? "pick-layout relative" : "relative"}>
-          <div className={chosen ? "pick-main min-w-0" : undefined}>
-            {heroAction}
-          </div>
-          {chosen && context?.userId && current?.id ? (
-            <div className="pick-nudge min-w-0">
+      {heroAction}
+      {chosen && context ? (
+        <>
+          <MilestoneCard groupId={context.groupId} userId={context.userId} refreshKey={completedCount} />
+          {renderWhatsNext()}
+          {context.userId && current?.id ? (
+            <div className="pick-nudge mx-auto mt-8 w-full max-w-[22rem]">
               <PickValueNudge
                 userId={context.userId}
                 sessionId={current.id}
@@ -1622,35 +1636,23 @@ export function HomeScreen() {
               />
             </div>
           ) : null}
-          <div className={chosen ? "pick-actions min-w-0" : undefined}>
-            {renderRoundProgress()}
-            {chosen ? (
-              <div className="grid items-start gap-4 lg:grid-cols-2">
-                {renderScheduleEditor()}
-                {renderCloseLoopPanel()}
-              </div>
-            ) : current ? (
-              <div className="mt-5">{renderScheduleEditor()}</div>
-            ) : null}
-            {message && (
-              <p
-                role="status"
-                className="mt-4 rounded-xl bg-emerald-50 px-3 py-2 text-sm font-bold text-emerald-900"
-              >
-                {message}
-              </p>
-            )}
-            {error && context && (
-              <p
-                role="alert"
-                className="mt-4 rounded-xl bg-rose-50 px-3 py-2 text-sm font-bold text-rose-800"
-              >
-                {error}
-              </p>
-            )}
-          </div>
-        </div>
-      </div>}
+        </>
+      ) : current ? (
+        <>
+          {renderRoundProgress()}
+          <div className="mt-4">{renderScheduleEditor()}</div>
+        </>
+      ) : null}
+      {message && (
+        <p role="status" className="mt-4 rounded-[var(--ll-radius-md)] bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-900">
+          {message}
+        </p>
+      )}
+      {error && context && (
+        <p role="alert" className="mt-4 rounded-[var(--ll-radius-md)] bg-rose-50 px-4 py-3 text-sm font-medium text-rose-800">
+          {error}
+        </p>
+      )}
       {loading ? (
         <div className="mt-6 rounded-2xl bg-white p-5 text-sm text-stone-600 shadow-sm">
           <p className="font-semibold">{slowLoading ? "Still connecting to your Lunch Loop…" : "Loading your Lunch Loop…"}</p>
@@ -1682,47 +1684,18 @@ export function HomeScreen() {
           </section>
         </>
       ) : (
-        <>
-          <MilestoneCard groupId={context.groupId} userId={context.userId} refreshKey={completedCount} />
-          <SectionTitle
-            className="mt-8"
-            title="Places"
-            action={restaurants.length > 0 ? <Link href="/database" className="text-sm font-medium text-accent-strong">See all {restaurants.length}</Link> : undefined}
-          />
-          {topPlaces.length > 0 ? (
-            <ListCard className="mt-3">
-              {topPlaces.map((restaurant) => (
-                <li key={restaurant.id}>
-                  <button
-                    type="button"
-                    onClick={() => setDetailRestaurant(restaurant)}
-                    className="flex w-full items-center gap-3 px-5 py-4 text-left hover:bg-surface-muted"
-                  >
-                    <span className="min-w-0 flex-1 truncate text-[15px] font-medium">{restaurant.name}</span>
-                    <span className="shrink-0 text-sm text-muted">{winsLine(restaurant.visit_count)}</span>
-                    <span className="text-stone-300" aria-hidden="true">›</span>
-                  </button>
-                </li>
-              ))}
-            </ListCard>
-          ) : (
-            <p className="mt-3 text-sm text-muted">No places yet. Add a few favorites to get the loop rolling.</p>
-          )}
-          <Link
-            href="/add-place"
-            className="mt-3 flex w-full items-center justify-center rounded-[var(--ll-radius-md)] border border-dashed border-stone-300 py-3 text-sm font-medium text-muted md:hidden"
-          >
-            ＋ Add place
-          </Link>
-          {loreLine && (
-            <p className="mt-8 text-center text-sm text-subtle">
-              {loreLine.href ? <Link href={loreLine.href} className="hover:text-ink">{loreLine.text}</Link> : loreLine.text}
+        !chosen && (
+          <>
+            <MilestoneCard groupId={context.groupId} userId={context.userId} refreshKey={completedCount} />
+            <p className="mt-10 text-center text-sm text-subtle">
+              {loreLine ? (
+                loreLine.href ? <Link href={loreLine.href} className="hover:text-ink">{loreLine.text}</Link> : loreLine.text
+              ) : null}
+              {loreLine ? <span aria-hidden="true"> · </span> : null}
+              <Link href="/report" className="font-medium text-accent-strong">Loop report →</Link>
             </p>
-          )}
-          <p className="mt-1 text-center text-sm">
-            <Link href="/report" className="font-medium text-accent-strong">View loop report →</Link>
-          </p>
-        </>
+          </>
+        )
       )}
       <RestaurantDetailsDialog
         restaurant={detailRestaurant}

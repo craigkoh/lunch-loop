@@ -28,6 +28,18 @@ function changeText(change: ReleaseChange) {
 
 const releases: { build: string; changes: ReleaseChange[] }[] = [
   {
+    build: "2026.10.31.74",
+    changes: [
+      "The win page is cleaner: the winner card comes first, then any celebration, then one “What’s next” card with the lunch time and the hand-off. The tip receipt sits last, and the narrow side-by-side boxes are gone.",
+      "One set of text sizes everywhere, and nothing tiny anymore.",
+      "What’s New, Privacy, Terms, Support, Install, sign-in, and invitation pages now match the rest of the app, with the same header instead of a separate Home button.",
+      "History is grouped by month in short rows. Stats shows the top five for cuisines and veto habits, with “Show all” for the rest, and “Who’s picked” replaces a win rate that always came out the same.",
+      "Crew and pick order in Settings is roomier, comes first, and the invite help text is shorter.",
+      "Every page now says “Built by Craig Kohler with AI” at the bottom.",
+      "Behind the scenes: a security fix so the activity-log functions can only run from their database triggers.",
+    ],
+  },
+  {
     build: "2026.10.31.73",
     changes: [
       "A fresh, calmer look across every page: clean white cards, one orange accent, and dark mode everywhere. It looks the same whether you are a member, an owner, or an admin.",

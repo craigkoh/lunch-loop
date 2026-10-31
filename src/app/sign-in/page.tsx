@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { AuthShell, authCardClass } from "@/components/ui/auth-shell";
 import { useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useRef, useState } from "react";
 import { authErrorMessage, canonicalSiteOrigin, isAuthRateLimit, originForHost, safeReturnPath } from "@/lib/auth-redirect";
@@ -166,14 +167,13 @@ function SignInScreen() {
   }
 
   return (
-    <main className="grid min-h-dvh place-items-center bg-[#fffaf3] p-4">
-      <section className="w-full max-w-md rounded-3xl bg-white p-7 shadow-xl shadow-orange-100">
-        <div className="text-4xl">🍽️</div>
-        <p className="mt-4 text-sm font-medium text-accent-strong">
+    <AuthShell>
+      <section className={authCardClass}>
+        <p className="text-sm font-medium text-accent-strong">
           Lunch Loop
         </p>
         <h1 className="mt-1 text-[28px] font-bold leading-tight tracking-tight md:text-[36px]">Join your lunch crew</h1>
-        <p className="mt-2 text-stone-600">
+        <p className="mt-2 text-[15px] leading-6 text-muted">
           Continue with Google, or use a one-time email link—no passwords to remember.
         </p>
         {sentTo ? (
@@ -205,7 +205,7 @@ function SignInScreen() {
           </div>
         ) : (
           <form onSubmit={sendMagicLink} className="mt-6">
-            <label className="block text-sm font-black">
+            <label className="block text-sm font-semibold">
               Email address
               <input
                 required
@@ -241,16 +241,16 @@ function SignInScreen() {
         >
           {busy === "google" ? "Opening Google…" : "Continue with Google"}
         </button>
-        <p className="mt-5 text-xs leading-5 text-stone-500">
+        <p className="mt-5 text-sm leading-6 text-subtle">
           Your group owner controls invitations and settings. Signing in
           identifies you; an invitation decides whether you can join this lunch
           crew.
         </p>
-        <p className="mt-3 text-xs leading-5 text-stone-500">
+        <p className="mt-3 text-sm leading-6 text-subtle">
           By continuing, you agree to the <Link href="/terms" className="font-bold text-orange-700 underline">Terms of Use</Link> and acknowledge the <Link href="/privacy" className="font-bold text-orange-700 underline">Privacy Policy</Link>.
         </p>
         {nextPath === "/request-invite" && (
-          <p className="mt-3 rounded-xl bg-orange-50 p-3 text-xs leading-5 text-orange-900">
+          <p className="mt-3 rounded-xl bg-accent-soft p-3 text-sm leading-6 text-accent-ink">
             You&apos;ll return to the invite request after you sign in.
           </p>
         )}
@@ -263,7 +263,7 @@ function SignInScreen() {
           </p>
         )}
       </section>
-    </main>
+    </AuthShell>
   );
 }
 
@@ -271,8 +271,8 @@ export default function SignInPage() {
   return (
     <Suspense
       fallback={
-        <main className="grid min-h-dvh place-items-center bg-[#fffaf3] p-4">
-          <p className="text-sm font-semibold text-stone-500">
+        <main className="grid min-h-dvh place-items-center bg-app p-4">
+          <p className="text-sm font-medium text-muted">
             Preparing secure sign-in…
           </p>
         </main>

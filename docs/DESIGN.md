@@ -247,21 +247,27 @@ is 7.8:1.
 
 ## Typography
 
-The UI font is Arial, Helvetica, sans-serif, set on `body` in
-`src/app/globals.css`. Do not load a webfont for the app. The receipt is the
-exception: `ui-monospace, "SF Mono", Menlo, Consolas`, so it feels like a
-printed slip.
+The UI font is the system stack in `--ll-font` (`-apple-system`, SF Pro,
+Segoe UI, Inter, system-ui), set on `body` in `src/app/globals.css`. Do not
+load a webfont for the app. The receipt is the exception:
+`ui-monospace, "SF Mono", Menlo, Consolas`, so it feels like a printed slip.
 
-| Role | Classes | Notes |
+### Type scale (build .74, Oct 31, 2026)
+
+Few sizes, used the same way everywhere. Nothing in the app is smaller than
+12px (no “eye-test” text). `text-xs` is redefined in `tokens.css` as 13px.
+
+| Role | Size | Classes |
 | --- | --- | --- |
-| Landing display | `text-5xl sm:text-6xl lg:text-7xl font-black tracking-[-0.055em]` | One per page. The only place type gets this large. |
-| Public page title | `text-4xl sm:text-5xl font-black text-orange-950` | Support, privacy, terms. |
-| App page title | `text-3xl font-black tracking-tight` | One `h1` inside the app frame. |
-| Section title | `text-xl font-black` or `text-lg font-black` | `h2`. Do not skip from `h1` to a plain bold paragraph. |
-| Eyebrow | `text-xs` or `text-sm font-black uppercase tracking-widest` | Short. On cream, color is `text-orange-600`. On the hero, `text-orange-100` (see contrast). |
-| Body | default size, `leading-6` or `leading-7` on public pages | `text-stone-700` on cream, `text-orange-50` on the hero. |
-| Secondary | `text-sm leading-6 text-stone-600` or `text-xs leading-5 text-stone-500` | `stone-500` on white is about 4.8:1. Fine for captions, not for instructions. |
-| Button label | `text-sm font-black` | Sentence case. Emoji, if any, sits after the words. |
+| Meta, captions, footer | 13–14px | `text-xs` (13px) or `text-sm` (14px), `text-muted` / `text-subtle` |
+| Body, rows, buttons | 15px | `text-[15px]`, buttons `font-semibold` |
+| Card and section titles | 17–20px | `text-[17px]`–`text-[20px] font-semibold`, `SectionTitle` is `text-lg` |
+| Page title | 28px phone, 36px from `md` | `PageHeader`, `text-[28px] md:text-[36px] font-bold tracking-tight` |
+| Landing hero only | 44–76px | One per page, see the home mockup |
+
+The tab-bar label (12px) and the small avatar initials (12px) are the floor.
+Eyebrows are `text-sm font-medium text-accent-strong`, sentence case, not
+uppercase tracking.
 
 The receipt’s restaurant name is `text-lg font-black` and may wrap anywhere
 (`overflow-wrap: anywhere`) because place names can be one long token.
@@ -284,35 +290,31 @@ one-off margins.
 | 8 | 32px | Footer padding. |
 | 10–14 | 40–56px | Public article padding (`py-10 sm:py-14`). |
 
-Page shells:
+Page shells: every page renders inside `AppFrame` (`src/components/app-frame.tsx`),
+so the header, the max width (`max-w-3xl` content), and the footer are the
+same everywhere. Sign-in, join, request-invite, the no-loop welcome, and the
+404 page use `AuthShell` (`AppFrame minimal`: no loop navigation, one
+centered card, `max-w-md` or `max-w-xl`). Privacy, Terms, and What’s New use
+`LegalPage` (an article header and one calm card). The marketing landing page
+is the only page with its own shell.
 
-| Surface | Max width | Padding |
-| --- | --- | --- |
-| Signed-in app | `max-w-5xl` | `px-4 md:px-6` |
-| Landing | `max-w-6xl` | `px-4 sm:px-6 lg:px-8` |
-| Privacy and terms | `max-w-4xl` | `px-4 sm:px-6` |
-| Support | `max-w-3xl` | `px-4 sm:px-6` |
-| Sign-in card | `max-w-md` | page `p-4`, card `p-7` |
-| Join card | `max-w-lg` | same |
+### Chosen-pick layout (the win page)
 
-These widths are different on purpose. A policy should be a readable column.
-The app should use the width. Do not squeeze privacy down to the support
-column, and do not stretch support out to the landing hero.
+One column at every width, in this order:
 
-### Chosen-pick layout
+1. Page header (“Lunch is decided”, “<place> wins! 🎉”).
+2. Winner card: the Picks → Vetoes → Winner line, a “🎉 Today’s winner”
+   chip, the name (20px), address, wins line, and “Details & map →”.
+3. Milestone card, when there is one (a celebration belongs with the win).
+4. “What’s next”: one grouped card with the lunch time (one line, “Change”
+   opens the editor) and the hand-off row (“Close the loop”, with “Opens
+   after …” in the helper text while the button is disabled).
+5. The tip receipt, centered, at most 22rem wide.
 
-On a phone the order is: restaurant result, thank-you, then schedule and close.
-The thank-you is full width of the hero, not a narrow slip floating in the
-middle.
-
-From 768px up, and only when a thank-you is actually showing, the hero becomes
-two columns: `minmax(0, 1fr)` and `minmax(16.5rem, 22rem)`, top-aligned, with
-a 1.5rem gap. The result and the actions stay in the left column. The receipt,
-one-liner, or tip jar fills the right column. An empty nudge is `display: none`,
-so a hidden thank-you does not leave a blank column. The fries decoration is
-hidden in this state so it does not sit behind the slip.
-
-The rules live in `.pick-layout` in `src/app/globals.css`.
+No places list, lore line, or report link on the win page. The old
+two-column `.pick-layout` grid is gone because it squeezed the result into
+narrow boxes with wrapped dates. `.pick-nudge:empty` still hides an empty
+receipt slot.
 
 ## Components
 
@@ -433,20 +435,23 @@ only). Tabs are buttons with `aria-pressed`, at least 44px tall, and the
 row scrolls sideways on a narrow phone. The tab is kept in the URL hash
 (`/settings#places`).
 
-Tabs are `text-[10px] font-bold` with an emoji. Active tab is `bg-orange-100 text-orange-800`.
+Tab labels are 12px under the icon. Active tab uses the accent.
 
-Public pages have a simple header: plate emoji in an orange rounded tile, the
-words Lunch Loop, and one action on the right (Sign in, or 🏠 Home). The link
-back to the app always says “Home”, not “Back to Lunch Loop”.
+Signed-out pages use the same slim `AppFrame` header: the logo and the words
+Lunch Loop (which link home), and “Sign in” on the right. There is no
+separate “🏠 Home” button anywhere.
 
 ### Footer
 
-Centered, `text-xs leading-5 text-stone-500`. Link rows use
-`flex flex-wrap justify-center gap-x-3 gap-y-1` so Privacy and Terms wrap
-instead of overflowing a phone.
+Every page ends with “Built by Craig Kohler with AI”, then
+“Build … · Privacy · Terms” (`FooterLine` in `app-frame.tsx`, 13px,
+`text-subtle`). On iPad and desktop with the sidebar, it sits at the bottom
+of the sidebar; otherwise it is centered under the page. The landing page has
+the same credit in its own footer. Exceptions: `/dev/receipt` (local
+development only) and `/decide` (a redirect with no page).
 
-“Lunch Loop is run by Craig Kohler.” stays. “Fuel the loop” appears only when
-`donations_enabled` is on, and never on `/support` itself.
+“Fuel the loop” appears only when `donations_enabled` is on, and never on
+`/support` itself. It is a quiet text link now, not an orange pill.
 
 ### Toasts and inline notes
 

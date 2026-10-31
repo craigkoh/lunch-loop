@@ -247,7 +247,7 @@ export function LoopAreaPicker({
               {value.radiusMiles} mi<br />search area
             </div>
           </div>
-          <p className="absolute bottom-2 left-2 right-2 rounded-lg bg-white/90 px-2 py-1 text-center text-[11px] font-bold text-stone-700 shadow-sm">
+          <p className="absolute bottom-2 left-2 right-2 rounded-lg bg-white/90 px-2 py-1 text-center text-xs font-bold text-stone-700 shadow-sm">
             The circle represents the distance Lunch Loop will search from the selected center.
           </p>
         </div>

@@ -29,9 +29,15 @@ type MembershipNotification = {
   created_at: string;
 };
 
-export function AppFrame({ children }: { children: ReactNode }) {
+/**
+ * The one frame every page uses. `minimal` keeps the slim header and the avatar
+ * menu but hides the loop navigation (for people signed in without a loop yet,
+ * and for sign-in and invitation pages).
+ */
+export function AppFrame({ children, minimal = false }: { children: ReactNode; minimal?: boolean }) {
   const pathname = usePathname() || "/";
   const [account, setAccount] = useState("");
+  const [sessionChecked, setSessionChecked] = useState(false);
   const [userId, setUserId] = useState("");
   const [feedbackPromptOpen, setFeedbackPromptOpen] = useState(false);
   const [loops, setLoops] = useState<LunchLoopSummary[]>([]);
@@ -44,6 +50,7 @@ export function AppFrame({ children }: { children: ReactNode }) {
   const headerLoadInFlight = useRef(false);
   const userIdRef = useRef("");
   userIdRef.current = userId;
+  const showNav = Boolean(account) && !minimal;
   const currentLoop = loops.find((loop) => loop.active) ?? loops.find((loop) => loop.status === "active") ?? null;
 
   useEffect(() => {
@@ -64,6 +71,7 @@ export function AppFrame({ children }: { children: ReactNode }) {
       const user = session?.user;
       setAccount(user ? user.user_metadata.full_name || user.user_metadata.name || user.email?.split("@")[0] || "Lunch friend" : "");
       setUserId(user?.id ?? "");
+      setSessionChecked(true);
       setFeedbackPromptOpen(Boolean(user && feedbackPromptOpenFor(user.id)));
       if (!user) {
         setLoops([]);
@@ -180,7 +188,7 @@ export function AppFrame({ children }: { children: ReactNode }) {
       >
         {placement === "sidebar" ? (
           <span className="min-w-0">
-            <span className="block text-[11px] text-subtle">Current loop</span>
+            <span className="block text-xs text-subtle">Current loop</span>
             <span className="block truncate text-sm font-semibold">{loopName}</span>
           </span>
         ) : (
@@ -219,7 +227,7 @@ export function AppFrame({ children }: { children: ReactNode }) {
 
   return (
     <div className="min-h-dvh bg-app text-ink md:flex">
-      {account && (
+      {showNav && (
         <aside className="hidden md:sticky md:top-0 md:flex md:h-dvh md:w-64 md:shrink-0 md:flex-col md:border-r md:border-line md:bg-surface/70 md:px-4 md:py-5">
           <Link href="/" className="flex items-center gap-2 px-2 font-semibold">
             <BrandMark className="size-8" />
@@ -268,12 +276,17 @@ export function AppFrame({ children }: { children: ReactNode }) {
       )}
 
       <div className="min-w-0 flex-1">
-        <header className={cn("sticky top-0 z-20 flex h-14 items-center gap-3 bg-app/85 px-4 backdrop-blur", account && "md:hidden")}>
+        <header className={cn("sticky top-0 z-20 flex h-14 items-center gap-3 bg-app/85 px-4 backdrop-blur", showNav && "md:hidden")}>
           <Link href="/" aria-label="Lunch Loop home" className="flex shrink-0 items-center gap-2 font-semibold">
             <BrandMark className="size-8" />
-            {!account && <span>Lunch Loop</span>}
+            {!showNav && <span>Lunch Loop</span>}
           </Link>
-          {account && loopSwitcher("header")}
+          {showNav && loopSwitcher("header")}
+          {!account && sessionChecked && !pathname.startsWith("/sign-in") && (
+            <Link href="/sign-in" className="ml-auto rounded-[var(--ll-radius-md)] px-3 py-2 text-sm font-semibold text-accent-strong hover:bg-accent-soft">
+              Sign in
+            </Link>
+          )}
           {account && (
             <button
               type="button"
@@ -288,7 +301,7 @@ export function AppFrame({ children }: { children: ReactNode }) {
           )}
         </header>
 
-        <main className={cn("mx-auto w-full max-w-3xl px-5 pt-3 md:px-10 md:pb-10 md:pt-10", account ? "pb-[calc(6.5rem+env(safe-area-inset-bottom))]" : "pb-10")}>
+        <main className={cn("mx-auto w-full max-w-3xl px-5 pt-3 md:px-10 md:pb-10 md:pt-10", showNav ? "pb-[calc(6.5rem+env(safe-area-inset-bottom))]" : "pb-10")}>
           {account && feedbackPromptOpen && pathname !== "/feedback" && (
             <Notice>
               <p>How did that decision go? A short note helps the next build.</p>
@@ -308,7 +321,7 @@ export function AppFrame({ children }: { children: ReactNode }) {
             </Notice>
           ))}
           {children}
-          {account && showInstallCard && (
+          {showNav && showInstallCard && pathname === "/" && (
             <aside className="mt-8 flex items-center gap-4 rounded-[var(--ll-radius-lg)] bg-surface p-4 shadow-[var(--ll-shadow-card)] md:hidden">
               <BrandMark className="size-11 shrink-0" />
               <div className="min-w-0 flex-1">
@@ -321,13 +334,13 @@ export function AppFrame({ children }: { children: ReactNode }) {
               </div>
             </aside>
           )}
-          <FooterLine className={cn("mt-10 text-center", account && "md:hidden")} />
+          <FooterLine className={cn("mt-10 text-center", showNav && "md:hidden")} />
         </main>
       </div>
 
-      {account && (
+      {showNav && (
         <nav aria-label="Tabs" className="fixed inset-x-0 bottom-0 z-20 border-t border-line bg-surface/85 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-2 backdrop-blur md:hidden">
-          <div className="mx-auto grid max-w-md grid-cols-4 text-[10px] font-medium">
+          <div className="mx-auto grid max-w-md grid-cols-4 text-[12px] font-medium">
             {tabs.map((tab) => {
               const active = tab.match(pathname);
               return (
@@ -353,7 +366,10 @@ export function AppFrame({ children }: { children: ReactNode }) {
             role="dialog"
             aria-modal="true"
             aria-label="Menu"
-            className="absolute inset-x-0 bottom-0 max-h-[85dvh] overflow-y-auto rounded-t-[var(--ll-radius-sheet)] bg-app px-4 pb-[max(2rem,env(safe-area-inset-bottom))] pt-3 md:inset-x-auto md:bottom-6 md:left-6 md:w-80 md:rounded-[var(--ll-radius-sheet)] md:pb-4 md:shadow-xl"
+            className={cn(
+              "absolute inset-x-0 bottom-0 max-h-[85dvh] overflow-y-auto rounded-t-[var(--ll-radius-sheet)] bg-app px-4 pb-[max(2rem,env(safe-area-inset-bottom))] pt-3 md:inset-x-auto md:w-80 md:rounded-[var(--ll-radius-sheet)] md:pb-4 md:shadow-xl",
+              showNav ? "md:bottom-6 md:left-6" : "md:bottom-auto md:right-6 md:top-16",
+            )}
           >
             <div className="mx-auto h-1 w-9 rounded-full bg-stone-300 md:hidden" />
             <div className="mt-4 flex items-center gap-3 px-1">
@@ -404,16 +420,22 @@ function Notice({ children }: { children: ReactNode }) {
   );
 }
 
-/** The one-line footer: Build · Privacy · Terms. */
+/**
+ * The footer on every page: the maker credit, then Build · Privacy · Terms.
+ * The credit is on purpose (Craig showcases building Lunch Loop with AI).
+ */
 export function FooterLine({ className }: { className?: string }) {
   return (
-    <p className={cn("text-[11px] text-subtle", className)}>
-      <Link href="/whats-new" className="hover:text-ink">Build {appInfo.build}</Link>
-      {" · "}
-      <Link href="/privacy" className="hover:text-ink">Privacy</Link>
-      {" · "}
-      <Link href="/terms" className="hover:text-ink">Terms</Link>
-    </p>
+    <footer className={cn("text-xs leading-5 text-subtle", className)}>
+      <p>Built by Craig Kohler with AI</p>
+      <p>
+        <Link href="/whats-new" className="hover:text-ink">Build {appInfo.build}</Link>
+        {" · "}
+        <Link href="/privacy" className="hover:text-ink">Privacy</Link>
+        {" · "}
+        <Link href="/terms" className="hover:text-ink">Terms</Link>
+      </p>
+    </footer>
   );
 }
 

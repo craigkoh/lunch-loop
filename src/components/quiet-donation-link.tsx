@@ -23,10 +23,10 @@ export function FuelTheLoopLink() {
   }, []);
   if (!enabled || pathname === "/support") return null;
   return (
-    <p className="mt-2">
+    <p>
       <Link
         href="/support"
-        className="inline-flex min-h-11 items-center justify-center rounded-full bg-orange-100 px-3 py-1.5 text-xs font-black text-orange-900"
+        className="inline-flex min-h-11 items-center text-sm font-medium text-accent-strong hover:underline"
       >
         {fuelLinkLabel}
       </Link>

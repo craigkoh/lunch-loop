@@ -51,7 +51,12 @@ rate limits and a hosted bot challenge.
 
 Items Craig has approved for the next batch. More may be added.
 
-- Nothing open. Build 2026.10.31.73 (PR from `ui-refresh`) has the calm
+- Build 2026.10.31.74 (PR from `ui-polish`): the activity-trigger EXECUTE
+  revoke, one type scale with no tiny text, the footer credit on every page,
+  the win-page reorder, and the calm style on Install, Support, sign-in,
+  invitations, History, Stats, and Settings. Still to build: the new
+  logged-out home page (mockups are in the PR description).
+- Build 2026.10.31.73 (PR from `ui-refresh`) has the calm
   redesign (mockup D), milestone cards, the feedback progress line, and the
   private activity log. Build .72 had the “won” wording, the Loop report, the
   Google Places storage audit, and the loop CSV download.

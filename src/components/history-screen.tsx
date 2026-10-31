@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useRefreshOnFocus } from "@/lib/use-refresh-on-focus";
 import { useEffect, useState } from "react";
 import { AppFrame, EmptyState } from "./app-frame";
-import { RestaurantCard } from "./restaurant-card";
+import { ListCard, PageHeader, SectionTitle } from "./ui/card";
 import { RestaurantDetailsDialog } from "./restaurant-details-dialog";
 import type { Restaurant } from "@/lib/types";
 import { createClient } from "@/lib/supabase/client";
@@ -133,124 +133,89 @@ export function HistoryScreen() {
 
   return (
     <AppFrame>
-      <p className="text-sm font-medium text-accent-strong">
-        The record
-      </p>
-      <h1 className="mt-1 text-[28px] font-bold leading-tight tracking-tight md:text-[36px]">History</h1>
-      <p className="mt-2 text-stone-600">
-        Every winner, suggester, and friendly veto in one spot.
-      </p>
-      <Link
-        href="/report"
-        className="mt-4 inline-flex rounded-xl bg-orange-500 px-4 py-2 text-sm font-black text-white transition hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-orange-300"
-      >
-        📋 View loop report
-      </Link>
+      <PageHeader eyebrow="The record" title="History">
+        Every winner, picker, and friendly veto in one spot.{" "}
+        <Link href="/report" className="font-medium text-accent-strong">Loop report →</Link>
+      </PageHeader>
       {loading ? (
-        <p className="mt-6 text-sm font-semibold text-stone-500">
-          Loading lunch history…
-        </p>
+        <p className="text-sm text-muted">Loading lunch history…</p>
       ) : error ? (
-        <div className="mt-6">
-          <EmptyState emoji="🗓️" title="History is unavailable">
-            {error}
-          </EmptyState>
-        </div>
+        <EmptyState emoji="🗓️" title="History is unavailable">
+          {error}
+        </EmptyState>
       ) : (
         <>
-          <section className="mt-6">
-            <h2 className="text-lg font-black">Recent lunches</h2>
-            {history.length ? (
-              <div className="mt-3 space-y-3">
-                {history.map((round) => (
-                  <button
-                    key={round.id}
-                    type="button"
-                    onClick={() => setDetail(round)}
-                    className="w-full rounded-2xl border border-orange-100 bg-white p-4 text-left shadow-sm transition hover:ring-2 hover:ring-orange-200 focus:outline-none focus:ring-2 focus:ring-orange-300"
-                  >
-                    <div className="flex flex-wrap items-start justify-between gap-2">
-                      <div>
-                        <p className="text-xs font-bold text-stone-400">
-                          {new Date(round.scheduled_for).toLocaleDateString(
-                            undefined,
-                            {
-                              weekday: "long",
-                              month: "short",
-                              day: "numeric",
-                              year: "numeric",
-                            },
-                          )}
-                        </p>
-                        <h3 className="mt-1 font-black">
-                          {round.restaurant.name}{" "}
-                          <span className="font-semibold text-stone-400">
-                            · {round.restaurant.cuisine || "Restaurant"}
+          {history.length ? (
+            groupByMonth(history).map(([month, rounds]) => (
+              <section key={month} className="mb-6">
+                <SectionTitle title={month} action={<span className="text-sm text-subtle">{rounds.length} {rounds.length === 1 ? "lunch" : "lunches"}</span>} />
+                <ListCard className="mt-3">
+                  {rounds.map((round) => {
+                    const when = new Date(round.scheduled_for);
+                    return (
+                      <li key={round.id}>
+                        <button
+                          type="button"
+                          onClick={() => setDetail(round)}
+                          className="flex w-full items-center gap-4 px-5 py-3.5 text-left hover:bg-surface-muted"
+                        >
+                          <span className="w-10 shrink-0 text-center leading-tight">
+                            <span className="block text-sm text-subtle">{when.toLocaleDateString(undefined, { weekday: "short" })}</span>
+                            <span className="block text-[17px] font-semibold tabular-nums">{when.getDate()}</span>
                           </span>
-                        </h3>
-                      </div>
-                      <span className="rounded-full bg-orange-50 px-3 py-1 text-xs font-bold text-orange-800">
-                        {round.suggester} suggested
-                      </span>
-                    </div>
-                    {round.vetoes.length > 0 && (
-                      <p className="mt-3 border-t border-stone-100 pt-3 text-sm text-stone-500">
-                        {round.vetoes.join(" · ")}
-                      </p>
-                    )}
-                    <p className="mt-3 text-xs font-bold text-orange-700">
-                      View details, map, and directions →
-                    </p>
-                  </button>
-                ))}
-              </div>
-            ) : (
-              <div className="mt-3">
-                <EmptyState emoji="🗓️" title="No lunches decided yet">
-                  Your completed lunch decisions will appear here.
-                </EmptyState>
-              </div>
-            )}
-          </section>
+                          <span className="min-w-0 flex-1">
+                            <span className="block truncate text-[15px] font-semibold">{round.restaurant.name}</span>
+                            <span className="block truncate text-sm text-muted">
+                              {[round.restaurant.cuisine || "Restaurant", round.suggester ? `picked by ${round.suggester}` : null].filter(Boolean).join(" · ")}
+                            </span>
+                            {round.vetoes.length > 0 && (
+                              <span className="block truncate text-sm text-subtle">{round.vetoes.join(" · ")}</span>
+                            )}
+                          </span>
+                          <span className="text-subtle" aria-hidden="true">›</span>
+                        </button>
+                      </li>
+                    );
+                  })}
+                </ListCard>
+              </section>
+            ))
+          ) : (
+            <EmptyState emoji="🗓️" title="No lunches decided yet">
+              Your completed lunch decisions will appear here.
+            </EmptyState>
+          )}
           <section className="mt-8">
-            <div className="mb-3">
-              <p className="text-xs font-bold text-rose-600">
-                Retired from the rotation
-              </p>
-              <h2 className="text-lg font-black">Never again</h2>
-            </div>
+            <SectionTitle title="Never again" action={<span className="text-sm text-subtle">Retired from the rotation</span>} />
             {neverAgain.length ? (
-              <div className="space-y-3">
+              <ListCard className="mt-3">
                 {neverAgain.map((restaurant) => (
-                  <RestaurantCard
-                    key={restaurant.id}
-                    restaurant={restaurant}
-                    onOpen={(place) =>
-                      setDetail({
-                        id: place.id,
-                        scheduled_for:
-                          place.last_visited_at ??
-                          place.created_at ??
-                          new Date().toISOString(),
-                        suggester: "",
-                        restaurant: place,
-                        addedBy: place.added_by ? "A crew member" : null,
-                        vetoes: [],
-                      })
-                    }
-                    action={
-                      <p className="text-sm text-rose-700">
-                        {restaurant.never_again_note ||
-                          "The group retired this place."}
-                      </p>
-                    }
-                  />
+                  <li key={restaurant.id}>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setDetail({
+                          id: restaurant.id,
+                          scheduled_for: restaurant.last_visited_at ?? restaurant.created_at ?? new Date().toISOString(),
+                          suggester: "",
+                          restaurant,
+                          addedBy: restaurant.added_by ? "A crew member" : null,
+                          vetoes: [],
+                        })
+                      }
+                      className="flex w-full items-center gap-3 px-5 py-3.5 text-left hover:bg-surface-muted"
+                    >
+                      <span className="min-w-0 flex-1">
+                        <span className="block truncate text-[15px] font-semibold">{restaurant.name}</span>
+                        <span className="block truncate text-sm text-muted">{restaurant.never_again_note || "The group retired this place."}</span>
+                      </span>
+                      <span className="text-subtle" aria-hidden="true">›</span>
+                    </button>
+                  </li>
                 ))}
-              </div>
+              </ListCard>
             ) : (
-              <EmptyState emoji="💚" title="No places are retired">
-                Places your group does not want to revisit will appear here.
-              </EmptyState>
+              <p className="mt-3 text-sm text-muted">No places are retired. Places the crew doesn’t want to revisit show up here.</p>
             )}
           </section>
         </>
@@ -262,4 +227,14 @@ export function HistoryScreen() {
       />
     </AppFrame>
   );
+}
+
+function groupByMonth(rounds: HistoryItem[]): [string, HistoryItem[]][] {
+  const groups = new Map<string, HistoryItem[]>();
+  const newestFirst = [...rounds].sort((a, b) => b.scheduled_for.localeCompare(a.scheduled_for));
+  for (const round of newestFirst) {
+    const label = new Date(round.scheduled_for).toLocaleDateString(undefined, { month: "long", year: "numeric" });
+    groups.set(label, [...(groups.get(label) ?? []), round]);
+  }
+  return [...groups.entries()];
 }

@@ -1,7 +1,7 @@
 # Lunch Loop documentation
 
-Current release: version 0.1.0, build 2026.10.31.76 (PR 18; build .75 from
-PR #17 is live on [lunchloop.app](https://lunchloop.app) until it merges). The build
+Current release: version 0.1.0, build 2026.10.31.76 (live on
+[lunchloop.app](https://lunchloop.app) since October 31, 2026, PR #18). The build
 number lives in src/lib/app-info.ts and on the What’s New page.
 
 This is the starting point for a maintainer. Documentation describes intended

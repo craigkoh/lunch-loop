@@ -51,7 +51,7 @@ rate limits and a hosted bot challenge.
 
 Items Craig has approved for the next batch. More may be added.
 
-- Build 2026.10.31.76 (PR 18): win page reorder (winner, time, Close the
+- Build 2026.10.31.76 (PR #18, live Oct 31, 2026): win page reorder (winner, time, Close the
   loop, then the progress line), the progress line with initials, a new
   Stats page (streak, time to decide, favorites, little facts), the public
   About page, the “An idea by Craig Kohler, brought to life with new tools”

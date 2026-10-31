@@ -1,8 +1,8 @@
 "use client";
 
-import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
-import { AppFrame, EmptyState } from "./app-frame";
+import { AppFrame, EmptyState, OccasionLabel } from "./app-frame";
+import { buttonClass, ButtonLink } from "./ui/button";
 import { createClient } from "@/lib/supabase/client";
 import { getMyLunchLoops, type LunchLoopSummary } from "@/lib/supabase/group";
 
@@ -97,76 +97,75 @@ export function LunchLoopsScreen() {
     <div className="flex flex-wrap items-start justify-between gap-4">
       <div>
         <p className="text-sm font-medium text-accent-strong">Your Lunch Loops</p>
-        {currentLoop ? <Link href="/" className="mt-1 inline-block text-3xl font-black text-stone-900 underline decoration-orange-300 underline-offset-4">{currentLoop.group_name}</Link> : <h1 className="mt-1 text-[28px] font-bold leading-tight tracking-tight md:text-[36px]">Start your first Lunch Loop</h1>}
-        <p className="mt-2 max-w-2xl text-stone-600">Each Lunch Loop keeps its own people, home area, restaurant database, picks, and stats.</p>
+        <h1 className="mt-1 text-[28px] font-bold leading-tight tracking-tight md:text-[36px]">{currentLoop ? "My Lunch Loops" : "Start your first Lunch Loop"}</h1>
+        <p className="mt-2 max-w-2xl text-[15px] leading-6 text-muted">Each Lunch Loop keeps its own people, home area, restaurant database, picks, and stats.</p>
       </div>
       {!loading && currentLoop && (
-        <button disabled={busy || ownedActiveCount >= ownedLoopLimit} onClick={() => void startAnotherLoop()} className="rounded-xl bg-orange-500 px-4 py-3 text-sm font-black text-white disabled:opacity-60">
-          {ownedActiveCount >= ownedLoopLimit ? `${ownedLoopLimit} owned loops active` : "＋ Create a Lunch Loop"}
+        <button disabled={busy || ownedActiveCount >= ownedLoopLimit} onClick={() => void startAnotherLoop()} className={buttonClass("secondary")}>
+          {ownedActiveCount >= ownedLoopLimit ? `${ownedLoopLimit} owned loops active` : "＋ New Lunch Loop"}
         </button>
       )}
     </div>
-    {loading ? <p className="mt-6 text-sm font-semibold text-stone-500">Loading your Lunch Loops…</p> : currentLoop ? <>
-      <section className="mt-6 rounded-3xl bg-white p-5 shadow-sm">
-        <p className="text-xs font-bold text-orange-600">Switch Lunch Loops</p>
-        <h2 className="mt-1 text-xl font-black">{loops.length === 1 ? "This is your Lunch Loop" : "Choose the crew you’re using now"}</h2>
-        <p className="mt-1 text-sm leading-6 text-stone-600">{loops.length === 1 ? "When you create or join another Lunch Loop, it will appear here." : "Each crew has a separate restaurant list, lunch history, and settings. Switching never combines them."}</p>
-        <div className="mt-4 grid gap-3 lg:grid-cols-2">
-          {loops.filter((loop) => loop.status === "active").map((loop) => <LoopSwitcherCard key={loop.group_id} loop={loop} isCurrent={loop.group_id === currentLoop.group_id} busy={busy} onSwitch={switchLoop} />)}
+    {loading ? <p className="mt-6 text-[15px] text-muted">Loading your Lunch Loops…</p> : currentLoop ? <>
+      <section className="mt-6 rounded-[var(--ll-radius-lg)] bg-surface p-5 shadow-[var(--ll-shadow-card)]">
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div className="min-w-0">
+            <p className="text-sm font-medium text-muted">Current Lunch Loop</p>
+            <h2 className="mt-1 flex flex-wrap items-center gap-2 text-[22px] font-bold tracking-tight">{currentLoop.group_name}<LoopTags loop={currentLoop} /></h2>
+            <p className="mt-1 text-[15px] text-muted">Owned by {currentLoop.owner_display_name ?? "your crew"} · {currentLoop.member_count}/6 people</p>
+          </div>
         </div>
+        <p className="mt-3 max-w-2xl text-[15px] leading-6 text-muted">{currentLoop.loop_type === "occasion" ? "A special-night crew. There is no automatic handoff: whoever starts the next outing makes that night’s picks." : "A standing crew. Once a meal is closed, the next person in the saved order gets the next round of picks."}</p>
+        <dl className="mt-4 divide-y divide-line rounded-[var(--ll-radius-md)] border border-line"><Info label="Home area" value={currentLoop.home_label ? currentLoop.home_label.split("·")[0] : "Needs setup"} /><Info label="Search radius" value={currentLoop.search_radius_miles ? currentLoop.search_radius_miles + " miles" : "Needs setup"} /><Info label="Crew size" value={currentLoop.member_count + " of 6 people"} /></dl>
+        <div className="mt-5 flex flex-wrap gap-2"><ButtonLink href="/">Open this loop</ButtonLink><ButtonLink href="/settings" variant="secondary">{currentLoop.role === "owner" ? "Manage this loop" : "Loop settings"}</ButtonLink></div>
       </section>
-      <section className="ll-calm mt-6 overflow-hidden rounded-[var(--ll-radius-lg)] p-5">
-        <p className="text-xs font-bold text-orange-100">Current Lunch Loop</p>
-        <div className="mt-2 flex flex-wrap items-start justify-between gap-4"><div><h2 className="text-2xl font-black">{currentLoop.group_name}</h2><p className="mt-1 text-sm text-orange-50">Owned by {currentLoop.owner_display_name ?? "your crew"} · {currentLoop.member_count}/6 people</p></div><div className="flex gap-2"><span className="rounded-full bg-white/20 px-3 py-1 text-xs font-black text-white">{currentLoop.loop_type === "occasion" ? "✨ Occasion" : "🔁 Standing"}</span><span className="rounded-full bg-white/20 px-3 py-1 text-xs font-black text-white">{currentLoop.role === "owner" ? "👑 Owner" : "👤 Member"}</span></div></div>
-        <p className="mt-4 max-w-2xl text-sm leading-6 text-orange-50">{currentLoop.loop_type === "occasion" ? "A special-night crew. There is no automatic handoff: whoever starts the next outing makes that night’s picks." : "A recurring crew. Once a meal is closed, the next person in the saved order gets the next round of picks."}</p>
-        <div className="mt-5 grid gap-3 sm:grid-cols-3"><Info label="Home area" value={currentLoop.home_label ? currentLoop.home_label.split("·")[0] : "Needs setup"} /><Info label="Search radius" value={currentLoop.search_radius_miles ? currentLoop.search_radius_miles + " miles" : "Needs setup"} /><Info label="Crew size" value={currentLoop.member_count + " of 6 people"} /></div>
-        <div className="mt-5 flex flex-wrap gap-2"><Link href="/database" className="rounded-xl bg-white px-4 py-3 text-sm font-black text-orange-800">Open lunch database</Link><Link href="/settings" className="rounded-xl border border-white/50 bg-white/10 px-4 py-3 text-sm font-black text-white">{currentLoop.role === "owner" ? "Manage this loop" : "View loop settings"}</Link></div>
-      </section>
-      {loops.some((loop) => loop.status === "archived") && <section className="mt-7 rounded-3xl bg-white p-5 shadow-sm"><h2 className="text-xl font-black">Archived Lunch Loops</h2><p className="mt-1 text-sm text-stone-600">Archived loops are out of your everyday switcher. Owners can restore or permanently remove them here.</p><div className="mt-4 space-y-2">{loops.filter((loop) => loop.status === "archived").map((loop) => <ArchivedLoopCard key={loop.group_id} loop={loop} busy={busy} onRestore={restore} onDelete={permanentlyDelete} />)}</div></section>}
-    </> : <div className="mt-6"><EmptyState title="Make your first Lunch Loop">Create a Lunch Loop for your own crew, then invite up to five people. Already have an owner’s crew invitation? Use its short code to join that crew instead.<div className="mt-5 flex flex-wrap justify-center gap-3"><Link href="/start" className="rounded-xl bg-orange-500 px-4 py-3 text-sm font-black text-white">Create a Lunch Loop</Link><Link href="/join" className="rounded-xl border border-orange-200 bg-white px-4 py-3 text-sm font-black text-orange-800">Use an invitation code</Link></div></EmptyState></div>}
-    {message && <p role="status" className="mt-4 rounded-2xl bg-emerald-50 p-4 text-sm font-semibold text-emerald-800">{message}</p>}
-    {error && <p role="alert" className="mt-4 rounded-2xl bg-rose-50 p-4 text-sm font-semibold text-rose-700">{error}</p>}
+      {loops.filter((loop) => loop.status === "active").length > 1 && <section className="mt-8">
+        <h2 className="text-lg font-semibold tracking-tight">Switch Lunch Loops</h2>
+        <p className="mt-1 text-[15px] leading-6 text-muted">Each crew has a separate restaurant list, lunch history, and settings. Switching never combines them.</p>
+        <ul className="mt-3 divide-y divide-line overflow-hidden rounded-[var(--ll-radius-lg)] bg-surface shadow-[var(--ll-shadow-card)]">
+          {loops.filter((loop) => loop.status === "active").map((loop) => <LoopSwitcherRow key={loop.group_id} loop={loop} isCurrent={loop.group_id === currentLoop.group_id} busy={busy} onSwitch={switchLoop} />)}
+        </ul>
+      </section>}
+      {loops.some((loop) => loop.status === "archived") && <section className="mt-8"><h2 className="text-lg font-semibold tracking-tight">Archived Lunch Loops</h2><p className="mt-1 text-[15px] leading-6 text-muted">Archived loops are out of your everyday switcher. Owners can restore or permanently remove them here.</p><ul className="mt-3 divide-y divide-line overflow-hidden rounded-[var(--ll-radius-lg)] bg-surface shadow-[var(--ll-shadow-card)]">{loops.filter((loop) => loop.status === "archived").map((loop) => <ArchivedLoopCard key={loop.group_id} loop={loop} busy={busy} onRestore={restore} onDelete={permanentlyDelete} />)}</ul></section>}
+    </> : <div className="mt-6"><EmptyState title="Make your first Lunch Loop">Create a Lunch Loop for your own crew, then invite up to five people. Already have an owner’s crew invitation? Use its short code to join that crew instead.<div className="mt-5 flex flex-wrap justify-center gap-3"><ButtonLink href="/start">Create a Lunch Loop</ButtonLink><ButtonLink href="/join" variant="secondary">Use an invitation code</ButtonLink></div></EmptyState></div>}
+    {message && <p role="status" className="mt-4 rounded-[var(--ll-radius-md)] bg-surface p-4 text-[15px] text-ink shadow-[var(--ll-shadow-card)]">{message}</p>}
+    {error && <p role="alert" className="mt-4 rounded-[var(--ll-radius-md)] bg-danger-soft p-4 text-[15px] text-danger">{error}</p>}
   </AppFrame>;
 }
 
-function Info({ label, value }: { label: string; value: string }) {
-  return <div className="rounded-2xl bg-white/15 p-3"><p className="text-xs font-bold text-orange-100">{label.toUpperCase()}</p><p className="mt-1 font-black text-white">{value}</p></div>;
+/** Occasion gets a small label; Standing (the default) stays unlabeled. Owner is a quiet tag. */
+function LoopTags({ loop }: { loop: LunchLoopSummary }) {
+  return <>
+    {loop.loop_type === "occasion" && <OccasionLabel />}
+    {loop.role === "owner" && <span className="shrink-0 rounded-full bg-surface-muted px-2 py-0.5 text-xs font-medium text-muted">Owner</span>}
+  </>;
 }
 
-function LoopSwitcherCard({ loop, isCurrent, busy, onSwitch }: { loop: LunchLoopSummary; isCurrent: boolean; busy: boolean; onSwitch: (loop: LunchLoopSummary) => Promise<void> }) {
-  return <button type="button" disabled={busy} onClick={() => isCurrent ? window.location.assign("/") : void onSwitch(loop)} className={"w-full rounded-2xl border p-4 text-left transition hover:-translate-y-0.5 hover:shadow-sm disabled:cursor-wait disabled:opacity-60 " + (isCurrent ? "border-orange-300 bg-orange-50" : "border-stone-100 bg-stone-50")}>
-    <div className="flex flex-wrap items-start justify-between gap-3">
-      <div>
-        <div className="flex flex-wrap items-center gap-2">
-          <h3 className="font-black">{loop.group_name}</h3>
-          {loop.loop_type === "occasion" ? <span className="rounded-full bg-violet-100 px-2 py-0.5 text-xs font-black text-violet-900">✨ Occasion</span> : <span className="rounded-full bg-orange-100 px-2 py-0.5 text-xs font-black text-orange-800">🔁 Standing</span>}
-          {loop.role === "owner" && <span className="rounded-full bg-amber-100 px-2 py-0.5 text-xs font-black text-amber-900">👑 Owner</span>}
-        </div>
-        <p className="mt-2 text-xs leading-5 text-stone-600">
-          {loop.home_label ? loop.home_label.split("·")[0] : "home area needs setup"} · {loop.member_count}/6 people
-        </p>
-      </div>
-      {isCurrent ? <span className="rounded-xl bg-orange-500 px-3 py-2 text-sm font-black text-white">Open this loop →</span> : <span className="rounded-xl bg-orange-500 px-3 py-2 text-sm font-black text-white">Use this loop →</span>}
-    </div>
-  </button>;
+function Info({ label, value }: { label: string; value: string }) {
+  return <div className="flex items-center justify-between gap-4 px-4 py-3 text-[15px]"><dt className="text-muted">{label}</dt><dd className="text-right font-semibold">{value}</dd></div>;
+}
+
+function LoopSwitcherRow({ loop, isCurrent, busy, onSwitch }: { loop: LunchLoopSummary; isCurrent: boolean; busy: boolean; onSwitch: (loop: LunchLoopSummary) => Promise<void> }) {
+  return <li><button type="button" disabled={busy} onClick={() => isCurrent ? window.location.assign("/") : void onSwitch(loop)} className="flex w-full items-center gap-3 px-5 py-4 text-left hover:bg-surface-muted disabled:cursor-wait disabled:opacity-60">
+    <span className="min-w-0 flex-1">
+      <span className="flex flex-wrap items-center gap-2 text-[15px] font-semibold">{loop.group_name}<LoopTags loop={loop} /></span>
+      <span className="mt-0.5 block text-sm text-muted">{loop.home_label ? loop.home_label.split("·")[0] : "Home area needs setup"} · {loop.member_count}/6 people</span>
+    </span>
+    {isCurrent ? <span className="shrink-0 text-sm font-medium text-accent-strong">Current ✓</span> : <span className="shrink-0 text-sm font-medium text-accent-strong">Switch ›</span>}
+  </button></li>;
 }
 
 function ArchivedLoopCard({ loop, busy, onRestore, onDelete }: { loop: LunchLoopSummary; busy: boolean; onRestore: (loop: LunchLoopSummary) => Promise<void>; onDelete: (loop: LunchLoopSummary) => Promise<void> }) {
   const scheduled = loop.status === "archived" ? new Date(loop.delete_scheduled_for ?? "") : null;
   const canDelete = Boolean(scheduled && !Number.isNaN(scheduled.valueOf()) && scheduled <= new Date());
-  return <article className="rounded-2xl bg-stone-50 p-4">
-    <div className="flex flex-wrap items-start justify-between gap-3">
-      <div>
-        <div className="flex flex-wrap items-center gap-2">
-          <h3 className="font-black">{loop.group_name}</h3>
-          {loop.role === "owner" && <span className="rounded-full bg-amber-100 px-2 py-0.5 text-xs font-black text-amber-900">👑 Owner</span>}
-        </div>
-        <p className="mt-1 text-xs leading-5 text-stone-500">
-          {loop.loop_type === "occasion" ? "✨ Occasion" : "🔁 Standing"} · {loop.owner_display_name ?? "Lunch Loop owner"} · archived
-          {scheduled && <> · deletion available {dateLabel(loop.delete_scheduled_for)}</>}
-        </p>
-      </div>
-      {loop.role === "owner" && <div className="flex flex-wrap gap-2"><button disabled={busy} onClick={() => void onRestore(loop)} className="rounded-xl bg-orange-500 px-3 py-2 text-sm font-black text-white disabled:opacity-60">Restore</button>{canDelete && <button disabled={busy} onClick={() => void onDelete(loop)} className="rounded-xl bg-rose-700 px-3 py-2 text-sm font-black text-white disabled:opacity-60">Delete</button>}</div>}
+  return <li className="flex flex-wrap items-center justify-between gap-3 px-5 py-4">
+    <div className="min-w-0">
+      <p className="flex flex-wrap items-center gap-2 text-[15px] font-semibold">{loop.group_name}<LoopTags loop={loop} /></p>
+      <p className="mt-0.5 text-sm text-muted">
+        {loop.owner_display_name ?? "Lunch Loop owner"} · archived
+        {scheduled && <> · deletion available {dateLabel(loop.delete_scheduled_for)}</>}
+      </p>
     </div>
-  </article>;
+    {loop.role === "owner" && <div className="flex flex-wrap gap-2"><button disabled={busy} onClick={() => void onRestore(loop)} className={buttonClass("secondary")}>Restore</button>{canDelete && <button disabled={busy} onClick={() => void onDelete(loop)} className={buttonClass("danger")}>Delete</button>}</div>}
+  </li>;
 }

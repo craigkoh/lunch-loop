@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { AppFrame, EmptyState } from "./app-frame";
+import { AppFrame, EmptyState, OccasionLabel } from "./app-frame";
 import {
   RestaurantDatabaseBrowser,
   type RestaurantWithContributor,
@@ -914,7 +914,7 @@ export function SettingsScreen() {
                     Who is this for? <span className="font-normal text-subtle">Optional, only you see it.</span>
                     <input value={shareableInviteLabel} onChange={(event) => setShareableInviteLabel(event.target.value)} maxLength={80} placeholder="e.g. Jamie" className={inputClass} />
                   </label>
-                  <button type="button" disabled={saving || availableInvitationCount === 0} onClick={() => void createShareableInvite()} className={`mt-3 ${secondaryButton}`}>
+                  <button type="button" disabled={saving || availableInvitationCount === 0} onClick={() => void createShareableInvite()} className={`mt-3 ${primaryButton}`}>
                     {saving ? "Creating code…" : "Make a code and link"}
                   </button>
                 </div>
@@ -925,7 +925,7 @@ export function SettingsScreen() {
                   <p className={helpClass}>{inviteShare.kind === "share-code" ? "Text this link or code to one person. Whoever redeems it first joins the crew." : inviteShare.kind === "member" ? "Email is optional. Copy the link and code to text it instead." : "Copy this link if you’d rather text it yourself."}</p>
                   <p className="mt-3 break-all rounded-[var(--ll-radius-sm)] bg-surface px-3 py-2 text-sm">{inviteShare.url}</p>
                   {inviteShare.code && <p className="mt-2 text-[15px] font-semibold">One-time code: <code className="tracking-widest">{inviteShare.code}</code></p>}
-                  <button type="button" onClick={copyInviteCode} className={`mt-3 ${primaryButton}`}>Copy invite message</button>
+                  <button type="button" onClick={copyInviteCode} className={`mt-3 ${secondaryButton}`}>Copy invite message</button>
                 </div>
               )}
               {context.role === "owner" && (memberInvitations.length > 0 || shareableInvitations.length > 0) && (
@@ -955,7 +955,7 @@ export function SettingsScreen() {
                 <span className="mt-1 block text-sm leading-6 text-muted">They become the owner of a separate crew, list, and history.</span>
                 <input required type="email" value={newLoopInviteEmail} onChange={(event) => setNewLoopInviteEmail(event.target.value)} placeholder="friend@example.com" className={inputClass} />
               </label>
-              <button disabled={saving} className={`mt-3 ${secondaryButton}`}>{saving ? "Creating invite…" : "Invite them to start a loop"}</button>
+              <button disabled={saving} className={`mt-3 ${primaryButton}`}>{saving ? "Creating invite…" : "Invite them to start a loop"}</button>
             </form>
             </>}
 
@@ -981,7 +981,7 @@ export function SettingsScreen() {
                   {loops.map((loop) => (
                     <li key={loop.group_id} className="flex flex-wrap items-center justify-between gap-3 px-4 py-3">
                       <div className="min-w-0">
-                        <p className="text-[15px] font-semibold">{loop.group_name}{loop.active && <span className="ml-2 text-sm font-medium text-accent-strong">Current</span>}</p>
+                        <p className="flex flex-wrap items-center gap-x-2 gap-y-1 text-[15px] font-semibold">{loop.group_name}{loop.loop_type === "occasion" && <OccasionLabel />}{loop.active && <span className="text-sm font-medium text-accent-strong">Current</span>}</p>
                         <p className="text-sm text-subtle">{loop.role} · {loop.member_count}/6 people · {loop.status}</p>
                       </div>
                       {loop.status === "active" && !loop.active && <button disabled={saving} onClick={() => void switchLoop(loop)} className={secondaryButton}>Switch</button>}

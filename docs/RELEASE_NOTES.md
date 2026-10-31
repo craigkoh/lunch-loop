@@ -1,5 +1,49 @@
 # Release Notes
 
+## Build 2026.10.31.76 (Saturday, October 31, 2026)
+
+Design and copy, plus a new public page. No database changes.
+
+- Win page reordered (`home-screen.tsx`): one card with the winner (tap for
+  details and map), the lunch time with Change, then a full-width Close the
+  loop (Finish occasion) with a one-line help (“Opens after 11:30 AM. Records
+  the visit and hands the picks to the next person.”). The disabled button is
+  now clearly inactive (muted surface, subtle text). Below the card: the
+  milestone, the tip line (restyled to calm tokens, no orange underline), and a
+  short “This round” list (who picked, who vetoed what) for crews of six or
+  fewer. The old “What’s next” block is gone.
+- New progress line with initials (`ui/round-track.tsx`, math in
+  `src/lib/round-progress.ts`, unit-tested): the suggester sits at the finish
+  once picks are in, others move to the finish as they veto, and everyone is
+  at the finish once a winner is decided. It replaces the avatar row and the
+  “Still holding a veto” chips on the active round card, and it closes the
+  win card.
+- Stats rewritten (`stats-screen.tsx`, math in `src/lib/lunch-stats.ts`,
+  unit-tested): four tiles (New places tried, Time to decide on average with the
+  fastest, Lunch streak in weeks, Top comeback), “Favorites you return to”
+  (places with two or more wins, about how often), and “Little facts”
+  (favorite lunch day, favorite cuisine, most vetoes survived, waiting for
+  a first win). Removed: “Who’s picked”, the monthly recap, the cuisine
+  popularity and veto-habit lists, and the old summary rows. Uses only existing
+  columns (`started_at`, `winner_recorded_at`, `scheduled_for`).
+- New public `/about` page: Craig’s story (started in August 2026, a lifelong
+  early adopter), the live-TV home-automation clip from about 23 years ago as a local
+  thumbnail that links out to YouTube (no embed, no CSP change), and links to
+  craigkohler.com, YouTube, LinkedIn, X, and Facebook.
+- Footer credit is now “An idea by Craig Kohler, brought to life with new
+  tools”, with the name linking to `/about` (app footer and logged-out home).
+  `/support`’s “Built while learning” line is softened to match.
+- Buttons: one primary per card. Invite: “Make a code and link” is primary,
+  “Copy invite message” is secondary; “Invite them to start a loop” is
+  primary. The selected sort chip and the Account theme choice are soft chips
+  (`bg-accent-soft text-accent-ink`). The Account page uses the calm card.
+- Menu: “Add to home screen” (links `/install`), shown only outside the
+  installed app.
+- Occasion loops get a small gray “Occasion” label in the loop switcher, the
+  Settings → Area loop list, and My Lunch Loops; Standing stays unlabeled.
+  My Lunch Loops is restyled: current loop card, a switch list, archived list,
+  no emoji badges.
+
 ## Build 2026.10.31.75 (Saturday, October 31, 2026)
 
 Design only. No database changes.

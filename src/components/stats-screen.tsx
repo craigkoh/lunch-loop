@@ -5,36 +5,25 @@ import { useRefreshOnFocus } from "@/lib/use-refresh-on-focus";
 import { useEffect, useMemo, useState } from "react";
 import { AppFrame, EmptyState } from "./app-frame";
 import { RestaurantDetailsDialog } from "./restaurant-details-dialog";
-import { Avatar } from "./ui/avatar";
-import { Card, ListCard, PageHeader, SectionTitle } from "./ui/card";
-import { winsLine } from "@/lib/wins";
+import { ListCard, PageHeader, SectionTitle } from "./ui/card";
 import type { Restaurant } from "@/lib/types";
 import { createClient } from "@/lib/supabase/client";
-import {
-  getGroupContext,
-  getGroupMembers,
-  type GroupMemberRecord,
-} from "@/lib/supabase/group";
+import { getGroupContext, getGroupMembers, type GroupMemberRecord } from "@/lib/supabase/group";
+import { durationLabel, lunchStats, type StatsCandidate, type StatsRound, type StatsVeto } from "@/lib/lunch-stats";
 
-type CompletedRound = {
-  id: string;
-  suggester_id: string;
-  final_restaurant_id: string | null;
-  completed_at: string | null;
-};
-type Veto = { candidate_id: string; user_id: string };
-
+/**
+ * Stats (build .76): a handful of value stats, all from data the app already
+ * stores. "Who's picked" and the monthly recap are gone (predictable in a
+ * standing loop). The math lives in src/lib/lunch-stats.ts.
+ */
 export function StatsScreen() {
   const [members, setMembers] = useState<GroupMemberRecord[]>([]);
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
-  const [detailRestaurant, setDetailRestaurant] = useState<Restaurant | null>(
-    null,
-  );
-  const [rounds, setRounds] = useState<CompletedRound[]>([]);
-  const [vetoes, setVetoes] = useState<Veto[]>([]);
-  const [candidateCuisine, setCandidateCuisine] = useState(
-    new Map<string, string>(),
-  );
+  const [detailRestaurant, setDetailRestaurant] = useState<Restaurant | null>(null);
+  const [rounds, setRounds] = useState<StatsRound[]>([]);
+  const [candidates, setCandidates] = useState<StatsCandidate[]>([]);
+  const [vetoes, setVetoes] = useState<StatsVeto[]>([]);
+  const [timeZone, setTimeZone] = useState("America/Chicago");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -48,64 +37,38 @@ export function StatsScreen() {
         const supabase = createClient();
         const [roster, restaurantResult, roundResult] = await Promise.all([
           getGroupMembers(context.groupId),
-          supabase
-            .from("restaurants")
-            .select("*")
-            .eq("group_id", context.groupId),
+          supabase.from("restaurants").select("*").eq("group_id", context.groupId),
           supabase
             .from("lunch_sessions")
-            .select("id, suggester_id, final_restaurant_id, completed_at")
+            .select("id, final_restaurant_id, started_at, winner_recorded_at, completed_at, scheduled_for")
             .eq("group_id", context.groupId)
             .eq("status", "completed"),
         ]);
         if (restaurantResult.error) throw restaurantResult.error;
         if (roundResult.error) throw roundResult.error;
-        const completed = (roundResult.data ?? []) as CompletedRound[];
+        const completed = (roundResult.data ?? []) as StatsRound[];
         const candidateResult = completed.length
           ? await supabase
               .from("lunch_session_candidates")
-              .select("id, restaurant_id")
-              .in(
-                "session_id",
-                completed.map((round) => round.id),
-              )
+              .select("id, session_id, restaurant_id")
+              .in("session_id", completed.map((round) => round.id))
           : { data: [], error: null };
         if (candidateResult.error) throw candidateResult.error;
         const vetoResult = candidateResult.data?.length
           ? await supabase
               .from("vetoes")
-              .select("candidate_id, user_id")
-              .in(
-                "candidate_id",
-                candidateResult.data.map((candidate) => candidate.id),
-              )
+              .select("candidate_id")
+              .in("candidate_id", candidateResult.data.map((candidate) => candidate.id))
           : { data: [], error: null };
         if (vetoResult.error) throw vetoResult.error;
-        const restaurantById = new Map(
-          ((restaurantResult.data ?? []) as Restaurant[]).map((restaurant) => [
-            restaurant.id,
-            restaurant,
-          ]),
-        );
         setMembers(roster);
         setRestaurants((restaurantResult.data ?? []) as Restaurant[]);
         setRounds(completed);
-        setVetoes((vetoResult.data ?? []) as Veto[]);
-        setCandidateCuisine(
-          new Map(
-            (candidateResult.data ?? []).map((candidate) => [
-              candidate.id,
-              restaurantById.get(candidate.restaurant_id)?.cuisine ||
-                "Restaurant",
-            ]),
-          ),
-        );
+        setCandidates((candidateResult.data ?? []) as StatsCandidate[]);
+        setVetoes((vetoResult.data ?? []) as StatsVeto[]);
+        if (context.timeZone) setTimeZone(context.timeZone);
       } catch (loadError) {
-        setError(
-          loadError instanceof Error
-            ? loadError.message
-            : "Stats could not be loaded.",
-        );
+        setError(loadError instanceof Error ? loadError.message : "Stats could not be loaded.");
       } finally {
         setLoading(false);
       }
@@ -113,233 +76,126 @@ export function StatsScreen() {
     void load();
   }, [reloadKey]);
 
-  const data = useMemo(() => {
-    const restaurantById = new Map(
-      restaurants.map((restaurant) => [restaurant.id, restaurant]),
-    );
-    const cuisineWins = new Map<string, number>();
-    for (const round of rounds) {
-      const cuisine =
-        restaurantById.get(round.final_restaurant_id ?? "")?.cuisine ||
-        "Restaurant";
-      cuisineWins.set(cuisine, (cuisineWins.get(cuisine) ?? 0) + 1);
-    }
-    const heat = new Map<string, number>();
-    for (const veto of vetoes) {
-      const cuisine = candidateCuisine.get(veto.candidate_id) || "Restaurant";
-      const key = `${veto.user_id}|${cuisine}`;
-      heat.set(key, (heat.get(key) ?? 0) + 1);
-    }
-    return {
-      cuisineWins: [...cuisineWins.entries()].sort((a, b) => b[1] - a[1]),
-      heat: [...heat.entries()]
-        .map(([key, count]) => {
-          const [userId, cuisine] = key.split("|");
-          return { userId, cuisine, count };
-        })
-        .sort((a, b) => b.count - a.count),
-    };
-  }, [candidateCuisine, restaurants, rounds, vetoes]);
-  const favorite = [...restaurants]
-    .filter((restaurant) => !restaurant.never_again)
-    .sort((a, b) => b.visit_count - a.visit_count)[0];
-  const newestRestaurant = [...restaurants]
-    .filter((restaurant) => !restaurant.never_again)
-    .sort(
-      (a, b) =>
-        new Date(b.created_at ?? 0).getTime() -
-          new Date(a.created_at ?? 0).getTime() ||
-        a.name.localeCompare(b.name),
-    )[0];
-  const freshCount = restaurants.filter((restaurant) => !restaurant.never_again && restaurant.visit_count === 0).length;
-  const maxPicked = Math.max(1, ...members.map((member) => rounds.filter((round) => round.suggester_id === member.user_id).length));
-  const memberName = new Map(
-    members.map((member) => [member.user_id, member.display_name]),
+  const stats = useMemo(
+    () => lunchStats({ rounds, candidates, vetoes, places: restaurants, timeZone }),
+    [rounds, candidates, vetoes, restaurants, timeZone],
   );
-  const monthName = new Intl.DateTimeFormat(undefined, {
-    month: "long",
-  }).format(new Date());
-  const thisMonth = rounds.filter(
-    (round) =>
-      round.completed_at &&
-      new Date(round.completed_at).getMonth() === new Date().getMonth() &&
-      new Date(round.completed_at).getFullYear() === new Date().getFullYear(),
-  ).length;
+  const memberName = new Map(members.map((member) => [member.user_id, member.display_name]));
+  const restaurantById = new Map(restaurants.map((restaurant) => [restaurant.id, restaurant]));
+  const shortDate = (iso: string, withYear = false) =>
+    new Intl.DateTimeFormat(undefined, { month: "short", day: "numeric", ...(withYear ? { year: "numeric" } : {}), timeZone }).format(new Date(iso));
+  const streakWeeks = stats.currentStreakWeeks || stats.bestStreakWeeks;
+  const tiles: { value: string; label: string; detail: string }[] = [
+    {
+      value: String(stats.newPlaces),
+      label: "New places tried",
+      detail: `Winners across ${stats.lunches} ${stats.lunches === 1 ? "lunch" : "lunches"}`,
+    },
+    stats.averageDecideMinutes !== null
+      ? {
+          value: durationLabel(stats.averageDecideMinutes),
+          label: "Time to decide",
+          detail: stats.fastestDecideMinutes !== null ? `On average · fastest ${durationLabel(stats.fastestDecideMinutes)}` : "On average",
+        }
+      : { value: "—", label: "Time to decide", detail: "Shows after the next round" },
+    {
+      value: `${streakWeeks} ${streakWeeks === 1 ? "wk" : "wks"}`,
+      label: stats.currentStreakWeeks ? "Lunch streak" : "Best lunch streak",
+      detail:
+        stats.currentStreakWeeks && stats.currentStreakWeeks === stats.bestStreakWeeks && stats.streakStart
+          ? `Every week since ${shortDate(stats.streakStart)}`
+          : stats.currentStreakWeeks
+            ? `Best: ${stats.bestStreakWeeks} weeks`
+            : "Weeks in a row with a lunch",
+    },
+    stats.favorites[0]
+      ? { value: `${stats.favorites[0].wins}×`, label: "Top comeback", detail: stats.favorites[0].name }
+      : { value: "—", label: "Top comeback", detail: "No repeat winner yet" },
+  ];
+  const facts: [string, string][] = [
+    ...(stats.favoriteDay ? [["Favorite lunch day", stats.favoriteDay.day] as [string, string]] : []),
+    ...(stats.favoriteCuisine ? [["Favorite cuisine", `${stats.favoriteCuisine.cuisine} · ${stats.favoriteCuisine.wins} ${stats.favoriteCuisine.wins === 1 ? "win" : "wins"}`] as [string, string]] : []),
+    ...(stats.toughestWinner ? [["Most vetoes survived", `${stats.toughestWinner.name} · ${stats.toughestWinner.vetoes}`] as [string, string]] : []),
+    ["Waiting for a first win", `${stats.waitingForFirstWin} ${stats.waitingForFirstWin === 1 ? "place" : "places"}`],
+  ];
 
   return (
     <AppFrame>
-      <PageHeader eyebrow="The delicious data" title="Stats">
-        A little friendly competition, a lot of lunch lore.{" "}
-        <Link href="/report" className="font-medium text-accent-strong">Loop report →</Link>
-      </PageHeader>
+      <PageHeader eyebrow="Your crew in numbers" title="Stats" />
       {loading ? (
-        <p className="text-sm text-muted">
-          Loading your group’s stats…
-        </p>
+        <p className="text-[15px] text-muted">Loading your crew’s stats…</p>
       ) : error ? (
-        <div>
-          <EmptyState emoji="📊" title="Stats are unavailable">
-            {error}
-          </EmptyState>
-        </div>
+        <EmptyState emoji="📊" title="Stats are unavailable">{error}</EmptyState>
+      ) : rounds.length === 0 ? (
+        <EmptyState emoji="📊" title="Your lunch story starts here">
+          Finish a lunch to see your crew’s numbers.
+        </EmptyState>
       ) : (
         <>
-          {rounds.length === 0 ? (
-            <div>
-              <EmptyState emoji="📊" title="Your lunch story starts here">
-                Complete a lunch decision to unlock group stats and the monthly
-                recap.
-              </EmptyState>
-            </div>
-          ) : (
-            <>
-              <ListCard>
-                <li>
-                  <button
-                    type="button"
-                    disabled={!newestRestaurant}
-                    onClick={() => newestRestaurant && setDetailRestaurant(newestRestaurant)}
-                    className="flex w-full items-center gap-3 px-5 py-4 text-left hover:bg-surface-muted disabled:cursor-default"
-                  >
-                    <span className="min-w-0 flex-1">
-                      <span className="block text-sm text-muted">New on the list</span>
-                      <span className="mt-0.5 block truncate text-[15px] font-semibold">{newestRestaurant?.name ?? "No place yet"}</span>
-                    </span>
-                    {newestRestaurant?.created_at ? (
-                      <span className="shrink-0 text-sm text-subtle">
-                        {new Intl.DateTimeFormat(undefined, { month: "short", day: "numeric" }).format(new Date(newestRestaurant.created_at))}
-                      </span>
-                    ) : null}
-                    {newestRestaurant ? <span className="text-subtle" aria-hidden="true">›</span> : null}
-                  </button>
-                </li>
-                <li className="flex items-center gap-3 px-5 py-4">
-                  <span className="min-w-0 flex-1">
-                    <span className="block text-sm text-muted">Top cuisine</span>
-                    <span className="mt-0.5 block truncate text-[15px] font-semibold">{data.cuisineWins[0]?.[0] ?? "—"}</span>
-                  </span>
-                  <span className="shrink-0 text-sm text-subtle">{winsLine(data.cuisineWins[0]?.[1] ?? 0)}</span>
-                </li>
-                <li className="flex items-center gap-3 px-5 py-4">
-                  <span className="min-w-0 flex-1">
-                    <span className="block text-sm text-muted">Fresh places</span>
-                    <span className="mt-0.5 block text-[15px] font-semibold">Waiting for a first win</span>
-                  </span>
-                  <span className="shrink-0 text-[17px] font-semibold tabular-nums">{freshCount}</span>
-                </li>
-              </ListCard>
+          <dl className="grid grid-cols-2 gap-3 md:grid-cols-4">
+            {tiles.map((tile, index) => (
+              <div key={tile.label} className="rounded-[var(--ll-radius-lg)] bg-surface p-4 shadow-[var(--ll-shadow-card)]">
+                <dd className={`text-[28px] font-bold leading-tight tracking-tight tabular-nums ${index === 0 ? "text-accent-strong" : ""}`}>{tile.value}</dd>
+                <dt className="mt-1 text-[15px] font-semibold leading-5">{tile.label}</dt>
+                <dd className="mt-1 text-sm leading-5 text-muted">{tile.detail}</dd>
+              </div>
+            ))}
+          </dl>
 
-              <Card className="mt-4">
-                <dl className="grid grid-cols-2 gap-y-4 sm:grid-cols-4">
-                  {[
-                    ["Decisions", rounds.length],
-                    ["Vetoes", vetoes.length],
-                    ["Total wins", restaurants.reduce((total, restaurant) => total + restaurant.visit_count, 0)],
-                    ["Retired", restaurants.filter((restaurant) => restaurant.never_again).length],
-                  ].map(([label, value]) => (
-                    <div key={label as string}>
-                      <dt className="text-sm text-muted">{label}</dt>
-                      <dd className="mt-0.5 text-[28px] font-bold leading-tight tabular-nums">{value}</dd>
-                    </div>
-                  ))}
-                </dl>
-              </Card>
-
-              <SectionTitle className="mt-8" title="Who’s picked" />
-              <p className="mt-1 text-sm text-muted">Finished rounds where each person made the picks.</p>
+          {stats.favorites.length > 0 && (
+            <section className="mt-8">
+              <SectionTitle title="Favorites you return to" />
               <ListCard className="mt-3">
-                {members.map((member) => {
-                  const picked = rounds.filter((round) => round.suggester_id === member.user_id).length;
+                {stats.favorites.map((favorite) => {
+                  const place = restaurantById.get(favorite.id);
+                  const weeks = favorite.everyDays ? Math.max(1, Math.round(favorite.everyDays / 7)) : null;
                   return (
-                    <li key={member.user_id} className="flex items-center gap-3 px-5 py-3">
-                      <Avatar name={member.display_name} size="sm" />
-                      <span className="min-w-0 flex-1 truncate text-[15px] font-medium">{member.display_name}</span>
-                      <span className="hidden h-1.5 w-24 overflow-hidden rounded-full bg-surface-muted sm:block" aria-hidden="true">
-                        <span className="block h-full rounded-full bg-accent" style={{ width: `${(picked / maxPicked) * 100}%` }} />
-                      </span>
-                      <span className="w-16 shrink-0 text-right text-sm tabular-nums text-muted">{picked} {picked === 1 ? "round" : "rounds"}</span>
+                    <li key={favorite.id}>
+                      <button
+                        type="button"
+                        disabled={!place}
+                        onClick={() => place && setDetailRestaurant(place)}
+                        className="flex w-full items-center gap-3 px-5 py-4 text-left hover:bg-surface-muted disabled:cursor-default"
+                      >
+                        <span className="min-w-0 flex-1">
+                          <span className="block truncate text-[15px] font-semibold">{favorite.name}</span>
+                          <span className="mt-0.5 block text-sm text-muted">
+                            {favorite.wins} visits · {weeks ? `about every ${weeks === 1 ? "week" : `${weeks} weeks`}` : `last on ${shortDate(favorite.lastDate)}`}
+                          </span>
+                        </span>
+                        {place ? <span className="text-subtle" aria-hidden="true">›</span> : null}
+                      </button>
                     </li>
                   );
                 })}
               </ListCard>
-
-              <section id="cuisine-popularity" className="mt-8">
-                <SectionTitle title="Cuisine popularity" />
-                <RankedRows
-                  rows={data.cuisineWins.map(([cuisine, count]) => ({ key: cuisine, label: cuisine, value: count, unit: winsLine(count) }))}
-                  empty="No winning lunches yet."
-                />
-              </section>
-
-              <section className="mt-8">
-                <SectionTitle title="Veto habits" />
-                <p className="mt-1 text-sm text-muted">Who tends to veto what.</p>
-                <RankedRows
-                  rows={data.heat.map((pair) => ({
-                    key: `${pair.userId}-${pair.cuisine}`,
-                    label: `${memberName.get(pair.userId) ?? "A member"} × ${pair.cuisine}`,
-                    value: pair.count,
-                    unit: `${pair.count} ${pair.count === 1 ? "veto" : "vetoes"}`,
-                  }))}
-                  empty="No vetoes have been recorded yet."
-                />
-              </section>
-
-              <Card className="mt-8">
-                <p className="text-sm font-medium text-accent-strong">{monthName} recap</p>
-                <h2 className="mt-1 text-[19px] font-semibold tracking-tight">
-                  {thisMonth
-                    ? `${thisMonth} lunch ${thisMonth === 1 ? "decision" : "decisions"} so far 🍽️`
-                    : "Your next lunch sets the tone 🍽️"}
-                </h2>
-                <p className="mt-1 text-[15px] leading-6 text-muted">
-                  {favorite && favorite.visit_count > 0
-                    ? `${favorite.name} leads the list with ${winsLine(favorite.visit_count)}.`
-                    : "Add a few places and let the crew decide."}
-                </p>
-              </Card>
-            </>
+            </section>
           )}
+
+          <section className="mt-8">
+            <SectionTitle title="Little facts" />
+            <ListCard className="mt-3">
+              {facts.map(([label, value]) => (
+                <li key={label} className="flex items-center justify-between gap-4 px-5 py-3.5">
+                  <span className="min-w-0 text-[15px] text-muted">{label}</span>
+                  <span className="min-w-0 text-right text-[15px] font-semibold">{value}</span>
+                </li>
+              ))}
+            </ListCard>
+          </section>
+
+          <p className="mt-8 flex justify-center gap-6 text-[15px]">
+            <Link href="/report" className="font-medium text-accent-strong">Loop report →</Link>
+            <Link href="/history" className="font-medium text-accent-strong">History →</Link>
+          </p>
         </>
       )}
       <RestaurantDetailsDialog
         restaurant={detailRestaurant}
         onClose={() => setDetailRestaurant(null)}
-        addedBy={
-          detailRestaurant?.added_by
-            ? memberName.get(detailRestaurant.added_by)
-            : null
-        }
+        addedBy={detailRestaurant?.added_by ? memberName.get(detailRestaurant.added_by) : null}
+        timeZone={timeZone}
       />
     </AppFrame>
-  );
-}
-
-/** Top five as calm one-line rows, the rest behind “Show all”. Keeps stats from turning into a wall of data. */
-function RankedRows({ rows, empty }: { rows: { key: string; label: string; value: number; unit: string }[]; empty: string }) {
-  if (!rows.length) return <p className="mt-3 text-sm text-muted">{empty}</p>;
-  const max = Math.max(1, ...rows.map((row) => row.value));
-  const row = (item: (typeof rows)[number]) => (
-    <li key={item.key} className="flex items-center gap-3 px-5 py-3">
-      <span className="min-w-0 flex-1 truncate text-[15px]">{item.label}</span>
-      <span className="hidden h-1.5 w-24 overflow-hidden rounded-full bg-surface-muted sm:block" aria-hidden="true">
-        <span className="block h-full rounded-full bg-accent" style={{ width: `${(item.value / max) * 100}%` }} />
-      </span>
-      <span className="w-20 shrink-0 text-right text-sm tabular-nums text-muted">{item.unit}</span>
-    </li>
-  );
-  return (
-    <>
-      <ListCard className="mt-3">{rows.slice(0, 5).map(row)}</ListCard>
-      {rows.length > 5 && (
-        <details className="group mt-2">
-          <summary className="inline-flex min-h-11 cursor-pointer list-none items-center text-sm font-medium text-accent-strong">
-            <span className="group-open:hidden">Show all {rows.length}</span>
-            <span className="hidden group-open:inline">Show fewer</span>
-          </summary>
-          <ListCard className="mt-1">{rows.slice(5).map(row)}</ListCard>
-        </details>
-      )}
-    </>
   );
 }

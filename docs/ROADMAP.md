@@ -51,6 +51,16 @@ rate limits and a hosted bot challenge.
 
 Items Craig has approved for the next batch. More may be added.
 
+- Build 2026.10.31.76 (PR 18): win page reorder (winner, time, Close the
+  loop, then the progress line), the progress line with initials, a new
+  Stats page (streak, time to decide, favorites, little facts), the public
+  About page, the “An idea by Craig Kohler, brought to life with new tools”
+  footer, button consistency, “Add to home screen” in the menu, the Occasion
+  label, and the restyled My Lunch Loops page.
+- PR 19 (next, planned): bring the remaining old-style pages to the calm
+  style: Start a loop (`/start`), Join (`/join`), the no-loop welcome on Home,
+  Add a place (`/add-place`), Global admin (`/global-admin`), and the legal
+  pages’ orange callouts. My Lunch Loops was restyled in .76; check it again.
 - Build 2026.10.31.75 (PR #17, live Oct 31, 2026): the new logged-out
   home page (built from the .74 mockup, simpler and shorter on phone), the
   calm style on every Settings tab and the Loop report, and Settings tabs

@@ -58,22 +58,21 @@ export function AccountScreen() {
       <div>
         <p className="text-sm font-medium text-accent-strong">Account settings</p>
         <h1 className="mt-1 text-[28px] font-bold leading-tight tracking-tight md:text-[36px]">Your Lunch Loop account</h1>
-        <p className="mt-2 max-w-3xl text-stone-600">Choose how Lunch Loop looks on this device.</p>
+        <p className="mt-2 max-w-3xl text-[15px] leading-6 text-muted">Choose how Lunch Loop looks on this device.</p>
       </div>
 
-      <section className="mt-6 rounded-3xl border border-orange-100 bg-white p-5 shadow-sm">
-        <p className="text-xs font-bold text-orange-700">Your experience</p>
-        <h2 className="mt-1 text-xl font-black">Appearance</h2>
-        <p className="mt-2 max-w-3xl text-sm leading-6 text-stone-600">Choose the look that feels right. System follows your phone or computer&apos;s appearance setting.</p>
+      <section className="mt-6 rounded-[var(--ll-radius-lg)] bg-surface p-5 shadow-[var(--ll-shadow-card)]">
+        <h2 className="text-[19px] font-semibold tracking-tight">Appearance</h2>
+        <p className="mt-1 max-w-3xl text-[15px] leading-6 text-muted">Choose the look that feels right. System follows your phone or computer&apos;s appearance setting.</p>
         <div className="mt-4 flex flex-wrap gap-2" aria-label="Theme preference">
-          {(["system", "light", "dark"] as ThemePreference[]).map((preference) => <button key={preference} type="button" disabled={busy || loading} onClick={() => void saveTheme(preference)} className={`rounded-xl px-4 py-3 text-sm font-black capitalize disabled:opacity-60 ${themePreference === preference ? "bg-orange-500 text-white" : "bg-orange-50 text-orange-900"}`}>
+          {(["system", "light", "dark"] as ThemePreference[]).map((preference) => <button key={preference} type="button" disabled={busy || loading} onClick={() => void saveTheme(preference)} aria-pressed={themePreference === preference} className={`min-h-11 rounded-full border px-4 text-sm font-medium capitalize disabled:opacity-60 ${themePreference === preference ? "border-transparent bg-accent-soft text-accent-ink" : "border-line bg-surface text-muted hover:text-ink"}`}>
             {preference === "system" ? "🖥️ System" : preference === "light" ? "☀️ Light" : "🌙 Dark"}
           </button>)}
         </div>
       </section>
 
-      {message && <p role="status" className="mt-5 rounded-2xl bg-emerald-50 p-4 text-sm font-semibold text-emerald-800">{message}</p>}
-      {error && <p role="alert" className="mt-5 rounded-2xl bg-rose-50 p-4 text-sm font-semibold text-rose-800">{error}</p>}
+      {message && <p role="status" className="mt-5 rounded-[var(--ll-radius-md)] bg-surface p-4 text-[15px] text-ink shadow-[var(--ll-shadow-card)]">{message}</p>}
+      {error && <p role="alert" className="mt-5 rounded-[var(--ll-radius-md)] bg-danger-soft p-4 text-[15px] text-danger">{error}</p>}
     </AppFrame>
   );
 }

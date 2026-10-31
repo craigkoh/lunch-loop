@@ -47,6 +47,7 @@ export function AppFrame({ children, minimal = false }: { children: ReactNode; m
   const [menuOpen, setMenuOpen] = useState(false);
   const [switcherOpen, setSwitcherOpen] = useState(false);
   const [showInstallCard, setShowInstallCard] = useState(false);
+  const [isStandalone, setIsStandalone] = useState(true);
   const headerLoadInFlight = useRef(false);
   const userIdRef = useRef("");
   userIdRef.current = userId;
@@ -116,6 +117,7 @@ export function AppFrame({ children, minimal = false }: { children: ReactNode; m
     const standalone =
       window.matchMedia("(display-mode: standalone)").matches ||
       (navigator as Navigator & { standalone?: boolean }).standalone === true;
+    setIsStandalone(standalone);
     setShowInstallCard(!standalone && window.localStorage.getItem(installCardKey) !== "1");
   }, []);
   useEffect(() => {
@@ -206,7 +208,10 @@ export function AppFrame({ children, minimal = false }: { children: ReactNode; m
               onClick={() => void switchLoop(loop)}
               className="flex w-full items-center justify-between gap-2 px-4 py-3 text-left hover:bg-surface-muted"
             >
-              <span className="truncate">{loop.group_name}</span>
+              <span className="flex min-w-0 items-center gap-2">
+                <span className="truncate">{loop.group_name}</span>
+                {loop.loop_type === "occasion" && <OccasionLabel />}
+              </span>
               {loop.active && <span className="text-accent-strong" aria-label="Current loop">✓</span>}
             </button>
           ))}
@@ -388,6 +393,7 @@ export function AppFrame({ children, minimal = false }: { children: ReactNode; m
               {menuRow("/account", "Account")}
               {menuRow(feedbackHref, "Feedback")}
               {menuRow("/whats-new", "What’s New")}
+              {!isStandalone && menuRow("/install", "Add to home screen")}
               {donationsEnabled && menuRow("/support", fuelLinkLabel, <span className="text-xs">optional tip</span>)}
             </div>
             {isGlobalAdmin && (
@@ -422,12 +428,17 @@ function Notice({ children }: { children: ReactNode }) {
 
 /**
  * The footer on every page: the maker credit, then Build · Privacy · Terms.
- * The credit is on purpose (Craig showcases building Lunch Loop with AI).
+ * The credit is on purpose: Craig's idea, brought to life with new tools.
+ * His name links to the public /about page.
  */
 export function FooterLine({ className }: { className?: string }) {
   return (
     <footer className={cn("text-xs leading-5 text-subtle", className)}>
-      <p>Built by Craig Kohler with AI</p>
+      <p>
+        An idea by{" "}
+        <Link href="/about" className="font-medium text-muted hover:text-ink">Craig Kohler</Link>
+        , brought to life with new tools
+      </p>
       <p>
         <Link href="/whats-new" className="hover:text-ink">Build {appInfo.build}</Link>
         {" · "}
@@ -437,6 +448,11 @@ export function FooterLine({ className }: { className?: string }) {
       </p>
     </footer>
   );
+}
+
+/** The small "Occasion" tag. Standing loops (the default) stay unlabeled. */
+export function OccasionLabel() {
+  return <span className="shrink-0 rounded-full bg-surface-muted px-2 py-0.5 text-xs font-medium text-muted">Occasion</span>;
 }
 
 export function EmptyState({

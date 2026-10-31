@@ -71,11 +71,12 @@ copy of their existing additions before inviting anyone else.
 | Home | Live decision, the next action, remaining vetoes, planned meal time, and list facts. |
 | Add Place | Google Places search and multi-select add flow. |
 | Lunch Database | Private search, contributor/cuisine filters, useful sorts, restaurant facts, map, and directions. |
-| History and Stats | Completed choices by month, vetoes, never-again places, who’s picked, cuisine popularity, veto habits (top five, then “Show all”), and recap facts. Both link to the Loop report. |
+| History and Stats | History: completed choices by month, vetoes, never-again places. Stats (build .76): New places tried, average and fastest time to decide, weekly lunch streak, top comeback, “Favorites you return to”, and “Little facts” (favorite day, favorite cuisine, most vetoes survived, waiting for a first win). Both link to the Loop report. |
+| About | Public `/about` (signed in or out): Craig’s story, the live-TV home-automation clip as a thumbnail that links to YouTube, and his links. The footer credit (“An idea by Craig Kohler, brought to life with new tools”) links here. |
 | Loop report | `/report`: a one-page summary (lunches, places, different winners, vetoes, top winners, who suggested, vetoes by person, lunch lore). Stats that would read 0 or 1 awkwardly stay hidden for new loops. Any member can download the loop CSV here. |
 | Settings | Tabs (one segmented row that fits a phone): Crew, Area, Places, and Owner. Owner controls for people, Standing rotation or Occasion crew, invitations, area/radius/time zone, cleanup, export/archive/transfer, and Discord. |
 | Account settings | Saved System, Light, or Dark appearance. The same theme is applied across signed-in, public, install, and legal pages. |
-| My Loops | Active-loop switcher and loop management. An account can own up to the site-wide configured number of active loops (initially four). |
+| My Loops | Active-loop switcher and loop management. Occasion loops carry a small “Occasion” label here, in the header switcher, and in Settings → Area; Standing loops are unlabeled. An account can own up to the site-wide configured number of active loops (initially four). |
 | Feedback | Signed-in bug, idea, question, and note submission. A Feedback / Report a bug button on signed-in pages opens the form with the current page and build filled in. After a decision is closed, a light prompt appears at most once every 14 days. |
 | Value for Value | Optional, and a new database keeps `donations_enabled` off until Global Admin turns it on (production has it on). When it is on, the footer can show a small “Fuel the loop” link to `/support`, and a finished pick can show one dismissible note beside the restaurant result on a tablet or desktop, and under that result on a phone. It is random: about 1 in 4 picks show nothing; otherwise a paper receipt, a one-liner, or a tip jar, equally likely, never the same style twice in a row. “Not now” hides that note for that pick only. The receipt is headed “Tip the loop?”, prints real facts about that lunch (places in the running, vetoes, time to decide, distance, visit number, days since the last visit, rating, cuisine, who suggested it, ads shown 0), says “Lunch Loop is free. This is an optional tip.”, and has a “Tip the loop ($1–3)” button. The page explains the idea, says a couple of bucks is plenty, and opens Stripe in a new tab. It does not change restaurant selection or unlock features. When the switch is off, every note and the footer link stay hidden, and `/support` says support isn’t open. |
 
@@ -161,6 +162,6 @@ a credit, and do not publish the reporter’s email address.
 ## Install on a phone
 
 Lunch Loop is a Progressive Web App. The landing page and signed-in app link to
-/install with iPhone/iPad and Android instructions. Installed apps refresh when
+/install with iPhone/iPad and Android instructions (the menu has an “Add to home screen” row whenever Lunch Loop is not already open as an installed app). Installed apps refresh when
 foregrounded, receive live updates when available, and recheck active state
 periodically. Share https://lunchloop.app, not the legacy Vercel address.

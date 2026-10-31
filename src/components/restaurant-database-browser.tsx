@@ -82,7 +82,7 @@ export function RestaurantSearchFilters({
               key={option}
               type="button"
               onClick={() => onSortChange(option)}
-              className={`min-h-10 whitespace-nowrap rounded-full px-3.5 text-sm font-medium ${sort === option ? "bg-accent-strong text-on-accent" : "border border-line bg-surface text-muted hover:text-ink"}`}
+              className={`min-h-10 whitespace-nowrap rounded-full px-3.5 text-sm font-medium ${sort === option ? "border border-transparent bg-accent-soft text-accent-ink" : "border border-line bg-surface text-muted hover:text-ink"}`}
             >
               {sortLabels[option]}
             </button>

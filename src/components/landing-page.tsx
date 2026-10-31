@@ -149,11 +149,11 @@ export function LandingPage() {
 
         <footer className="py-12 text-center text-muted">
           <p className="font-medium text-ink">
-            Built by{" "}
-            <a href="https://craigkohler.com" target="_blank" rel="noreferrer" className="text-accent-strong hover:underline">
+            An idea by{" "}
+            <Link href="/about" className="text-accent-strong hover:underline">
               Craig Kohler
-            </a>{" "}
-            with AI
+            </Link>
+            , brought to life with new tools
           </p>
           <div className="mt-2 flex flex-wrap items-center justify-center gap-x-6">
             <Link href="/whats-new" className="inline-flex min-h-11 items-center hover:text-ink">What’s New</Link>

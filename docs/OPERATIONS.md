@@ -71,9 +71,9 @@ Fixtures: `supabase/tests/activity-log-fixture.sql` and
 on staging). `scripts/backup/export.sql` now includes `lunch_loop_activity`
 and `lunch_loop_milestone_dismissals` (counts and rows).
 
-### Activity trigger EXECUTE revoke (build .74, pending production)
+### Activity trigger EXECUTE revoke (build .74, live)
 
-`20261031050909_revoke_activity_trigger_execute.sql` revokes EXECUTE on the
+`20261031055723_revoke_activity_trigger_execute.sql` revokes EXECUTE on the
 five `log_*_activity` trigger functions from `public`, `anon`, and
 `authenticated` (Supabase security advisor: security definer functions
 executable by anon/authenticated). The triggers keep firing because Postgres
@@ -83,9 +83,15 @@ checks EXECUTE on a trigger function only when the trigger is created.
   log fixture still passes (sessions, candidates, vetoes, restaurants and
   members all log), and `has_function_privilege` shows no EXECUTE for `anon` or
   `authenticated` on all five.
-- Production: apply only after the PR is merged, after a checksummed backup
-  (`scripts/backup/export.sql` plus `lunch-loop-backup.sh`). Then rename the
-  file to the version production records, as above.
+- Production: applied Oct 31, 2026 after merge, following backup
+  `20261031-005716` (21 tables, 263 rows, 3 accounts, 51 migrations).
+  Production recorded `20261031055723`, so the repo file was renamed to that
+  version (staging keeps `20261031050909` in its history). All five functions
+  show no EXECUTE for `anon` or `authenticated`, and the security advisor no
+  longer lists any `log_*_activity` function. Still listed, on purpose:
+  `log_loop_report_view` (called by the report page) and the other app RPCs,
+  `get_donations_enabled` for `anon` (logged-out donation check), and leaked
+  password protection (not used; sign-in is magic link and Google).
 
 At least monthly, review Global Admin feedback (set each item’s status there;
 the sender sees it as Received → Looking at it → Planned → Live), suspended groups, invite

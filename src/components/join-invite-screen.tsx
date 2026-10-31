@@ -53,8 +53,8 @@ export function JoinInviteScreen() {
     <main className="grid min-h-dvh place-items-center bg-[#fffaf3] p-4">
       <section className="w-full max-w-lg rounded-3xl bg-white p-7 shadow-xl shadow-orange-100">
         <div className="text-4xl">🍽️</div>
-        <p className="mt-4 text-sm font-bold uppercase tracking-widest text-orange-600">One-time invitation</p>
-        <h1 className="mt-1 text-3xl font-black">Join a Lunch Loop</h1>
+        <p className="mt-4 text-sm font-medium text-accent-strong">One-time invitation</p>
+        <h1 className="mt-1 text-[28px] font-bold leading-tight tracking-tight md:text-[36px]">Join a Lunch Loop</h1>
         <p className="mt-2 text-stone-600">You’re about to join a crew’s places, picks, and lunch lore. Email invitations must match the email address the owner invited, whether you sign in with Google or a one-time email link. A shareable one-time code works for the first person who uses it.</p>
         {loading ? <p className="mt-6 text-sm font-semibold text-stone-500">Checking your secure sign-in…</p> : !signedIn ? (
           <Link href={`/sign-in?next=${encodeURIComponent(currentPath)}`} className="mt-6 inline-flex min-h-11 items-center rounded-xl bg-orange-500 px-5 py-3 text-sm font-black text-white">Sign in to continue →</Link>

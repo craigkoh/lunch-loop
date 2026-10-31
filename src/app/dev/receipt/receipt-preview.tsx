@@ -38,7 +38,7 @@ function Hero({ style, facts, label }: { style: NudgeStyle; facts: PickNudgeFact
     <section className="relative overflow-hidden rounded-3xl bg-orange-500 p-4 text-white shadow-lg shadow-orange-200 sm:p-6">
       <div className="pick-layout relative">
         <div className="pick-main min-w-0">
-          <p className="text-sm font-bold uppercase tracking-widest text-orange-100">{label}</p>
+          <p className="text-sm font-bold text-orange-100">{label}</p>
           <h1 className="mt-1 text-3xl font-black tracking-tight">{facts.restaurantName} wins!</h1>
           <p className="mt-3 text-orange-50">Fixture data. This page only exists in local development.</p>
         </div>

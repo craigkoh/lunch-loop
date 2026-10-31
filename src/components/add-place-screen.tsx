@@ -216,10 +216,10 @@ export function AddPlaceScreen() {
   return (
     <AppFrame>
       <div className="max-w-2xl">
-        <p className="text-sm font-bold uppercase tracking-widest text-orange-600">
+        <p className="text-sm font-medium text-accent-strong">
           Build the list
         </p>
-        <h1 className="mt-1 text-3xl font-black tracking-tight">
+        <h1 className="mt-1 text-[28px] font-bold leading-tight tracking-tight md:text-[36px]">
           Add a lunch spot
         </h1>
         <p className="mt-2 text-stone-600">

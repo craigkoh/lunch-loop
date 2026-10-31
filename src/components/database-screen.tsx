@@ -1,7 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRefreshOnFocus } from "@/lib/use-refresh-on-focus";
 import Link from "next/link";
+import { buttonClass } from "./ui/button";
 import { AppFrame, EmptyState } from "./app-frame";
 import {
   RestaurantDatabaseBrowser,
@@ -22,11 +24,16 @@ export function DatabaseScreen({
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [timeZone, setTimeZone] = useState("America/Chicago");
+  const [isOwner, setIsOwner] = useState(false);
+  // Fresh data when the app comes back into view (no Refresh button).
+  const [reloadKey, setReloadKey] = useState(0);
+  useRefreshOnFocus(() => setReloadKey((key) => key + 1));
   useEffect(() => {
     async function load() {
       try {
         const group = await getGroupContext();
         setTimeZone(group.timeZone);
+        setIsOwner(group.role === "owner");
         const { data, error: loadError } = await createClient()
           .from("restaurants")
           .select("*, profiles!restaurants_added_by_fkey(display_name)")
@@ -44,32 +51,31 @@ export function DatabaseScreen({
       }
     }
     void load();
-  }, []);
+  }, [reloadKey]);
   return (
     <AppFrame>
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <p className="text-sm font-bold uppercase tracking-widest text-orange-600">
-            Shared knowledge
+          <p className="text-sm font-medium text-accent-strong">
+            Your loop’s list
           </p>
-          <h1 className="mt-1 text-3xl font-black tracking-tight">
-            Lunch database
+          <h1 className="mt-1 text-[28px] font-bold leading-tight tracking-tight md:text-[36px]">
+            Places
           </h1>
-          <p className="mt-2 text-stone-600">
-            Every place your group can choose from. Tap any place for details,
-            map, hours, and directions.
+          <p className="mt-2 text-[15px] text-muted">
+            Every place the crew can pick. Tap one for the map, hours, and directions.
           </p>
         </div>
         <Link
           href="/add-place"
-          className="rounded-xl bg-orange-500 px-4 py-3 text-sm font-black text-white"
+          className={buttonClass("primary")}
         >
-          Add place
+          ＋ Add place
         </Link>
       </div>
       {loading ? (
         <p className="mt-6 text-sm font-semibold text-stone-500">
-          Loading the lunch database…
+          Loading places…
         </p>
       ) : error ? (
         <div className="mt-6">
@@ -79,7 +85,15 @@ export function DatabaseScreen({
         </div>
       ) : (
         <>
-          <RestaurantDatabaseBrowser restaurants={restaurants} initialSort={initialSort} timeZone={timeZone} />
+          <RestaurantDatabaseBrowser
+            restaurants={restaurants}
+            initialSort={initialSort}
+            timeZone={timeZone}
+            canManage={isOwner}
+            onNeverAgainChange={(place, neverAgain) =>
+              setRestaurants((current) => current.map((item) => (item.id === place.id ? { ...item, never_again: neverAgain } : item)))
+            }
+          />
         </>
       )}
     </AppFrame>

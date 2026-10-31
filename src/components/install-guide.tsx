@@ -147,7 +147,7 @@ export function InstallGuide() {
                 <span>{platform === "iphone" ? "▮▮▮ ᯤ" : "◒ ◔ ▰"}</span>
               </div>
               <div className="mt-5 rounded-2xl bg-orange-500 p-4 text-white shadow-lg shadow-orange-200">
-                <p className="text-[10px] font-black uppercase tracking-widest text-orange-100">
+                <p className="text-[10px] font-black text-orange-100">
                   lunchloop.app
                 </p>
                 <p className="mt-2 text-xl font-black leading-tight">

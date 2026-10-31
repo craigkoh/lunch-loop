@@ -1,5 +1,75 @@
 # Release Notes
 
+## Build 2026.10.31.73 (Saturday, October 31, 2026; prepared Friday, October 30)
+
+A calmer, friendlier look (mockup D, Things-inspired, orange as the only
+accent), the same for members, owners, and admins, with dark mode on every
+page.
+
+Where things moved:
+
+- Phone: a slim header (logo, loop switcher, your initials) and a bottom bar
+  with Home, Places, History, and Stats. Add place is inside Places (and a
+  button on Home). iPad and desktop get a sidebar with the same items plus
+  Loop report.
+- Your initials open the menu: My Loops, Loop settings, Loop report,
+  Account, Feedback, What’s New, Fuel the loop (only when donations are on),
+  an Admin group for site admins, and Log out.
+- The footer is one line: Build · Privacy · Terms. Craig’s name stays on the
+  legal, support, and landing pages, not on every app page.
+- Owner tools are the “Owner” section in Loop settings.
+- The Refresh button is gone; pages reload when you come back to the app.
+
+Design system:
+
+- Tokens in `src/styles/tokens.css` (light and dark), read by Tailwind
+  through `@theme`. Shared components in `src/components/ui/`. See
+  [Design](DESIGN.md#design-tokens-build-73-oct-31-2026).
+- Labeled buttons use deep orange `#C2410C` (white text 5.2:1) instead of
+  `#F97316` (2.8:1, failed contrast). Dark mode uses `#FB923C` with dark ink.
+
+Home:
+
+- Text hero, a round card with avatars and Picks → Vetoes → Winner, veto
+  rows with one line each, the meal time folded into a “Change” row, one
+  milestone card, a one-line Places list, one quiet lunch-lore line, and
+  “View loop report →”. The rotating donation notes still appear after a pick
+  and still say plainly that they are optional tips.
+
+Places:
+
+- One-line cards (“Mexican · 🏆 2 wins”). Owners can mark a place “Never
+  again” or bring it back from its details (same permission as Settings).
+- Google Maps attribution stays on the list and in the details sheet.
+
+Milestones:
+
+- 10th/25th/50th lunch, the loop’s one-year anniversary, a place’s first win,
+  and a new member’s first lunch. Computed from existing data by
+  `get_my_loop_milestone_facts` and `src/lib/milestones.ts`; one shows at a
+  time for 14 days. Dismissals are saved per person
+  (`lunch_loop_milestone_dismissals`).
+
+Feedback:
+
+- One Feedback entry in the menu, plus “💡 Ideas?” on the Loop report.
+- “My feedback” shows Received → Looking at it → Planned → Live. Global
+  Admin uses the same friendly names when setting status. The database
+  values and the webhook are unchanged.
+
+Activity log (private):
+
+- `lunch_loop_activity` records loop events (round started, picks or time
+  changed, veto, winner, finished or cancelled, place added, never again on
+  or off, member joined or left, report viewed, CSV downloaded). Triggers and
+  a service-only function write it; only site admins can read it; rows cannot
+  be edited. No notes or veto reasons are copied. Deleted with the loop; ids
+  cleared when an account is deleted. The Privacy Policy explains it.
+
+Database: three migrations (see [Operations](OPERATIONS.md)), tested on
+staging with new fixtures. Production needs a backup, then the migrations,
+after merge.
+
 ## Build 2026.10.30.72 (Friday, October 30, 2026)
 
 Wording (Chris’s feedback): “picked” meant a place won a lunch, which read

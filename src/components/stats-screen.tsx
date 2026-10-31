@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRefreshOnFocus } from "@/lib/use-refresh-on-focus";
 import { useEffect, useMemo, useState } from "react";
 import { AppFrame, EmptyState } from "./app-frame";
 import { RestaurantDetailsDialog } from "./restaurant-details-dialog";
@@ -34,6 +35,9 @@ export function StatsScreen() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
+  // Fresh data when the app comes back into view (no Refresh button).
+  const [reloadKey, setReloadKey] = useState(0);
+  useRefreshOnFocus(() => setReloadKey((key) => key + 1));
   useEffect(() => {
     async function load() {
       try {
@@ -104,7 +108,7 @@ export function StatsScreen() {
       }
     }
     void load();
-  }, []);
+  }, [reloadKey]);
 
   const data = useMemo(() => {
     const restaurantById = new Map(
@@ -160,10 +164,10 @@ export function StatsScreen() {
 
   return (
     <AppFrame>
-      <p className="text-sm font-bold uppercase tracking-widest text-orange-600">
+      <p className="text-sm font-medium text-accent-strong">
         The delicious data
       </p>
-      <h1 className="mt-1 text-3xl font-black tracking-tight">Group stats</h1>
+      <h1 className="mt-1 text-[28px] font-bold leading-tight tracking-tight md:text-[36px]">Stats</h1>
       <p className="mt-2 text-stone-600">
         A little friendly competition, a lot of lunch lore.
       </p>
@@ -201,7 +205,7 @@ export function StatsScreen() {
                   onClick={() =>
                     newestRestaurant && setDetailRestaurant(newestRestaurant)
                   }
-                  className="rounded-2xl bg-orange-500 p-4 text-left text-white transition hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-orange-300 disabled:cursor-default"
+                  className="ll-calm rounded-2xl p-4 text-left transition hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-orange-300 disabled:cursor-default"
                 >
                   <p className="text-sm font-bold text-orange-100">
                     New on the list
@@ -376,7 +380,7 @@ export function StatsScreen() {
                 </div>
               </section>
               <section className="mt-8 rounded-3xl bg-amber-100 p-5">
-                <p className="text-sm font-bold uppercase tracking-widest text-amber-800">
+                <p className="text-sm font-bold text-amber-800">
                   {monthName} recap
                 </p>
                 <h2 className="mt-1 text-xl font-black">

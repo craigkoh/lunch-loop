@@ -1,86 +1,88 @@
 @import "tailwindcss";
+@import "../styles/tokens.css";
 
 :root {
-  --background: #fffaf3;
-  --foreground: #292524;
+  --background: var(--ll-bg);
+  --foreground: var(--ll-text);
 }
 
 :root[data-theme="dark"] {
-  --background: #17120f;
-  --foreground: #f8f1eb;
+  --background: var(--ll-bg);
+  --foreground: var(--ll-text);
   color-scheme: dark;
 }
 
-:root[data-theme="dark"] body,
-:root[data-theme="dark"] [class~="bg-[#fffaf3]"],
-:root[data-theme="dark"] [class~="bg-[#fffaf3]/95"] {
-  background-color: #17120f !important;
-}
+/* Older screens hard-coded the cream page color; it now follows the token. */
+[class~="bg-[#fffaf3]"] { background-color: var(--ll-bg) !important; }
+[class~="bg-[#fffaf3]/95"] { background-color: color-mix(in srgb, var(--ll-bg) 90%, transparent) !important; }
 
-/* App chrome is intentionally quiet in dark mode; orange remains reserved for
-   the same important actions and celebration panels used by the light theme. */
-:root[data-theme="dark"] header,
-:root[data-theme="dark"] footer,
-:root[data-theme="dark"] nav[aria-label="Primary"] {
-  background-color: #201914 !important;
-}
+/* White text on #F97316 is 2.8:1, so filled orange buttons use the strong accent. */
+.bg-orange-500.text-white,
+.bg-orange-600.text-white,
+.bg-amber-500.text-white { background-color: var(--ll-accent-strong) !important; color: var(--ll-on-accent) !important; }
 
-:root[data-theme="dark"] .bg-white {
-  background-color: #2a231e !important;
-}
-
-:root[data-theme="dark"] .bg-stone-50 { background-color: #211b17 !important; }
+/* Dark mode: black page, #1c1c1e surfaces, the same orange. Older class names
+   are mapped here so every screen follows without its own dark: variants. */
+:root[data-theme="dark"] body { background-color: var(--ll-bg) !important; }
+:root[data-theme="dark"] .bg-white { background-color: var(--ll-surface) !important; }
+:root[data-theme="dark"] .bg-white\/95,
+:root[data-theme="dark"] .bg-white\/85,
+:root[data-theme="dark"] .bg-white\/70 { background-color: rgb(28 28 30 / 0.9) !important; }
+:root[data-theme="dark"] .bg-stone-50 { background-color: #151517 !important; }
 :root[data-theme="dark"] .bg-stone-100,
-:root[data-theme="dark"] .bg-stone-200 { background-color: #332922 !important; }
-:root[data-theme="dark"] .bg-orange-50 { background-color: #352518 !important; }
-:root[data-theme="dark"] .bg-orange-100 { background-color: #482e19 !important; }
-:root[data-theme="dark"] .bg-amber-50 { background-color: #332a17 !important; }
-:root[data-theme="dark"] .bg-amber-100 { background-color: #453718 !important; }
+:root[data-theme="dark"] .bg-stone-200 { background-color: #2c2c2e !important; }
+:root[data-theme="dark"] .bg-orange-50,
+:root[data-theme="dark"] .bg-amber-50 { background-color: #2a1d14 !important; }
+:root[data-theme="dark"] .bg-orange-100,
+:root[data-theme="dark"] .bg-amber-100,
+:root[data-theme="dark"] .bg-amber-200 { background-color: #3a2717 !important; }
 :root[data-theme="dark"] .bg-emerald-50,
-:root[data-theme="dark"] .bg-emerald-50\/50 { background-color: #18342d !important; }
-:root[data-theme="dark"] .bg-emerald-100 { background-color: #1d4238 !important; }
-:root[data-theme="dark"] .bg-rose-50 { background-color: #3a2024 !important; }
-:root[data-theme="dark"] .bg-rose-100 { background-color: #4b252c !important; }
-:root[data-theme="dark"] .bg-violet-100 { background-color: #30273f !important; }
-:root[data-theme="dark"] .bg-indigo-50\/60 { background-color: #25283d !important; }
+:root[data-theme="dark"] .bg-emerald-50\/50,
+:root[data-theme="dark"] .bg-emerald-100,
+:root[data-theme="dark"] .bg-violet-100,
+:root[data-theme="dark"] .bg-indigo-50,
+:root[data-theme="dark"] .bg-indigo-50\/60 { background-color: #2c2c2e !important; }
+:root[data-theme="dark"] .bg-rose-50 { background-color: #3a1d22 !important; }
+:root[data-theme="dark"] .bg-rose-100 { background-color: #4b2128 !important; }
 
-:root[data-theme="dark"] .hover\:bg-orange-50:hover { background-color: #482e19 !important; }
-:root[data-theme="dark"] .hover\:bg-orange-100:hover { background-color: #5c391d !important; }
-:root[data-theme="dark"] .hover\:bg-stone-50:hover { background-color: #332922 !important; }
+:root[data-theme="dark"] .hover\:bg-orange-50:hover,
+:root[data-theme="dark"] .hover\:bg-orange-100:hover { background-color: #3a2717 !important; }
+:root[data-theme="dark"] .hover\:bg-stone-50:hover,
+:root[data-theme="dark"] .hover\:bg-stone-100:hover { background-color: #2c2c2e !important; }
 
+:root[data-theme="dark"] .text-stone-950,
 :root[data-theme="dark"] .text-stone-900,
-:root[data-theme="dark"] .text-stone-800 { color: #f8f1eb !important; }
-:root[data-theme="dark"] .text-stone-700 { color: #e7dbd2 !important; }
-:root[data-theme="dark"] .text-stone-600 { color: #d0c1b6 !important; }
-:root[data-theme="dark"] .text-stone-500 { color: #baaba0 !important; }
-:root[data-theme="dark"] .text-stone-400 { color: #a5968c !important; }
-:root[data-theme="dark"] .text-stone-300 { color: #908179 !important; }
+:root[data-theme="dark"] .text-stone-800,
+:root[data-theme="dark"] .text-emerald-950,
+:root[data-theme="dark"] .text-emerald-900,
+:root[data-theme="dark"] .text-violet-900 { color: #f2f2f7 !important; }
+:root[data-theme="dark"] .text-stone-700,
+:root[data-theme="dark"] .text-emerald-800,
+:root[data-theme="dark"] .text-emerald-700,
+:root[data-theme="dark"] .text-indigo-800,
+:root[data-theme="dark"] .text-indigo-700 { color: #d1d1d6 !important; }
+:root[data-theme="dark"] .text-stone-600 { color: #b4b4b9 !important; }
+:root[data-theme="dark"] .text-stone-500 { color: #a1a1a6 !important; }
+:root[data-theme="dark"] .text-stone-400 { color: #8e8e93 !important; }
+:root[data-theme="dark"] .text-stone-300 { color: #636366 !important; }
 
 :root[data-theme="dark"] .text-orange-950,
-:root[data-theme="dark"] .text-orange-900 { color: #ffe6d0 !important; }
-:root[data-theme="dark"] .text-orange-800 { color: #ffd0a3 !important; }
-:root[data-theme="dark"] .text-orange-700 { color: #ffc183 !important; }
-:root[data-theme="dark"] .text-orange-600 { color: #ffb36b !important; }
-
+:root[data-theme="dark"] .text-orange-900,
 :root[data-theme="dark"] .text-amber-950,
-:root[data-theme="dark"] .text-amber-900 { color: #ffe9a9 !important; }
+:root[data-theme="dark"] .text-amber-900 { color: #ffe4cc !important; }
+:root[data-theme="dark"] .text-orange-800,
+:root[data-theme="dark"] .text-orange-700,
+:root[data-theme="dark"] .text-orange-600,
 :root[data-theme="dark"] .text-amber-800,
-:root[data-theme="dark"] .text-amber-700 { color: #ffdb72 !important; }
-
-:root[data-theme="dark"] .text-emerald-950,
-:root[data-theme="dark"] .text-emerald-900 { color: #c8f5df !important; }
-:root[data-theme="dark"] .text-emerald-800,
-:root[data-theme="dark"] .text-emerald-700 { color: #9ce7c1 !important; }
+:root[data-theme="dark"] .text-amber-700,
+:root[data-theme="dark"] .text-accent-strong,
+:root[data-theme="dark"] .text-accent-ink { color: #fdba74 !important; }
 
 :root[data-theme="dark"] .text-rose-950,
 :root[data-theme="dark"] .text-rose-900 { color: #ffe2e5 !important; }
 :root[data-theme="dark"] .text-rose-800,
 :root[data-theme="dark"] .text-rose-700,
-:root[data-theme="dark"] .text-rose-600 { color: #ffb8c1 !important; }
-
-:root[data-theme="dark"] .text-indigo-800,
-:root[data-theme="dark"] .text-indigo-700,
-:root[data-theme="dark"] .text-violet-900 { color: #ddd2ff !important; }
+:root[data-theme="dark"] .text-rose-600 { color: #fda4af !important; }
 
 :root[data-theme="dark"] .border-stone-100,
 :root[data-theme="dark"] .border-stone-200,
@@ -94,34 +96,25 @@
 :root[data-theme="dark"] .border-rose-200,
 :root[data-theme="dark"] .border-rose-300,
 :root[data-theme="dark"] .border-indigo-100,
-:root[data-theme="dark"] .border-indigo-200 {
-  border-color: #5c4838 !important;
-}
+:root[data-theme="dark"] .border-indigo-200 { border-color: rgb(255 255 255 / 0.12) !important; }
+:root[data-theme="dark"] .ring-stone-200,
+:root[data-theme="dark"] .ring-orange-100,
+:root[data-theme="dark"] .ring-orange-200,
+:root[data-theme="dark"] .ring-amber-200 { --tw-ring-color: rgb(255 255 255 / 0.12) !important; }
 
 :root[data-theme="dark"] input,
 :root[data-theme="dark"] select,
 :root[data-theme="dark"] textarea {
-  background-color: #211b17 !important;
-  color: #fff8f2 !important;
-  border-color: #72533b !important;
+  background-color: #1c1c1e !important;
+  color: #f2f2f7 !important;
+  border-color: rgb(255 255 255 / 0.16) !important;
 }
-
 :root[data-theme="dark"] input::placeholder,
-:root[data-theme="dark"] textarea::placeholder {
-  color: #aa9b90 !important;
-}
-
+:root[data-theme="dark"] textarea::placeholder { color: #8e8e93 !important; }
 :root[data-theme="dark"] input:disabled,
 :root[data-theme="dark"] select:disabled,
-:root[data-theme="dark"] textarea:disabled {
-  background-color: #302720 !important;
-  color: #9d8e83 !important;
-}
-
-:root[data-theme="dark"] option {
-  background-color: #211b17;
-  color: #fff8f2;
-}
+:root[data-theme="dark"] textarea:disabled { background-color: #2c2c2e !important; color: #8e8e93 !important; }
+:root[data-theme="dark"] option { background-color: #1c1c1e; color: #f2f2f7; }
 
 @theme inline {
   --color-background: var(--background);
@@ -131,7 +124,8 @@
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--ll-font);
+  -webkit-font-smoothing: antialiased;
 }
 
 * {
@@ -277,17 +271,17 @@ input {
 }
 
 :root[data-theme="dark"] .lunch-receipt-sheet {
-  --receipt-paper: #2a231e;
-  --receipt-ink: #f8f1eb;
-  --receipt-muted: #d0c1b6;
+  --receipt-paper: #1c1c1e;
+  --receipt-ink: #f2f2f7;
+  --receipt-muted: #a1a1a6;
   --receipt-accent: #ffb36b;
-  --receipt-rule: #5c4838;
+  --receipt-rule: #3a3a3c;
   --receipt-button: #fb923c;
   --receipt-button-ink: #2a1205;
 }
 
 :root[data-theme="dark"] .lunch-receipt {
-  border-color: #5c4838;
+  border-color: #3a3a3c;
 }
 
 .lunch-receipt-button {
@@ -333,4 +327,32 @@ input {
   align-items: center;
   height: 100%;
   padding: 0;
+}
+:root[data-theme="dark"] .dark-track { background-color: #3a3a3c !important; }
+
+/*
+ * Calm panel: turns an older full-orange feature panel into a plain card so
+ * orange stays an accent (buttons, links, progress) rather than a background.
+ */
+.ll-calm {
+  background: var(--ll-surface) !important;
+  color: var(--ll-text) !important;
+  box-shadow: var(--ll-shadow-card) !important;
+}
+.ll-calm .text-white:not([class*="bg-orange-"]):not([class*="bg-rose-"]) {
+  color: var(--ll-text) !important;
+}
+.ll-calm .text-orange-50,
+.ll-calm .text-orange-100 {
+  color: var(--ll-text-muted) !important;
+}
+.ll-calm .bg-white,
+.ll-calm .bg-white\/95,
+.ll-calm .bg-white\/20,
+.ll-calm .bg-white\/15,
+.ll-calm .bg-white\/10 {
+  background: var(--ll-surface-muted) !important;
+}
+.ll-calm [class*="border-white"] {
+  border-color: var(--ll-border) !important;
 }

@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRefreshOnFocus } from "@/lib/use-refresh-on-focus";
 import { useEffect, useMemo, useState } from "react";
 import { AppFrame, EmptyState } from "./app-frame";
 import { RestaurantDetailsDialog } from "./restaurant-details-dialog";
@@ -46,6 +47,9 @@ export function ReportScreen() {
   const [downloading, setDownloading] = useState(false);
   const [downloadMessage, setDownloadMessage] = useState("");
 
+  // Fresh data when the app comes back into view (no Refresh button).
+  const [reloadKey, setReloadKey] = useState(0);
+  useRefreshOnFocus(() => setReloadKey((key) => key + 1));
   useEffect(() => {
     async function load() {
       try {
@@ -79,6 +83,8 @@ export function ReportScreen() {
           : { data: [], error: null };
         if (vetoResult.error) throw vetoResult.error;
         setContext(loopContext);
+        // Quiet usage note for future reporting; never blocks the report.
+        void supabase.rpc("log_loop_report_view", { target_group: loopContext.groupId }).then(() => undefined, () => undefined);
         setMembers(roster);
         setRestaurants((restaurantResult.data ?? []) as Restaurant[]);
         setRounds(completed);
@@ -91,7 +97,7 @@ export function ReportScreen() {
       }
     }
     void load();
-  }, []);
+  }, [reloadKey]);
 
   const timeZone = context?.timeZone ?? "America/Chicago";
   const report = useMemo(() => {
@@ -207,8 +213,8 @@ export function ReportScreen() {
 
   return (
     <AppFrame>
-      <p className="text-sm font-bold uppercase tracking-widest text-orange-600">Loop report</p>
-      <h1 className="mt-1 text-3xl font-black tracking-tight">{context?.groupName ?? "Your Lunch Loop"}</h1>
+      <p className="text-sm font-medium text-accent-strong">Loop report</p>
+      <h1 className="mt-1 text-[28px] font-bold leading-tight tracking-tight md:text-[36px]">{context?.groupName ?? "Your Lunch Loop"}</h1>
       <p className="mt-2 text-stone-600">
         {report.firstDate
           ? `Your loop’s story since ${dateLabel(report.firstDate, timeZone)}.`
@@ -242,7 +248,7 @@ export function ReportScreen() {
                 ]
                   .filter((card) => card.show)
                   .map((card) => (
-                    <div key={card.label} className={card.accent ? "rounded-2xl bg-orange-500 p-4 text-white" : "rounded-2xl bg-white p-4 shadow-sm"}>
+                    <div key={card.label} className={card.accent ? "ll-calm rounded-2xl p-4 [&_p:first-child]:text-accent-strong" : "rounded-2xl bg-white p-4 shadow-sm"}>
                       <p className="text-3xl font-black">{card.value}</p>
                       <p className={card.accent ? "text-sm font-bold text-orange-50" : "text-sm text-stone-500"}>{card.label}</p>
                     </div>
@@ -308,7 +314,7 @@ export function ReportScreen() {
 
               {report.facts.length > 0 && (
                 <section className="mt-6 rounded-3xl bg-amber-100 p-5">
-                  <p className="text-sm font-bold uppercase tracking-widest text-amber-800">Lunch lore</p>
+                  <p className="text-sm font-bold text-amber-800">Lunch lore</p>
                   <ul className="mt-2 list-disc space-y-1 pl-5 text-stone-800">
                     {report.facts.map((fact) => (
                       <li key={fact}>{fact}</li>
@@ -342,6 +348,8 @@ export function ReportScreen() {
             <Link href="/stats" className="font-bold text-orange-700 hover:underline">📊 See all stats</Link>
             {" · "}
             <Link href="/history" className="font-bold text-orange-700 hover:underline">🗓️ Lunch history</Link>
+            {" · "}
+            <Link href="/feedback?page=/report" className="font-bold text-orange-700 hover:underline">💡 Ideas?</Link>
           </p>
         </>
       )}

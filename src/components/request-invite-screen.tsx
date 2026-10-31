@@ -124,7 +124,7 @@ export function RequestInviteScreen() {
         <p className="mt-7 text-xs font-black uppercase tracking-[0.18em] text-orange-600">
           Invite-only early access
         </p>
-        <h1 className="mt-2 text-3xl font-black tracking-tight sm:text-4xl">
+        <h1 className="mt-2 text-[28px] font-bold leading-tight tracking-tight md:text-[36px] sm:text-4xl">
           Request a Lunch Loop invite
         </h1>
         <p className="mt-3 max-w-lg text-sm leading-6 text-stone-600">

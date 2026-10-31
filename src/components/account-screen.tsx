@@ -56,13 +56,13 @@ export function AccountScreen() {
   return (
     <AppFrame>
       <div>
-        <p className="text-sm font-bold uppercase tracking-widest text-orange-600">Account settings</p>
-        <h1 className="mt-1 text-3xl font-black tracking-tight">Your Lunch Loop account</h1>
+        <p className="text-sm font-medium text-accent-strong">Account settings</p>
+        <h1 className="mt-1 text-[28px] font-bold leading-tight tracking-tight md:text-[36px]">Your Lunch Loop account</h1>
         <p className="mt-2 max-w-3xl text-stone-600">Choose how Lunch Loop looks on this device.</p>
       </div>
 
       <section className="mt-6 rounded-3xl border border-orange-100 bg-white p-5 shadow-sm">
-        <p className="text-xs font-bold uppercase tracking-widest text-orange-700">Your experience</p>
+        <p className="text-xs font-bold text-orange-700">Your experience</p>
         <h2 className="mt-1 text-xl font-black">Appearance</h2>
         <p className="mt-2 max-w-3xl text-sm leading-6 text-stone-600">Choose the look that feels right. System follows your phone or computer&apos;s appearance setting.</p>
         <div className="mt-4 flex flex-wrap gap-2" aria-label="Theme preference">

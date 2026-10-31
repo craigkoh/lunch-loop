@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import { adminFeedbackStatusOptions } from "@/lib/feedback-status";
 import { AppFrame, EmptyState } from "./app-frame";
 import { RestaurantDetailsDialog } from "./restaurant-details-dialog";
 import type { Restaurant } from "@/lib/types";
@@ -162,7 +163,7 @@ function SummaryCard({ active, label, value, detail, onClick, tone = "plain" }: 
 }
 
 function StatFact({ label, value }: { label: string; value: string | number }) {
-  return <div className="rounded-2xl bg-orange-50 p-3"><p className="text-xs font-bold uppercase tracking-wide text-orange-700">{label}</p><p className="mt-1 text-xl font-black">{value}</p></div>;
+  return <div className="rounded-2xl bg-orange-50 p-3"><p className="text-xs font-bold text-orange-700">{label}</p><p className="mt-1 text-xl font-black">{value}</p></div>;
 }
 
 export function GlobalAdminScreen() {
@@ -848,10 +849,10 @@ export function GlobalAdminScreen() {
 
   return (
     <AppFrame>
-      <p className="text-sm font-bold uppercase tracking-widest text-orange-600">
+      <p className="text-sm font-medium text-accent-strong">
         Site controls
       </p>
-      <h1 className="mt-1 text-3xl font-black tracking-tight">Global admin</h1>
+      <h1 className="mt-1 text-[28px] font-bold leading-tight tracking-tight md:text-[36px]">Global admin</h1>
       <p className="mt-2 max-w-3xl text-stone-600">
         Manage Lunch Loop as a whole. These controls work across every group
         while preserving each group’s own restaurant history and audit trail.
@@ -906,22 +907,22 @@ export function GlobalAdminScreen() {
             >
               <div className="mb-5 flex items-center justify-between gap-4 border-b border-orange-100 pb-4">
                 <div>
-                  <p className="text-xs font-bold uppercase tracking-widest text-orange-600">Global Admin report</p>
+                  <p className="text-xs font-bold text-orange-600">Global Admin report</p>
                   <p className="mt-1 text-sm text-stone-600">A closer look without leaving the dashboard.</p>
                 </div>
                 <button type="button" onClick={() => setSummaryView(null)} className="rounded-xl border border-orange-200 px-3 py-2 text-sm font-black text-orange-800">Close</button>
               </div>
-            {summaryView === "loops" && <><p className="text-xs font-bold uppercase tracking-widest text-orange-600">Lunch Loop overview</p><h2 className="mt-1 text-xl font-black">{groups.filter((group) => group.status === "active").length} available · {groups.filter((group) => group.status === "suspended").length} suspended</h2><p className="mt-2 text-sm text-stone-600">{groups.filter((group) => group.loop_type === "standing").length} Standing and {groups.filter((group) => group.loop_type === "occasion").length} Occasion loops. Select a loop below to manage its people, access, and data.</p></>}
-            {summaryView === "people" && <><p className="text-xs font-bold uppercase tracking-widest text-orange-600">People overview</p><h2 className="mt-1 text-xl font-black">{totalMembers} people across {groups.length} Lunch Loops</h2><div className="mt-3 grid gap-3 sm:grid-cols-3"><StatFact label="Loop owners" value={totalOwners} /><StatFact label="In more than one loop" value={peopleInMultipleLoops} /><StatFact label="Average crew size" value={groups.length ? (members.length / groups.length).toFixed(1) : "0"} /></div></>}
-            {summaryView === "restaurants" && <><p className="text-xs font-bold uppercase tracking-widest text-orange-600">Restaurant database overview</p><h2 className="mt-1 text-xl font-black">{restaurants.length - retiredRestaurants} active places · {retiredRestaurants} retired</h2><div className="mt-3 grid gap-2 md:grid-cols-2">{restaurants.slice().sort((a, b) => b.visit_count - a.visit_count || a.name.localeCompare(b.name)).slice(0, 6).map((restaurant) => <button key={restaurant.id} type="button" onClick={() => { setSummaryView(null); setDetailRestaurant(restaurant); }} className="rounded-2xl bg-orange-50 p-3 text-left text-sm transition hover:bg-orange-100"><strong>{restaurant.name}</strong><span className="ml-2 text-xs text-stone-600">{restaurant.visit_count} win{restaurant.visit_count === 1 ? "" : "s"} · {groupsById.get(restaurant.group_id)?.name ?? "Lunch Loop"}</span></button>)}{!restaurants.length && <p className="text-sm text-stone-500">No restaurants have been added yet.</p>}</div></>}
-            {summaryView === "in-progress" && <><p className="text-xs font-bold uppercase tracking-widest text-orange-600">Decision activity</p><h2 className="mt-1 text-xl font-black">{activeLoops.length ? "Open decisions" : "No decision is currently in progress"}</h2><div className="mt-3 space-y-2">{activeLoops.map((session) => <div key={session.id} className="rounded-2xl bg-orange-50 p-3 text-sm"><strong>{groupsById.get(session.group_id)?.name ?? "Lunch Loop"}</strong><span className="ml-2 text-stone-600">{session.status === "chosen" ? "winner selected" : "picks and vetoes underway"} · {timeLabel(session.scheduled_for)}</span></div>)}</div></>}
-            {summaryView === "decisions" && <><div className="flex flex-wrap items-end justify-between gap-3"><div><p className="text-xs font-bold uppercase tracking-widest text-orange-600">Decision report</p><h2 className="mt-1 text-xl font-black">Winning restaurants</h2><p className="mt-1 text-sm text-stone-600">Completed decisions stay with their Lunch Loop; filter by home area to see local history.</p></div><label className="text-sm font-bold">Home area<select value={decisionLocation} onChange={(event) => setDecisionLocation(event.target.value)} className="ml-2 rounded-xl border border-orange-200 bg-white px-3 py-2 text-sm font-semibold"><option value="">All locations</option>{decisionLocations.map((location) => <option key={location} value={location}>{location}</option>)}</select></label></div><div className="mt-3 max-h-80 space-y-2 overflow-y-auto pr-1">{winningDecisions.map(({ session, restaurant, group }) => restaurant ? <button key={session.id} type="button" onClick={() => { setSummaryView(null); setDetailRestaurant(restaurant); }} className="flex w-full flex-wrap items-center justify-between gap-2 rounded-2xl bg-orange-50 p-3 text-left text-sm transition hover:bg-orange-100"><span><strong>{restaurant.name}</strong><span className="ml-2 text-stone-600">{group?.name ?? "Lunch Loop"}{group?.home_label ? ` · ${group.home_label}` : ""}</span></span><span className="text-xs font-bold text-orange-800">{timeLabel(session.scheduled_for)}</span></button> : <div key={session.id} className="rounded-2xl bg-stone-50 p-3 text-sm text-stone-500">A removed restaurant won {group?.name ?? "a Lunch Loop"} on {timeLabel(session.scheduled_for)}.</div>)}{!winningDecisions.length && <p className="text-sm text-stone-500">No completed decisions match this location yet.</p>}</div></>}
+            {summaryView === "loops" && <><p className="text-xs font-bold text-orange-600">Lunch Loop overview</p><h2 className="mt-1 text-xl font-black">{groups.filter((group) => group.status === "active").length} available · {groups.filter((group) => group.status === "suspended").length} suspended</h2><p className="mt-2 text-sm text-stone-600">{groups.filter((group) => group.loop_type === "standing").length} Standing and {groups.filter((group) => group.loop_type === "occasion").length} Occasion loops. Select a loop below to manage its people, access, and data.</p></>}
+            {summaryView === "people" && <><p className="text-xs font-bold text-orange-600">People overview</p><h2 className="mt-1 text-xl font-black">{totalMembers} people across {groups.length} Lunch Loops</h2><div className="mt-3 grid gap-3 sm:grid-cols-3"><StatFact label="Loop owners" value={totalOwners} /><StatFact label="In more than one loop" value={peopleInMultipleLoops} /><StatFact label="Average crew size" value={groups.length ? (members.length / groups.length).toFixed(1) : "0"} /></div></>}
+            {summaryView === "restaurants" && <><p className="text-xs font-bold text-orange-600">Restaurant database overview</p><h2 className="mt-1 text-xl font-black">{restaurants.length - retiredRestaurants} active places · {retiredRestaurants} retired</h2><div className="mt-3 grid gap-2 md:grid-cols-2">{restaurants.slice().sort((a, b) => b.visit_count - a.visit_count || a.name.localeCompare(b.name)).slice(0, 6).map((restaurant) => <button key={restaurant.id} type="button" onClick={() => { setSummaryView(null); setDetailRestaurant(restaurant); }} className="rounded-2xl bg-orange-50 p-3 text-left text-sm transition hover:bg-orange-100"><strong>{restaurant.name}</strong><span className="ml-2 text-xs text-stone-600">{restaurant.visit_count} win{restaurant.visit_count === 1 ? "" : "s"} · {groupsById.get(restaurant.group_id)?.name ?? "Lunch Loop"}</span></button>)}{!restaurants.length && <p className="text-sm text-stone-500">No restaurants have been added yet.</p>}</div></>}
+            {summaryView === "in-progress" && <><p className="text-xs font-bold text-orange-600">Decision activity</p><h2 className="mt-1 text-xl font-black">{activeLoops.length ? "Open decisions" : "No decision is currently in progress"}</h2><div className="mt-3 space-y-2">{activeLoops.map((session) => <div key={session.id} className="rounded-2xl bg-orange-50 p-3 text-sm"><strong>{groupsById.get(session.group_id)?.name ?? "Lunch Loop"}</strong><span className="ml-2 text-stone-600">{session.status === "chosen" ? "winner selected" : "picks and vetoes underway"} · {timeLabel(session.scheduled_for)}</span></div>)}</div></>}
+            {summaryView === "decisions" && <><div className="flex flex-wrap items-end justify-between gap-3"><div><p className="text-xs font-bold text-orange-600">Decision report</p><h2 className="mt-1 text-xl font-black">Winning restaurants</h2><p className="mt-1 text-sm text-stone-600">Completed decisions stay with their Lunch Loop; filter by home area to see local history.</p></div><label className="text-sm font-bold">Home area<select value={decisionLocation} onChange={(event) => setDecisionLocation(event.target.value)} className="ml-2 rounded-xl border border-orange-200 bg-white px-3 py-2 text-sm font-semibold"><option value="">All locations</option>{decisionLocations.map((location) => <option key={location} value={location}>{location}</option>)}</select></label></div><div className="mt-3 max-h-80 space-y-2 overflow-y-auto pr-1">{winningDecisions.map(({ session, restaurant, group }) => restaurant ? <button key={session.id} type="button" onClick={() => { setSummaryView(null); setDetailRestaurant(restaurant); }} className="flex w-full flex-wrap items-center justify-between gap-2 rounded-2xl bg-orange-50 p-3 text-left text-sm transition hover:bg-orange-100"><span><strong>{restaurant.name}</strong><span className="ml-2 text-stone-600">{group?.name ?? "Lunch Loop"}{group?.home_label ? ` · ${group.home_label}` : ""}</span></span><span className="text-xs font-bold text-orange-800">{timeLabel(session.scheduled_for)}</span></button> : <div key={session.id} className="rounded-2xl bg-stone-50 p-3 text-sm text-stone-500">A removed restaurant won {group?.name ?? "a Lunch Loop"} on {timeLabel(session.scheduled_for)}.</div>)}{!winningDecisions.length && <p className="text-sm text-stone-500">No completed decisions match this location yet.</p>}</div></>}
             </section>
           </div>}
-          <section className="mt-6 rounded-3xl bg-orange-600 p-5 text-white shadow-xl shadow-orange-100">
+          <section className="ll-calm mt-6 rounded-[var(--ll-radius-lg)] p-5">
             <div className="flex flex-wrap items-start justify-between gap-4">
               <div>
-                <p className="text-xs font-bold uppercase tracking-widest text-orange-200">
+                <p className="text-xs font-bold text-orange-200">
                   Growth controls
                 </p>
                 <h2 className="mt-1 text-xl font-black">New lunch loops</h2>
@@ -1014,7 +1015,7 @@ export function GlobalAdminScreen() {
               </div>
               <div className="mt-4 grid gap-3 md:grid-cols-2">
                 <div className="rounded-xl bg-orange-700/35 p-3">
-                  <p className="text-xs font-bold uppercase tracking-widest text-orange-100">Recent daily activity</p>
+                  <p className="text-xs font-bold text-orange-100">Recent daily activity</p>
                   <div className="mt-2 space-y-1 text-xs text-orange-50">
                     {placesUsage.length ? placesUsage.map((entry) => (
                       <p key={`${entry.day}-${entry.action_name}`}>
@@ -1024,7 +1025,7 @@ export function GlobalAdminScreen() {
                   </div>
                 </div>
                 <div className="rounded-xl bg-orange-700/35 p-3">
-                  <p className="text-xs font-bold uppercase tracking-widest text-orange-100">Most active lunch loops</p>
+                  <p className="text-xs font-bold text-orange-100">Most active lunch loops</p>
                   <div className="mt-2 space-y-1 text-xs text-orange-50">
                     {placesUsageByGroup.length ? placesUsageByGroup.slice(0, 5).map((entry) => (
                       <p key={entry.group_id}><strong>{entry.group_name}</strong> · {entry.requests} requests · {entry.place_searches} searches · {entry.place_details} details</p>
@@ -1051,7 +1052,7 @@ export function GlobalAdminScreen() {
               <button type="button" disabled={busy} onClick={savePlacesLimits} className="mt-4 rounded-xl bg-white px-4 py-3 text-sm font-black text-stone-900 disabled:opacity-60">Save Places limits</button>
             </div>
             <div className="mt-6 border-t border-white/15 pt-5">
-              <p className="text-xs font-bold uppercase tracking-widest text-orange-200">
+              <p className="text-xs font-bold text-orange-200">
                 Administrator access
               </p>
               <h2 className="mt-1 text-xl font-black">Global admin team</h2>
@@ -1164,7 +1165,7 @@ export function GlobalAdminScreen() {
           <section className="mt-7 rounded-3xl bg-white p-5 shadow-sm">
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div>
-                <p className="text-xs font-bold uppercase tracking-widest text-orange-600">
+                <p className="text-xs font-bold text-orange-600">
                   Access requests
                 </p>
                 <h2 className="mt-1 text-xl font-black">Invite requests</h2>
@@ -1294,7 +1295,7 @@ export function GlobalAdminScreen() {
           <section className="mt-7 rounded-3xl bg-white p-5 shadow-sm">
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div>
-                <p className="text-xs font-bold uppercase tracking-widest text-orange-600">Product queue</p>
+                <p className="text-xs font-bold text-orange-600">Product queue</p>
                 <h2 className="mt-1 text-xl font-black">Feedback and feature requests</h2>
                 <p className="mt-1 max-w-2xl text-sm text-stone-500">A signed-in member supplied each note. Keep an internal implementation note if helpful, and add a friendly update the reporter will see when their fix ships.</p>
               </div>
@@ -1310,7 +1311,7 @@ export function GlobalAdminScreen() {
                       <p className="mt-3 text-xs leading-5 text-stone-500">From {item.display_name}{item.account_email ? ` · ${item.account_email}` : ""}{item.group_name ? ` · ${item.group_name}` : ""} · {timeLabel(item.created_at)}{item.page_path ? ` · ${item.page_path}` : ""}{item.build ? ` · build ${item.build}` : ""}{item.credit_opt_in && item.credit_name ? ` · release-note credit: ${item.credit_name}` : " · no public credit"}{item.notified_at ? ` · alert queued ${timeLabel(item.notified_at)}` : ""}</p>
                     </div>
                     <div className="flex shrink-0 flex-wrap gap-2">
-                      <select value={item.status} disabled={busy} onChange={(event) => updateFeedback(item, { status: event.target.value as FeedbackItem["status"] })} className="rounded-lg border border-stone-200 bg-white px-2 py-2 text-xs font-bold"><option value="new">New</option><option value="triaged">Triaged</option><option value="planned">Planned</option><option value="in_progress">In progress</option><option value="shipped">Shipped</option><option value="declined">Declined</option><option value="duplicate">Duplicate</option></select>
+                      <select value={item.status} disabled={busy} aria-label={`Status for ${item.title}`} title="What the sender sees on their progress line" onChange={(event) => updateFeedback(item, { status: event.target.value as FeedbackItem["status"] })} className="rounded-lg border border-stone-200 bg-white px-2 py-2 text-xs font-bold">{adminFeedbackStatusOptions.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}</select>
                       <select value={item.priority} disabled={busy} onChange={(event) => updateFeedback(item, { priority: event.target.value as FeedbackItem["priority"] })} className="rounded-lg border border-stone-200 bg-white px-2 py-2 text-xs font-bold"><option value="low">Low</option><option value="normal">Normal</option><option value="high">High</option><option value="urgent">Urgent</option></select>
                       <button type="button" disabled={busy} onClick={() => deleteFeedback(item)} className="rounded-lg bg-rose-50 px-3 py-2 text-xs font-bold text-rose-700 disabled:opacity-50">Delete</button>
                     </div>
@@ -1388,7 +1389,7 @@ export function GlobalAdminScreen() {
                 <div className="rounded-3xl bg-white p-5 shadow-sm">
                   <div className="flex flex-wrap items-start justify-between gap-3">
                     <div>
-                      <p className="text-xs font-bold uppercase tracking-widest text-orange-600">
+                      <p className="text-xs font-bold text-orange-600">
                         Managing lunch loop
                       </p>
                       <h2 className="mt-1 text-2xl font-black">
@@ -1633,7 +1634,7 @@ export function GlobalAdminScreen() {
               aria-labelledby="delete-loop-title"
             >
               <div className="w-full max-w-lg rounded-3xl bg-white p-6 shadow-2xl">
-                <p className="text-sm font-bold uppercase tracking-widest text-rose-700">
+                <p className="text-sm font-bold text-rose-700">
                   Permanent deletion
                 </p>
                 <h2 id="delete-loop-title" className="mt-1 text-2xl font-black text-stone-900">

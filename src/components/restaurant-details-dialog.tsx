@@ -23,13 +23,35 @@ export function RestaurantDetailsDialog({
   addedBy,
   plannedFor,
   timeZone,
+  canManage = false,
+  onNeverAgainChange,
 }: {
   restaurant: Restaurant | null;
   onClose: () => void;
   addedBy?: string | null;
   plannedFor?: Date | string | null;
   timeZone?: string;
+  /** Loop owners (same rule as Settings → Places) can retire or restore a place here. */
+  canManage?: boolean;
+  onNeverAgainChange?: (restaurant: Restaurant, neverAgain: boolean) => void;
 }) {
+  const [neverAgainBusy, setNeverAgainBusy] = useState(false);
+  const [neverAgainError, setNeverAgainError] = useState("");
+  async function toggleNeverAgain(place: Restaurant) {
+    setNeverAgainBusy(true);
+    setNeverAgainError("");
+    const next = !place.never_again;
+    const { error } = await createClient()
+      .from("restaurants")
+      .update({ never_again: next })
+      .eq("id", place.id);
+    setNeverAgainBusy(false);
+    if (error) {
+      setNeverAgainError("That did not save. Only the loop owner can change this.");
+      return;
+    }
+    onNeverAgainChange?.(place, next);
+  }
   const [decisionFacts, setDecisionFacts] = useState({
     appearances: 0,
     vetoes: 0,
@@ -101,7 +123,7 @@ export function RestaurantDetailsDialog({
       >
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
-            <p className="text-xs font-bold uppercase tracking-widest text-orange-600">
+            <p className="text-xs font-bold text-orange-600">
               Restaurant details
             </p>
             <h2
@@ -148,7 +170,7 @@ export function RestaurantDetailsDialog({
         </div>
         <div className="mt-4 grid gap-3 sm:grid-cols-2">
           <div className="rounded-2xl bg-stone-50 p-4">
-            <p className="text-xs font-bold uppercase tracking-widest text-stone-500">
+            <p className="text-xs font-bold text-stone-500">
               Google Maps hours
             </p>
             <p className="mt-2 text-sm font-black">
@@ -163,7 +185,7 @@ export function RestaurantDetailsDialog({
               className={`rounded-2xl p-4 ${plannedHours.isOpen ? "bg-emerald-50" : "bg-rose-50"}`}
             >
               <p
-                className={`text-xs font-bold uppercase tracking-widest ${plannedHours.isOpen ? "text-emerald-700" : "text-rose-700"}`}
+                className={`text-xs font-bold ${plannedHours.isOpen ? "text-emerald-700" : "text-rose-700"}`}
               >
                 {plannedHours.known
                   ? plannedHours.isOpen
@@ -181,8 +203,26 @@ export function RestaurantDetailsDialog({
         <p className="mt-2 text-xs text-stone-400">
           Place information from <span translate="no">Google Maps</span>
         </p>
+        {canManage && onNeverAgainChange && (
+          <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-2xl bg-stone-50 p-4">
+            <p className="text-sm text-stone-600">
+              {restaurant.never_again
+                ? "Retired: it stays in history but will not be picked."
+                : "Done with this one? Retire it from future picks."}
+            </p>
+            <button
+              type="button"
+              disabled={neverAgainBusy}
+              onClick={() => void toggleNeverAgain(restaurant)}
+              className="rounded-full border border-stone-200 px-4 py-2 text-sm font-semibold text-stone-800 disabled:opacity-60"
+            >
+              {restaurant.never_again ? "Bring it back" : "🚫 Never again"}
+            </button>
+            {neverAgainError && <p role="alert" className="w-full text-sm text-rose-700">{neverAgainError}</p>}
+          </div>
+        )}
         <div className="mt-4 rounded-2xl bg-orange-50 p-4">
-          <p className="text-xs font-bold uppercase tracking-widest text-orange-700">
+          <p className="text-xs font-bold text-orange-700">
             Lunch Loop facts
           </p>
           <p className="mt-2 text-sm text-stone-700">

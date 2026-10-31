@@ -93,7 +93,7 @@ const settingsTabs: { id: SettingsTab; label: string; emoji: string }[] = [
   { id: "crew", label: "Crew", emoji: "👥" },
   { id: "area", label: "Area & loops", emoji: "🌎" },
   { id: "places", label: "Places", emoji: "🍽️" },
-  { id: "owner", label: "Owner tools", emoji: "🛠️" },
+  { id: "owner", label: "Owner", emoji: "👑" },
 ];
 
 function SettingsTabs({
@@ -107,7 +107,7 @@ function SettingsTabs({
 }) {
   return (
     <nav aria-label="Settings sections" className="mt-5 -mx-1 overflow-x-auto px-1 pb-1">
-      <div className="flex w-max gap-2 rounded-2xl bg-white p-1.5 shadow-sm ring-1 ring-orange-100">
+      <div className="flex w-max gap-1 rounded-[var(--ll-radius-md)] bg-stone-100 p-1">
         {settingsTabs
           .filter((tab) => tab.id !== "owner" || showOwnerTools)
           .map((tab) => (
@@ -116,7 +116,7 @@ function SettingsTabs({
               type="button"
               aria-pressed={active === tab.id}
               onClick={() => onChange(tab.id)}
-              className={`inline-flex min-h-11 items-center gap-1.5 whitespace-nowrap rounded-xl px-3 text-sm font-black transition ${active === tab.id ? "bg-orange-500 text-white" : "text-stone-700 hover:bg-orange-50"}`}
+              className={`inline-flex min-h-11 items-center gap-1.5 whitespace-nowrap rounded-[10px] px-3 text-sm font-semibold transition ${active === tab.id ? "bg-surface text-ink shadow-[var(--ll-shadow-card)]" : "text-stone-600 hover:text-ink"}`}
             >
               <span aria-hidden="true">{tab.emoji}</span>
               {tab.label}
@@ -751,16 +751,15 @@ export function SettingsScreen() {
 
   return (
     <AppFrame>
-      <p className="text-sm font-bold uppercase tracking-widest text-orange-600">
-        Group controls
+      <p className="text-sm font-medium text-accent-strong">
+        Loop settings
       </p>
       <div className="mt-1 flex items-center gap-3">
-        <span className="grid size-11 place-items-center rounded-2xl bg-orange-100 text-2xl" aria-hidden="true">⚙️</span>
-        <h1 className="text-3xl font-black tracking-tight">Settings</h1>
-        {context?.role === "owner" && <span className="rounded-full bg-amber-100 px-2.5 py-1 text-xs font-black text-amber-900">👑 Owner</span>}
+        <h1 className="text-[28px] font-bold leading-tight tracking-tight md:text-[36px]">Settings</h1>
+        {context?.role === "owner" && <span className="rounded-full bg-accent-soft px-2.5 py-1 text-xs font-semibold text-accent-strong">👑 Owner</span>}
       </div>
-      <p className="mt-2 text-stone-600">
-        Manage your crew, invitations, search area, and Lunch Database.
+      <p className="mt-2 text-[15px] text-muted">
+        Your crew, search area, and places.{" "}{/* owner-only tools sit in the Owner section */}
       </p>
       {loading ? (
         <p className="mt-6 text-sm font-semibold text-stone-500">
@@ -775,11 +774,11 @@ export function SettingsScreen() {
           <>
             <SettingsTabs active={settingsTab} onChange={setSettingsTab} showOwnerTools={context.role === "owner"} />
             {settingsTab === "crew" && <>
-            <section className="mt-6 overflow-hidden rounded-3xl bg-gradient-to-br from-orange-500 via-orange-500 to-amber-500 p-5 text-white shadow-[0_18px_36px_rgba(249,115,22,0.18)]">
+            <section className="ll-calm mt-6 overflow-hidden rounded-[var(--ll-radius-lg)] p-5">
               <div className="flex items-start gap-3">
                 <span className="grid size-11 shrink-0 place-items-center rounded-2xl bg-white/20 text-2xl" aria-hidden="true">👋</span>
                 <div>
-                  <p className="text-xs font-bold uppercase tracking-widest text-orange-100">{context.groupName}</p>
+                  <p className="text-xs font-bold text-orange-100">{context.groupName}</p>
                   <h2 className="mt-1 text-xl font-black">Invite people, the easy way</h2>
                 </div>
               </div>
@@ -938,7 +937,7 @@ export function SettingsScreen() {
             </>}
             {settingsTab === "area" && <>
             <section className="mt-7 rounded-3xl bg-white p-5 shadow-sm">
-              <div className="flex items-start gap-3"><span className="grid size-10 place-items-center rounded-2xl bg-orange-100 text-xl" aria-hidden="true">🌎</span><div><p className="text-xs font-bold uppercase tracking-widest text-orange-600">Your search area</p>
+              <div className="flex items-start gap-3"><span className="grid size-10 place-items-center rounded-2xl bg-orange-100 text-xl" aria-hidden="true">🌎</span><div><p className="text-xs font-bold text-orange-600">Your search area</p>
               <h2 className="mt-1 text-xl font-black">Where does {context.groupName} eat?</h2></div></div>
               <p className="mt-2 text-sm text-stone-600">Every Lunch Loop has its own home location and search radius. The shared restaurant database stays separate, even when another crew uses Lunch Loop in a different city.</p>
               {context.role === "owner" ? <>
@@ -989,7 +988,7 @@ export function SettingsScreen() {
             {settingsTab === "owner" && context.role === "owner" && <>
             {context.role === "owner" && (
               <section className="mt-7 rounded-3xl border border-indigo-100 bg-indigo-50/60 p-5 shadow-sm">
-                <p className="text-xs font-bold uppercase tracking-widest text-indigo-700">
+                <p className="text-xs font-bold text-indigo-700">
                   Optional integration
                 </p>
                 <h2 className="mt-1 text-xl font-black">
@@ -1127,7 +1126,7 @@ export function SettingsScreen() {
             )}
             {context.role === "owner" && (
               <section className="mt-7 rounded-3xl border border-amber-200 bg-amber-50 p-5">
-                <p className="text-xs font-bold uppercase tracking-widest text-amber-800">Owner safeguards</p>
+                <p className="text-xs font-bold text-amber-800">Owner safeguards</p>
                 <h2 className="mt-1 text-xl font-black">🛟 Your Lunch Loop, under your control</h2>
                 <p className="mt-2 text-sm leading-6 text-stone-600">Export a portable copy whenever you want. If this crew ends, archive it first—nothing is permanently removed for 30 days.</p>
                 <div className="mt-4 flex flex-wrap gap-2">

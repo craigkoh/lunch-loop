@@ -112,7 +112,7 @@ Loop CSV download:
 - Cells that start with `=`, `+`, `-`, `@`, tab, or carriage return get a
   leading `'` so spreadsheets do not run them as formulas.
 - Privacy Policy updated (October 30, 2026).
-- Migration `20261031005344_loop_csv_export.sql`. Tested on staging with
+- Migration `20261031010646_loop_csv_export.sql`. Tested on staging with
   `supabase/tests/loop-export-fixture.sql`. Production apply happens after
   merge, after a backup.
 - New `npm test` runs the CSV unit tests in `scripts/tests/`.

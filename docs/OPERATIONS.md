@@ -41,36 +41,35 @@ second policy. Take the checksummed backup in Backup and restore before any
 further database change. Do not repair migration history to different
 version numbers.
 
-### Migration version mismatch (noted Oct 31, 2026)
+### Migration versions match production (fixed Oct 31, 2026)
 
-Production records the loop CSV export migration as version
-`20261031010646`, but the repository file is
-`supabase/migrations/20261031005344_loop_csv_export.sql`. The SQL is the
-same; only the version number differs because the hosted tool assigned its
-own timestamp. A `supabase db push` would treat the repository file as new.
-Do not repair history blindly: either rename the repository file to the
-production version in a small PR, or mark it applied with
-`supabase migration repair` after a backup. Build .73 adds three migrations,
-applied and tested on staging only so far (staging recorded them as
-`20261031025332`, `20261031025529`, `20261031030009`, matching the file
-names):
+The hosted Supabase tool assigns its own version timestamp when a migration
+is applied, so the repository files are renamed to the production versions
+(the same rule as the 2026-10-19 indexes above). On Oct 31, 2026 (Oct 30
+evening Central time) the loop CSV export file was renamed from
+`20261031005344` to `20261031010646` (identical SQL, md5 checked), and build
+.73's three migrations were applied to production after the checksummed
+backup `20261030-234526` and renamed to the versions production recorded:
 
-- `20261031025332_ui_refresh_activity_and_milestones.sql`: the private
+- `20261031044600_ui_refresh_activity_and_milestones.sql`: the private
   `lunch_loop_activity` log (admin-only reads, append-only, written by
   triggers and `record_loop_activity`), `log_loop_report_view`, the CSV
   export logging, and `lunch_loop_milestone_dismissals`.
-- `20261031025529_ui_refresh_activity_account_deletion.sql`: lets account
+- `20261031044605_ui_refresh_activity_account_deletion.sql`: lets account
   deletion clear ids in the activity log.
-- `20261031030009_ui_refresh_milestone_facts.sql`:
+- `20261031044610_ui_refresh_milestone_facts.sql`:
   `get_my_loop_milestone_facts`.
+
+Production history now matches the repository. Staging (a test project)
+still records these four under its own versions (`20261031005344`,
+`20261031025332`, `20261031025529`, `20261031030009`); that is expected and
+harmless, so never `db push` staging history onto production. No migration
+history was repaired and no data changed.
 
 Fixtures: `supabase/tests/activity-log-fixture.sql` and
 `supabase/tests/milestone-facts-fixture.sql` (run inside `begin … rollback`
-on staging). Take the pre-migration backup with the current `export.sql`
-(the new tables do not exist yet). Right after the production migration,
-add `lunch_loop_activity` and `lunch_loop_milestone_dismissals` to
-`scripts/backup/export.sql` (counts and rows); until then the backup script
-warns that they are missing.
+on staging). `scripts/backup/export.sql` now includes `lunch_loop_activity`
+and `lunch_loop_milestone_dismissals` (counts and rows).
 
 At least monthly, review Global Admin feedback (set each item’s status there;
 the sender sees it as Received → Looking at it → Planned → Live), suspended groups, invite

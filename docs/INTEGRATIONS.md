@@ -174,6 +174,49 @@ stop charges. One restaurant search can use a few Autocomplete requests while
 someone types, so 300 a day is roughly 40–60 searches across the whole site.
 Raise a quota only after real use gets close to it.
 
+### Places data storage audit (Oct 30, 2026)
+
+Checked against the
+[Places API policies](https://developers.google.com/maps/documentation/places/web-service/policies)
+and the [Service Specific Terms](https://cloud.google.com/maps-platform/terms/maps-service-terms)
+(section 14.3 for Places API). The rules: the Place ID may be stored
+indefinitely. Latitude and longitude may be cached for up to 30 days, then
+must be deleted. Other Places content (name, address, phone, hours, rating,
+types) must not be pre-fetched, cached, or stored.
+
+What Lunch Loop stores today:
+
+| Where | Google-derived fields | Kept for | Follows the rules? |
+| --- | --- | --- | --- |
+| `restaurants.google_place_id` | Place ID | Indefinitely | Yes |
+| `restaurants` | `name`, `address`, `phone`, `hours` (jsonb), `rating`, `lat`, `lng`, and `cuisine` (derived from Google types) | Indefinitely, copied once when a member adds the place; never refreshed | No |
+| `groups` | `home_label`, `home_lat`, `home_lng` from the area search | Indefinitely | No for lat/lng after 30 days; the label is Google text too |
+| Owner JSON export (`export_lunch_loop_data`) | Whole `restaurants` rows, so all the fields above | In the downloaded file | No, it hands out stored Google content |
+| `copy_member_restaurants_to_lunch_loop` | Copies the stored fields into another loop | Indefinitely | No, same issue |
+
+Production on Oct 30, 2026: 112 restaurants, all with phone, hours, rating,
+and lat/lng. 109 were last updated more than 30 days ago (oldest Aug 15,
+2026), and `updated_at` also moves for non-Google changes, so the Google
+data is at least that old. Nothing refreshes it. `/api/places/[placeId]`
+can fetch live details, but no screen calls it. Attribution (“Place
+information from Google Maps”) is shown where place content appears.
+
+The new loop CSV follows the rules: it exports only the Place ID (as a
+Google Maps link) plus our own data.
+
+Recommended follow-up (not done in build .72; needs Craig’s decision
+because of cost):
+
+1. Keep only `google_place_id` plus our own data (who added it, wins,
+   vetoes, never again, notes) in the database.
+2. Fetch name, address, hours, rating, and phone live from Place Details
+   when a place is shown, with a narrow field mask, and cache only in the
+   browser for the session. Or, if live fetches cost too much, refresh
+   stored content and delete lat/lng within 30 days.
+3. Drop Google fields from the owner JSON export and the cross-loop copy.
+4. Watch the 300-a-day GetPlace quota: showing a 30-place list live would
+   use it up fast, so this needs batching or a quota raise.
+
 ## Resend and inbound email
 
 Resend is optional. Without it, owners can still copy one-time invitation links

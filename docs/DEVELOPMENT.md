@@ -54,7 +54,12 @@ or raw backup data in source, docs, screenshots, Git, or chat.
     npx supabase start
     npm run dev
     npm run lint
+    npm test
     npm run build
+
+`npm test` runs the Node unit tests in `scripts/tests/` (currently the loop
+CSV: formula escaping, quoting, Google Maps links, and no Google details).
+It needs no extra packages.
 
 Use a separate local/test group for experiments. Verify Google sign-in, a
 one-time email link, restaurant search, selection/veto, Settings, Feedback,
@@ -96,6 +101,13 @@ When a change touches the donation switch, also run
 `supabase/tests/donations-flag-fixture.sql` the same way. It checks that
 `donations_enabled` starts off, a member cannot turn it on, and a site admin
 can turn it on and back off.
+
+When a change touches the loop report CSV, run
+`supabase/tests/loop-export-fixture.sql` the same way. It checks the member
+download, that display names come through, that no Google details or
+emails appear, and that outsiders, non-member site admins, signed-out
+callers, and a 6th download in one day are refused. On Oct 30, 2026 it was
+run on the staging project, because the box had no local Docker.
 
 When a change touches email sign-in, profile names, or feedback credit, also
 run:

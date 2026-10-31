@@ -171,7 +171,7 @@ function LunchReceipt({
         </p>
         <div className="my-2 border-t border-dashed" style={{ borderColor: "var(--receipt-rule)" }} />
         <p className="text-[11px] font-bold tracking-[0.16em]" style={{ color: "var(--receipt-ink)" }}>
-          TODAY&apos;S PICK
+          TODAY&apos;S WINNER
         </p>
         <p className="mt-1 text-lg font-black leading-6 [overflow-wrap:anywhere]" style={{ color: "var(--receipt-accent)" }}>
           {facts.restaurantName}

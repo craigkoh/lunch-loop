@@ -48,8 +48,24 @@ rate limits and a hosted bot challenge.
 - A native iPhone wrapper only if the PWA has a real user-facing limitation.
 - Show real site stats (e.g. lunches decided) on /support and receipts once usage grows, as V4V proof.
 
+## Next PR (open list, added Oct 28, 2026)
+
+Items Craig has approved for the next batch. More may be added.
+
+- Nothing open. Build 2026.10.30.72 (PR from `next-pr`) has the “won” wording, the Loop
+  report, the Google Places storage audit, and the loop CSV download.
+- Keep the random facts sprinkled through the app (do not remove them).
+
 ## Backlog
 
+- UI cleanup: the header and footer are getting cluttered; simplify later
+  (Craig, Oct 30, 2026).
+- Google Places storage fix: stop keeping Google place details (name,
+  address, phone, hours, rating, lat/lng) indefinitely. Keep the Place ID
+  and our own data, and fetch details live or refresh within 30 days. Also
+  drop Google fields from the owner JSON export and the cross-loop copy.
+  Needs a cost decision because of the 300-a-day GetPlace quota. See the
+  [audit](INTEGRATIONS.md#places-data-storage-audit-oct-30-2026).
 - Plate Loop is the live icon. The arrow is documented in
   [Design](DESIGN.md). Fork L and Tray LL stay in [docs/brand/](brand/) as
   studies.

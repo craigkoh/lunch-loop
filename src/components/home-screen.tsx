@@ -713,11 +713,9 @@ export function HomeScreen() {
       : null;
     return (
       <span className="mt-1 block break-words text-xs leading-5 text-stone-500">
-        {restaurant.visit_count}{" "}
-        {restaurant.visit_count === 1 ? "pick" : "picks"} ·{" "}
-        {restaurant.last_visited_at
-          ? `last ${shortDate(restaurant.last_visited_at, timeZone)}`
-          : "never picked"}{" "}
+        {restaurant.visit_count > 0
+          ? `🏆 ${restaurant.visit_count} ${restaurant.visit_count === 1 ? "win" : "wins"}${restaurant.last_visited_at ? ` · last won ${shortDate(restaurant.last_visited_at, timeZone)}` : ""}`
+          : "No wins yet"}{" "}
         · added by {addedBy ?? "a crew member"}
         {restaurant.created_at ? ` on ${shortDate(restaurant.created_at, timeZone)}` : ""}
       </span>
@@ -1032,7 +1030,7 @@ export function HomeScreen() {
             onClick={() => applySmartChoices("fresh")}
             className="rounded-xl bg-white px-3 py-3 text-left text-sm font-bold text-orange-900 disabled:opacity-40"
           >
-            🌱 Never picked
+            🌱 No wins yet
           </button>
           <button
             type="button"
@@ -1065,7 +1063,7 @@ export function HomeScreen() {
             onClick={() => applySmartChoices("least")}
             className="rounded-xl bg-white px-3 py-3 text-left text-sm font-bold text-orange-900 disabled:opacity-40"
           >
-            🔁 Least picked
+            🔁 Fewest wins
           </button>
           <button
             type="button"
@@ -1576,7 +1574,7 @@ export function HomeScreen() {
                 base={{
                   loopName: context.groupName,
                   groupId: context.groupId,
-                  restaurantName: winner?.name ?? "Today's pick",
+                  restaurantName: winner?.name ?? "Today's winner",
                   restaurantId: winner?.id ?? null,
                   restaurantLat: winner?.lat ?? null,
                   restaurantLng: winner?.lng ?? null,
@@ -1724,7 +1722,7 @@ export function HomeScreen() {
                   {freshPlaceCount}
                 </p>
                 <p className="text-sm text-stone-500">
-                  places waiting for a first visit
+                  places waiting for a first win
                 </p>
                 <p className="mt-2 text-xs font-bold text-orange-700">
                   See fresh places →

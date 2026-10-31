@@ -1,5 +1,56 @@
 # Release Notes
 
+## Build 2026.10.30.72 (Friday, October 30, 2026)
+
+Wording (Chris’s feedback): “picked” meant a place won a lunch, which read
+like someone chose it for a list. It is now “won” everywhere a place won:
+
+- Cards, the details popup, and Home facts show “🏆 2 wins · last won
+  Oct 21” or “No wins yet”.
+- Lunch Database sorts are “Most wins”, “Fewest wins”, “Last won”, and “No
+  wins yet”. The URL sort keys did not change, so saved links still work.
+- Home buttons are “🌱 No wins yet” and “🔁 Fewest wins”. Stats, History,
+  and Global Admin use “win(s)” and “winners”.
+- The thank-you receipt says “TODAY’S WINNER” and “Suggested by”.
+- “Picks” still means the suggester choosing the options for a round.
+
+Loop report (`/report`):
+
+- A one-page summary built from the same data as Stats and History: lunches,
+  places, different winners, vetoes, top winners, lunches suggested per
+  person, vetoes per person, and a few “lunch lore” facts.
+- Stats that read awkwardly for a new loop stay hidden until they mean
+  something (for example, “different winners” needs 2 lunches; busiest
+  month needs 2 lunches across 2 months). With no lunches yet, the page
+  shows a friendly empty state.
+- Linked from Stats and History with “📋 View loop report”.
+
+Loop CSV download:
+
+- “Download CSV” on the Loop report. `POST /api/loops/export` (same-origin
+  only, signed-in session, never the service role) calls the new
+  `export_loop_data` database function.
+- Members of that loop only, checked in the database. Site admins who are
+  not members are refused too.
+- 5 downloads per person per day (`export_loop_csv` rate limit).
+- Contents are our own data only: lunch dates in the loop’s time zone, the
+  suggester’s display name, the winning place, places in the running,
+  vetoes, win counts, never-again flags, and who added each place. Places
+  are listed as P1, P2, … with a Google Maps link built from the Place ID.
+  No email addresses and no Google place details (names, addresses,
+  ratings, phone numbers, hours).
+- Cells that start with `=`, `+`, `-`, `@`, tab, or carriage return get a
+  leading `'` so spreadsheets do not run them as formulas.
+- Privacy Policy updated (October 30, 2026).
+- Migration `20261031005344_loop_csv_export.sql`. Tested on staging with
+  `supabase/tests/loop-export-fixture.sql`. Production apply happens after
+  merge, after a backup.
+- New `npm test` runs the CSV unit tests in `scripts/tests/`.
+
+Google Places storage audit: see
+[Integrations](INTEGRATIONS.md#places-data-storage-audit-oct-30-2026). No
+storage change in this build.
+
 ## Build 2026.10.27.71 (Tuesday, October 27, 2026)
 
 Thank-you after a pick (Seth did not see the old receipt was asking for a tip):

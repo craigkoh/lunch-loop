@@ -265,4 +265,11 @@ changes. Obtain qualified legal review before broad public or monetized release.
 
 Google-derived restaurant content requires attribution and retention/use review.
 Follow [Integrations](INTEGRATIONS.md#google-maps-platform) before changing
-stored fields, maps, or monetization.
+stored fields, maps, or monetization. The Oct 30, 2026 storage audit
+([findings](INTEGRATIONS.md#places-data-storage-audit-oct-30-2026)) found
+stored Google fields beyond the Place ID; a fix is on the roadmap.
+
+The member loop CSV (`POST /api/loops/export`, `export_loop_data`) is
+members-only, 5 per person per day (`export_loop_csv` in
+`user_action_rate_limits`), has no emails or Google place details, and
+escapes spreadsheet formulas.

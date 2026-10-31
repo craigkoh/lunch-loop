@@ -28,6 +28,15 @@ function changeText(change: ReleaseChange) {
 
 const releases: { build: string; changes: ReleaseChange[] }[] = [
   {
+    build: "2026.10.30.72",
+    changes: [
+      "“Picked” is now “won” when a place won a lunch: “🏆 2 wins · last won Oct 21”, “No wins yet”, and sorts like “Most wins” and “Fewest wins”. (Thanks, Chris!)",
+      "New Loop report: a one-page summary of your loop with top winners, who suggested what, vetoes, and a few fun facts. Open it from Stats or History.",
+      "Members can download their loop’s lunch data as a CSV file from the Loop report, up to 5 times a day. It lists places by number with a Google Maps link, and has no email addresses.",
+      "The Privacy Policy now explains the loop CSV download.",
+    ],
+  },
+  {
     build: "2026.10.27.71",
     changes: [
       "The thank-you after a pick now clearly says it’s an optional tip: “Tip the loop?”, with a “Tip the loop ($1–3)” button.",

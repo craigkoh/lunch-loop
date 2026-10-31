@@ -23,10 +23,10 @@ const placesPerPage = 6;
 const sortLabels: Record<RestaurantSort, string> = {
   newest: "Last added",
   oldest: "First added",
-  "most-picked": "Most picked",
-  "least-picked": "Least picked",
-  "recently-visited": "Last visited",
-  "never-visited": "Never visited",
+  "most-picked": "Most wins",
+  "least-picked": "Fewest wins",
+  "recently-visited": "Last won",
+  "never-visited": "No wins yet",
 };
 
 export function RestaurantSearchFilters({

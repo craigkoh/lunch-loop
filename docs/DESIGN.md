@@ -321,11 +321,11 @@ Receipt:
 - Torn bottom is a sibling with a zigzag `clip-path`, so the orange hero
   shows through the teeth.
 - Top line is the heading “Tip the loop?” (`text-xl font-black`, accent).
-  Then loop name and date, then TODAY’S PICK and the restaurant.
+  Then loop name and date, then TODAY’S WINNER and the restaurant.
 - Line items (`receiptLines` in `src/lib/donation.ts`), in this order:
   Places in the running, Vetoes, Time to decide, Distance (crow-flies miles
   from the loop’s home area), Visit (“First time” or `#N`), Since last visit,
-  Rating, Cuisine, Picked by, Ads shown 0. A line with no data is dropped.
+  Rating, Cuisine, Suggested by, Ads shown 0. A line with no data is dropped.
   No joke lines, no crew-wide counts that read 0 or 1 on a new loop.
 - Under the lines: “Lunch Loop is free. This is an optional tip.” Then the
   pill button “Tip the loop ($1–3)” to `/support`, then “Not now”.

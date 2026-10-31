@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { BrandMark } from "./brand-mark";
-import { FuelTheLoopLink, OperatorCredit } from "./quiet-donation-link";
+import { FuelTheLoopLink } from "./quiet-donation-link";
 
 const loopSteps = [
   {
@@ -178,30 +178,20 @@ export function LandingPage() {
         </div>
       </section>
 
-      <footer className="border-t border-orange-100 px-4 py-8 text-center text-xs leading-5 text-stone-500">
-        <p>© Craig Kohler · Lunch Loop · Private crews for real-life friends</p>
-        <OperatorCredit />
-        <FuelTheLoopLink />
-        <p className="mt-1">
-          <a
-            href="https://craigkohler.com"
-            target="_blank"
-            rel="noreferrer"
-            className="font-bold text-orange-700 underline"
-          >
-            craigkohler.com
-          </a>
+      <footer className="border-t border-line px-4 py-8 text-center text-sm leading-6 text-subtle">
+        <p className="font-medium text-muted">
+          Built by{" "}
+          <a href="https://craigkohler.com" target="_blank" rel="noreferrer" className="text-accent-strong hover:underline">
+            Craig Kohler
+          </a>{" "}
+          with AI
         </p>
-        <p className="mt-2 flex flex-wrap justify-center gap-x-3 gap-y-1">
-          <Link href="/whats-new" className="font-bold text-orange-700 underline">
-            What&apos;s New
-          </Link>
-          <Link href="/privacy" className="font-bold text-orange-700 underline">
-            Privacy Policy
-          </Link>
-          <Link href="/terms" className="font-bold text-orange-700 underline">
-            Terms of Use
-          </Link>
+        <p>Private crews for real-life friends</p>
+        <FuelTheLoopLink />
+        <p className="flex flex-wrap justify-center gap-x-4 gap-y-1">
+          <Link href="/whats-new" className="hover:text-ink">What&apos;s New</Link>
+          <Link href="/privacy" className="hover:text-ink">Privacy</Link>
+          <Link href="/terms" className="hover:text-ink">Terms</Link>
         </p>
       </footer>
     </main>

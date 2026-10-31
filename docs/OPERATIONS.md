@@ -71,6 +71,22 @@ Fixtures: `supabase/tests/activity-log-fixture.sql` and
 on staging). `scripts/backup/export.sql` now includes `lunch_loop_activity`
 and `lunch_loop_milestone_dismissals` (counts and rows).
 
+### Activity trigger EXECUTE revoke (build .74, pending production)
+
+`20261031050909_revoke_activity_trigger_execute.sql` revokes EXECUTE on the
+five `log_*_activity` trigger functions from `public`, `anon`, and
+`authenticated` (Supabase security advisor: security definer functions
+executable by anon/authenticated). The triggers keep firing because Postgres
+checks EXECUTE on a trigger function only when the trigger is created.
+
+- Staging: applied Oct 31, 2026, recorded as `20261031050909`. The activity
+  log fixture still passes (sessions, candidates, vetoes, restaurants and
+  members all log), and `has_function_privilege` shows no EXECUTE for `anon` or
+  `authenticated` on all five.
+- Production: apply only after the PR is merged, after a checksummed backup
+  (`scripts/backup/export.sql` plus `lunch-loop-backup.sh`). Then rename the
+  file to the version production records, as above.
+
 At least monthly, review Global Admin feedback (set each item’s status there;
 the sender sees it as Received → Looking at it → Planned → Live), suspended groups, invite
 requests, seven-day Places usage, provider errors, and Google Cloud budgets.

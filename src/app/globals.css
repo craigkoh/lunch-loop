@@ -146,38 +146,9 @@ input {
   }
 }
 
-/* Chosen-pick hero. The thank-you sits in the right column only while it is
-   actually rendered, so a hidden nudge does not leave an empty gutter. */
-.pick-layout {
-  display: grid;
-  align-items: start;
-  gap: 1rem;
-}
-
+/* The tip receipt hides itself when it has nothing to show. */
 .pick-nudge:empty {
   display: none;
-}
-
-@media (min-width: 768px) {
-  .pick-layout:has(.pick-nudge:not(:empty)) {
-    grid-template-columns: minmax(0, 1fr) minmax(16.5rem, 22rem);
-    column-gap: 1.5rem;
-  }
-
-  .pick-layout:has(.pick-nudge:not(:empty)) .pick-main {
-    grid-column: 1;
-    grid-row: 1;
-  }
-
-  .pick-layout:has(.pick-nudge:not(:empty)) .pick-actions {
-    grid-column: 1;
-    grid-row: 2;
-  }
-
-  .pick-layout:has(.pick-nudge:not(:empty)) .pick-nudge {
-    grid-column: 2;
-    grid-row: 1 / span 2;
-  }
 }
 
 @keyframes install-pulse {
@@ -192,27 +163,12 @@ input {
   }
 }
 
-@keyframes install-pointer {
-  0%,
-  100% {
-    transform: translateY(0) scale(1);
-  }
-  50% {
-    transform: translateY(-12px) scale(1.06);
-  }
-}
-
 .install-pulse {
   animation: install-pulse 2.6s ease-in-out infinite;
 }
 
-.install-pointer {
-  animation: install-pointer 1.8s ease-in-out infinite;
-}
-
 @media (prefers-reduced-motion: reduce) {
-  .install-pulse,
-  .install-pointer {
+  .install-pulse {
     animation: none;
   }
 }

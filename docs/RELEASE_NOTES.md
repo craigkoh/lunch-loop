@@ -1,5 +1,46 @@
 # Release Notes
 
+## Build 2026.10.31.74 (Saturday, October 31, 2026; prepared Friday, October 30)
+
+Polish on top of build .73, plus one security fix.
+
+Security:
+
+- Migration `20261031050909_revoke_activity_trigger_execute.sql` revokes
+  EXECUTE on the five `log_*_activity` trigger functions from `public`,
+  `anon`, and `authenticated` (Supabase advisor warning). Tested on staging;
+  production gets it after merge (see
+  [Operations](OPERATIONS.md#activity-trigger-execute-revoke-build-74-pending-production)).
+
+Design and flow:
+
+- One type scale (see [Design](DESIGN.md#type-scale-build-74-oct-31-2026)).
+  `text-xs` is 13px; the 10–11px labels are gone (tab bar, avatar, loop
+  switcher, place filters, receipt nudge, install guide).
+- Win page, top to bottom: winner card (with the progress line), milestone,
+  “What’s next” (lunch time and hand-off in one card), tip receipt. The
+  two-column `.pick-layout` grid is removed.
+- Home no longer repeats a top-4 Places list or a phone “Add place” link
+  (both live on the Places tab). The lore line and “Loop report →” stay as
+  one quiet line when there is no winner on screen.
+- `AppFrame` gains `minimal` (no loop navigation) and the new `AuthShell`
+  wraps sign-in, join, request-invite, the no-loop welcome, and a new 404
+  page. Privacy, Terms, and What’s New use `AppFrame` through `LegalPage`.
+  Support and Install use `AppFrame`. The separate “🏠 Home” headers and the
+  “© Craig Kohler” footers are gone.
+- Footer on every page: “Built by Craig Kohler with AI”, then build, Privacy,
+  Terms. Exceptions: `/dev/receipt` (dev only) and `/decide` (redirect).
+- Logged-out header shows “Sign in”. The install card shows on Home only.
+- History: grouped by month, one row per lunch. Never again: compact rows.
+- Stats: highlights as rows, one numbers card, “Who’s picked” (rounds each
+  person picked) instead of the suggester win rate, which always equaled
+  1 ÷ crew size. Cuisines and veto habits show the top five plus “Show all”.
+- Settings, Crew tab: the roster comes first; each person has the name on its
+  own line, a meta line, then the controls. Invite copy is shorter.
+- Install guide: four numbered rows and one tip card; the drawn phone
+  illustration is removed.
+- “Fuel the loop” is a quiet text link instead of an orange pill.
+
 ## Build 2026.10.31.73 (Saturday, October 31, 2026; prepared Friday, October 30)
 
 A calmer, friendlier look (mockup D, Things-inspired, orange as the only

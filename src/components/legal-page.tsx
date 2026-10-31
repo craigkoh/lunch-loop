@@ -1,8 +1,11 @@
-import Link from "next/link";
-import { BrandMark } from "./brand-mark";
-import { FuelTheLoopLink, OperatorCredit } from "./quiet-donation-link";
 import type { ReactNode } from "react";
+import { AppFrame } from "./app-frame";
+import { FuelTheLoopLink, OperatorCredit } from "./quiet-donation-link";
 
+/**
+ * Privacy, Terms and What's New share the app frame (sidebar or tabs when signed
+ * in, the slim brand header when signed out) so they look like every other page.
+ */
 export function LegalPage({
   eyebrow,
   title,
@@ -15,50 +18,22 @@ export function LegalPage({
   children: ReactNode;
 }) {
   return (
-    <main className="min-h-dvh bg-[#fffaf3] text-stone-900">
-      <header className="border-b border-orange-100 bg-[#fffaf3]/95 px-4 py-4 backdrop-blur sm:px-6">
-        <div className="mx-auto flex max-w-4xl items-center justify-between gap-4">
-          <Link
-            href="/"
-            className="flex items-center gap-2 font-black tracking-tight text-orange-950"
-          >
-            <BrandMark className="size-10" />
-            <span>Lunch Loop</span>
-          </Link>
-          <Link
-            href="/"
-            className="inline-flex min-h-11 items-center rounded-xl bg-white px-3 text-sm font-black text-stone-700 shadow-sm ring-1 ring-orange-100"
-          >
-            🏠 Home
-          </Link>
-        </div>
-      </header>
-      <article className="mx-auto max-w-4xl px-4 py-10 sm:px-6 sm:py-14">
-        <p className="text-sm font-medium text-accent-strong">
-          {eyebrow}
-        </p>
-        <h1 className="mt-2 text-[28px] font-bold leading-tight tracking-tight md:text-[36px]">
-          {title}
-        </h1>
-        <p className="mt-3 text-sm text-stone-500">Last updated: {updated}</p>
-        <div className="mt-8 space-y-7 rounded-3xl bg-white p-5 shadow-sm ring-1 ring-orange-100 sm:p-8">
+    <AppFrame>
+      <article>
+        <header className="mb-6">
+          <p className="text-sm font-medium text-accent-strong">{eyebrow}</p>
+          <h1 className="mt-1 text-[28px] font-bold leading-tight tracking-tight md:text-[36px]">{title}</h1>
+          <p className="mt-2 text-sm text-muted">Last updated: {updated}</p>
+        </header>
+        <div className="space-y-8 rounded-[var(--ll-radius-lg)] bg-surface p-5 shadow-[var(--ll-shadow-card)] sm:p-8">
           {children}
         </div>
+        <div className="mt-6 space-y-1 text-center text-sm text-muted">
+          <OperatorCredit />
+          <FuelTheLoopLink />
+        </div>
       </article>
-      <footer className="border-t border-orange-100 px-4 py-8 text-center text-xs leading-5 text-stone-500">
-        <p>© Craig Kohler · Lunch Loop</p>
-        <OperatorCredit />
-        <FuelTheLoopLink />
-        <p className="mt-2 flex flex-wrap justify-center gap-x-3 gap-y-1">
-          <Link className="font-bold text-orange-700 underline" href="/privacy">
-            Privacy Policy
-          </Link>
-          <Link className="font-bold text-orange-700 underline" href="/terms">
-            Terms of Use
-          </Link>
-        </p>
-      </footer>
-    </main>
+    </AppFrame>
   );
 }
 
@@ -71,8 +46,8 @@ export function LegalSection({
 }) {
   return (
     <section>
-      <h2 className="text-xl font-black tracking-tight">{title}</h2>
-      <div className="mt-2 space-y-3 text-sm leading-7 text-stone-700">
+      <h2 className="text-[19px] font-semibold tracking-tight">{title}</h2>
+      <div className="mt-2 space-y-3 text-[15px] leading-7 text-muted">
         {children}
       </div>
     </section>

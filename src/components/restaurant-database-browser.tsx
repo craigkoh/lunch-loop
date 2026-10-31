@@ -294,7 +294,7 @@ export function RestaurantDatabaseBrowser({
         </div>
       )}
       {visibleRestaurants.length > 0 && (
-        <p className="mt-3 text-[11px] text-subtle">
+        <p className="mt-3 text-xs text-subtle">
           Place information from <span translate="no">Google Maps</span>
         </p>
       )}

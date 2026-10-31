@@ -75,6 +75,12 @@
 }
 
 @theme {
+  /* Type scale (build .74): four sizes do almost everything.
+   *   13px meta (text-xs) · 15px body (text-[15px]/text-sm 14px for dense rows)
+   *   17–20px card titles · 28–36px page titles (48–72px only on the landing hero).
+   * Nothing smaller than 12px ships; text-xs was 12px and is now 13px. */
+  --text-xs: 0.8125rem;
+  --text-xs--line-height: 1.15rem;
   /* Semantic colors as Tailwind utilities: bg-surface, text-muted, bg-accent … */
   --color-accent: var(--ll-accent);
   --color-accent-strong: var(--ll-accent-strong);

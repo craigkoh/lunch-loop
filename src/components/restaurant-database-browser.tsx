@@ -54,35 +54,35 @@ export function RestaurantSearchFilters({
   onSortChange?: (value: RestaurantSort) => void;
   dark?: boolean;
 }) {
-  const labelColor = dark ? "text-orange-50" : "text-stone-600";
+  const labelColor = dark ? "text-orange-50" : "text-muted";
   return (
     <>
-      <div className="flex gap-2 rounded-2xl border border-orange-200 bg-white p-2 shadow-sm">
+      <div className="flex gap-2 rounded-[var(--ll-radius-md)] border border-line bg-surface p-1.5">
         <input
           value={search}
           onChange={(event) => onSearchChange(event.target.value)}
           placeholder="Search places, cities, cuisines, or who added them…"
-          className="min-w-0 flex-1 rounded-xl bg-white px-3 py-3 text-sm text-stone-900 caret-stone-900 outline-none placeholder:text-stone-400 focus:ring-2 focus:ring-orange-300"
+          className="min-h-10 min-w-0 flex-1 rounded-[var(--ll-radius-sm)] bg-surface px-2.5 text-base text-ink outline-none placeholder:text-subtle"
           aria-label="Search lunch database"
         />
         {search && (
           <button
             type="button"
             onClick={() => onSearchChange("")}
-            className="rounded-xl bg-orange-50 px-3 text-sm font-bold text-orange-800"
+            className="rounded-[var(--ll-radius-sm)] px-3 text-sm font-medium text-accent-strong hover:bg-surface-muted"
           >
             Clear
           </button>
         )}
       </div>
       {sort && onSortChange && (
-        <div className="mt-3 flex gap-2 overflow-x-auto pb-1" aria-label="Sort lunch database">
+        <div className="mt-3 flex flex-wrap gap-2" aria-label="Sort lunch database">
           {(Object.keys(sortLabels) as RestaurantSort[]).map((option) => (
             <button
               key={option}
               type="button"
               onClick={() => onSortChange(option)}
-              className={`whitespace-nowrap rounded-full px-3 py-2 text-sm font-bold ${sort === option ? "bg-orange-500 text-white" : "bg-white text-stone-600 shadow-sm"}`}
+              className={`min-h-10 whitespace-nowrap rounded-full px-3.5 text-sm font-medium ${sort === option ? "bg-accent-strong text-on-accent" : "border border-line bg-surface text-muted hover:text-ink"}`}
             >
               {sortLabels[option]}
             </button>
@@ -90,12 +90,12 @@ export function RestaurantSearchFilters({
         </div>
       )}
       <div className="mt-3 grid gap-2 sm:grid-cols-2">
-        <label className={`text-xs font-bold ${labelColor}`}>
+        <label className={`text-sm font-medium ${labelColor}`}>
           Cuisine
           <select
             value={cuisineFilter}
             onChange={(event) => onCuisineFilterChange(event.target.value)}
-            className="mt-1 block w-full rounded-xl border border-orange-200 bg-white px-3 py-3 text-sm font-semibold text-stone-900"
+            className="mt-1 block min-h-11 w-full rounded-[var(--ll-radius-md)] border border-line bg-surface px-3 text-[15px] font-normal text-ink"
           >
             <option value="">All cuisines</option>
             {cuisines.map((cuisine) => (
@@ -105,12 +105,12 @@ export function RestaurantSearchFilters({
             ))}
           </select>
         </label>
-        <label className={`text-xs font-bold ${labelColor}`}>
+        <label className={`text-sm font-medium ${labelColor}`}>
           Added by
           <select
             value={addedByFilter}
             onChange={(event) => onAddedByFilterChange(event.target.value)}
-            className="mt-1 block w-full rounded-xl border border-orange-200 bg-white px-3 py-3 text-sm font-semibold text-stone-900"
+            className="mt-1 block min-h-11 w-full rounded-[var(--ll-radius-md)] border border-line bg-surface px-3 text-[15px] font-normal text-ink"
           >
             <option value="">Everyone</option>
             {contributors.map(([id, name]) => (
@@ -261,7 +261,7 @@ export function RestaurantDatabaseBrowser({
           }}
         />
       </div>
-      <p className="mt-3 text-xs font-semibold text-stone-500" aria-live="polite">
+      <p className="mt-3 text-sm text-muted" aria-live="polite">
         {visibleRestaurants.length} matching place
         {visibleRestaurants.length === 1 ? "" : "s"}
       </p>
@@ -294,28 +294,28 @@ export function RestaurantDatabaseBrowser({
         </div>
       )}
       {visibleRestaurants.length > 0 && (
-        <p className="mt-3 text-xs text-subtle">
+        <p className="mt-3 text-sm text-subtle">
           Place information from <span translate="no">Google Maps</span>
         </p>
       )}
       {visibleRestaurants.length > placesPerPage && (
-        <nav className="mt-5 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-orange-100 bg-orange-50 px-3 py-3" aria-label="Lunch database pages">
+        <nav className="mt-5 flex flex-wrap items-center justify-between gap-3" aria-label="Lunch database pages">
           <button
             type="button"
             onClick={() => setPage((current) => Math.max(1, current - 1))}
             disabled={currentPage === 1}
-            className="rounded-xl bg-white px-3 py-2 text-sm font-black text-stone-800 shadow-sm disabled:opacity-40"
+            className="inline-flex min-h-11 items-center rounded-[var(--ll-radius-md)] border border-line bg-surface px-4 text-[15px] font-semibold text-ink hover:bg-surface-muted disabled:opacity-40"
           >
             ← Previous
           </button>
-          <span className="text-sm font-bold text-stone-600">
+          <span className="text-sm text-muted">
             Places {(currentPage - 1) * placesPerPage + 1}–{Math.min(currentPage * placesPerPage, visibleRestaurants.length)} of {visibleRestaurants.length}
           </span>
           <button
             type="button"
             onClick={() => setPage((current) => Math.min(totalPages, current + 1))}
             disabled={currentPage === totalPages}
-            className="rounded-xl bg-white px-3 py-2 text-sm font-black text-stone-800 shadow-sm disabled:opacity-40"
+            className="inline-flex min-h-11 items-center rounded-[var(--ll-radius-md)] border border-line bg-surface px-4 text-[15px] font-semibold text-ink hover:bg-surface-muted disabled:opacity-40"
           >
             Next →
           </button>

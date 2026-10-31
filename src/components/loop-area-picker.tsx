@@ -154,8 +154,8 @@ export function LoopAreaPicker({
   }
 
   return (
-    <div className="rounded-2xl bg-orange-50 p-4 ring-1 ring-orange-100">
-      <label htmlFor={listId + "-input"} className="block text-sm font-black text-stone-900">
+    <div>
+      <label htmlFor={listId + "-input"} className="block text-[15px] font-medium">
         Center of your search area
       </label>
       <div ref={anchorRef} className="relative z-30 mt-2">
@@ -177,15 +177,15 @@ export function LoopAreaPicker({
           onKeyDown={onInputKeyDown}
           placeholder="Start with a city, e.g. Evansville, IN"
           autoComplete="off"
-          className="w-full rounded-xl border border-orange-200 bg-white px-3 py-3 font-normal outline-none focus:ring-2 focus:ring-orange-300 disabled:opacity-60"
+          className="min-h-11 w-full rounded-[var(--ll-radius-md)] border border-line bg-surface px-3 text-base font-normal text-ink outline-none focus:ring-2 focus:ring-accent/40 disabled:opacity-60"
         />
         {suggestionsOpen && (
           <div
             id={listId}
             role="listbox"
-            className="absolute left-0 right-0 top-full z-30 mt-1 max-h-64 w-full overflow-y-auto rounded-xl border border-orange-200 bg-white shadow-lg"
+            className="absolute left-0 right-0 top-full z-30 mt-1 max-h-64 w-full overflow-y-auto rounded-[var(--ll-radius-md)] border border-line bg-surface shadow-lg"
           >
-            {loading ? <p className="px-3 py-3 text-sm text-stone-500">Finding places and cities…</p> : null}
+            {loading ? <p className="px-3 py-3 text-sm text-muted">Finding places and cities…</p> : null}
             {results.map((area, index) => (
               <button
                 key={`${area.lat}:${area.lng}:${area.address}`}
@@ -197,23 +197,23 @@ export function LoopAreaPicker({
                 onMouseDown={(event) => event.preventDefault()}
                 onMouseEnter={() => setActiveIndex(index)}
                 onClick={() => choose(area)}
-                className={"block min-h-11 w-full border-b border-stone-100 px-3 py-3 text-left last:border-0 disabled:opacity-60 " + (index === highlightedIndex ? "bg-orange-50" : "hover:bg-orange-50")}
+                className={"block min-h-11 w-full border-b border-line px-3 py-3 text-left last:border-0 disabled:opacity-60 " + (index === highlightedIndex ? "bg-surface-muted" : "hover:bg-surface-muted")}
               >
-                <strong className="block text-sm">{area.label}</strong>
-                <span className="mt-0.5 block text-xs text-stone-500">{area.address}</span>
+                <strong className="block text-[15px] font-semibold">{area.label}</strong>
+                <span className="mt-0.5 block text-sm text-muted">{area.address}</span>
               </button>
             ))}
-            {!loading && !results.length && error ? <p className="px-3 py-3 text-sm font-semibold text-rose-700">{error}</p> : null}
+            {!loading && !results.length && error ? <p className="px-3 py-3 text-sm font-medium text-danger">{error}</p> : null}
           </div>
         )}
       </div>
-      <label className="mt-5 block text-sm font-black text-stone-900">
+      <label className="mt-5 block text-[15px] font-medium">
         Your crew’s time zone
         <select
           value={value.timeZone}
           disabled={disabled}
           onChange={(event) => onChange({ ...value, timeZone: event.target.value })}
-          className="mt-2 w-full rounded-xl border border-orange-200 bg-white px-3 py-3 font-normal outline-none focus:ring-2 focus:ring-orange-300 disabled:opacity-60"
+          className="mt-2 min-h-11 w-full rounded-[var(--ll-radius-md)] border border-line bg-surface px-3 text-base font-normal text-ink outline-none focus:ring-2 focus:ring-accent/40 disabled:opacity-60"
         >
           {timeZones.map((timeZone) => (
             <option key={timeZone} value={timeZone}>
@@ -221,12 +221,12 @@ export function LoopAreaPicker({
             </option>
           ))}
         </select>
-        <span className="mt-1 block text-xs font-normal text-stone-600">We set this automatically from the city you choose. Change it here only if your crew follows a different local clock.</span>
+        <span className="mt-1 block text-sm font-normal leading-6 text-muted">We set this automatically from the city you choose. Change it here only if your crew follows a different local clock.</span>
       </label>
-      <p className="mt-2 text-xs leading-5 text-stone-600">
+      <p className="mt-2 text-sm leading-6 text-muted">
         Pick the city or area your crew considers home. We use its map point to keep restaurant searches inside your chosen radius.
       </p>
-      <label className="mt-5 block text-sm font-black text-stone-900">
+      <label className="mt-5 block text-[15px] font-medium">
         Search radius: {value.radiusMiles} {value.radiusMiles === 1 ? "mile" : "miles"}
         <input
           type="range"
@@ -235,24 +235,24 @@ export function LoopAreaPicker({
           value={value.radiusMiles}
           disabled={disabled}
           onChange={(event) => onChange({ ...value, radiusMiles: Number(event.target.value) })}
-          className="mt-3 w-full accent-orange-500 disabled:opacity-60"
+          className="mt-3 w-full accent-[var(--ll-accent)] disabled:opacity-60"
         />
-        <span className="mt-1 flex justify-between text-xs font-normal text-stone-500"><span>1 mile</span><span>35 miles</span></span>
+        <span className="mt-1 flex justify-between text-sm font-normal text-subtle"><span>1 mile</span><span>35 miles</span></span>
       </label>
       {mapUrl ? (
-        <div className="relative mt-5 aspect-square overflow-hidden rounded-2xl border border-orange-200 bg-white">
+        <div className="relative mt-5 aspect-square overflow-hidden rounded-[var(--ll-radius-md)] border border-line bg-surface">
           <iframe title="Lunch Loop search area map" src={mapUrl} className="pointer-events-none absolute inset-0 size-full border-0" loading="lazy" referrerPolicy="no-referrer-when-downgrade" />
           <div className="pointer-events-none absolute inset-0 grid place-items-center">
-            <div style={{ width: circleDiameter, height: circleDiameter }} className="grid place-items-center rounded-full border-2 border-orange-500 bg-orange-300/20 text-center text-xs font-black text-orange-900 shadow-sm backdrop-blur-[1px]">
+            <div style={{ width: circleDiameter, height: circleDiameter }} className="grid place-items-center rounded-full border-2 border-orange-500 bg-orange-300/20 text-center text-sm font-semibold text-orange-900 shadow-sm backdrop-blur-[1px]">
               {value.radiusMiles} mi<br />search area
             </div>
           </div>
-          <p className="absolute bottom-2 left-2 right-2 rounded-lg bg-white/90 px-2 py-1 text-center text-xs font-bold text-stone-700 shadow-sm">
-            The circle represents the distance Lunch Loop will search from the selected center.
+          <p className="absolute bottom-2 left-2 right-2 rounded-[var(--ll-radius-sm)] bg-white/90 px-2 py-1 text-center text-sm font-medium text-stone-700 shadow-sm">
+            The circle is how far Lunch Loop searches.
           </p>
         </div>
       ) : (
-        <p className="mt-4 rounded-xl bg-white px-3 py-3 text-sm text-stone-600">Choose an autocomplete result to preview your search area on a map.</p>
+        <p className="mt-4 rounded-[var(--ll-radius-md)] bg-surface-muted px-3 py-3 text-sm text-muted">Choose an autocomplete result to preview your search area on a map.</p>
       )}
     </div>
   );

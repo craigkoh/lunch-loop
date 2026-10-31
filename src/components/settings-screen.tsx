@@ -91,7 +91,7 @@ const discordEvents = [
 type SettingsTab = "crew" | "area" | "places" | "owner";
 const settingsTabs: { id: SettingsTab; label: string; emoji: string }[] = [
   { id: "crew", label: "Crew", emoji: "👥" },
-  { id: "area", label: "Area & loops", emoji: "🌎" },
+  { id: "area", label: "Area", emoji: "🌎" },
   { id: "places", label: "Places", emoji: "🍽️" },
   { id: "owner", label: "Owner", emoji: "👑" },
 ];
@@ -106,8 +106,8 @@ function SettingsTabs({
   showOwnerTools: boolean;
 }) {
   return (
-    <nav aria-label="Settings sections" className="mt-5 -mx-1 overflow-x-auto px-1 pb-1">
-      <div className="flex w-max gap-1 rounded-[var(--ll-radius-md)] bg-stone-100 p-1">
+    <nav aria-label="Settings sections" className="mt-5">
+      <div className="flex w-full gap-1 rounded-[var(--ll-radius-md)] bg-surface-muted p-1">
         {settingsTabs
           .filter((tab) => tab.id !== "owner" || showOwnerTools)
           .map((tab) => (
@@ -116,9 +116,8 @@ function SettingsTabs({
               type="button"
               aria-pressed={active === tab.id}
               onClick={() => onChange(tab.id)}
-              className={`inline-flex min-h-11 items-center gap-1.5 whitespace-nowrap rounded-[10px] px-3 text-sm font-semibold transition ${active === tab.id ? "bg-surface text-ink shadow-[var(--ll-shadow-card)]" : "text-stone-600 hover:text-ink"}`}
+              className={`inline-flex min-h-11 min-w-0 flex-1 items-center justify-center whitespace-nowrap rounded-[10px] px-2 text-[15px] font-medium transition ${active === tab.id ? "bg-surface text-ink shadow-[var(--ll-shadow-card)]" : "text-muted hover:text-ink"}`}
             >
-              <span aria-hidden="true">{tab.emoji}</span>
               {tab.label}
             </button>
           ))}
@@ -749,22 +748,27 @@ export function SettingsScreen() {
     6 - members.length - pendingInvitationCount,
   );
 
+  const cardClass = "mt-4 rounded-[var(--ll-radius-lg)] bg-surface p-5 text-ink shadow-[var(--ll-shadow-card)] sm:p-6";
+  const subCardClass = "mt-4 rounded-[var(--ll-radius-md)] border border-line p-4";
+  const h2Class = "text-[17px] font-semibold";
+  const h3Class = "text-[15px] font-semibold";
+  const helpClass = "mt-1 text-sm leading-6 text-muted";
+  const inputClass = "mt-2 min-h-11 w-full rounded-[var(--ll-radius-md)] border border-line bg-surface px-3 text-base font-normal text-ink outline-none focus:ring-2 focus:ring-accent/40";
+  const primaryButton = "inline-flex min-h-11 items-center justify-center rounded-[var(--ll-radius-md)] bg-accent-strong px-4 text-[15px] font-semibold text-on-accent disabled:opacity-60";
+  const secondaryButton = "inline-flex min-h-11 items-center justify-center rounded-[var(--ll-radius-md)] border border-line bg-surface px-4 text-[15px] font-semibold text-ink hover:bg-surface-muted disabled:opacity-50";
+  const dangerButton = "inline-flex min-h-11 items-center justify-center rounded-[var(--ll-radius-md)] px-4 text-[15px] font-semibold text-danger hover:bg-danger-soft disabled:opacity-50";
+
   return (
     <AppFrame>
-      <p className="text-sm font-medium text-accent-strong">
-        Loop settings
-      </p>
-      <div className="mt-1 flex items-center gap-3">
-        <h1 className="text-[28px] font-bold leading-tight tracking-tight md:text-[36px]">Settings</h1>
-        {context?.role === "owner" && <span className="rounded-full bg-accent-soft px-2.5 py-1 text-xs font-semibold text-accent-strong">👑 Owner</span>}
-      </div>
-      <p className="mt-2 text-[15px] text-muted">
-        Your crew, search area, and places.{" "}{/* owner-only tools sit in the Owner section */}
-      </p>
+      <header>
+        <div className="flex items-center gap-3">
+          <h1 className="text-[28px] font-bold leading-tight tracking-tight md:text-[36px]">Settings</h1>
+          {context?.role === "owner" && <span className="rounded-full bg-accent-soft px-2.5 py-1 text-sm font-medium text-accent-ink">Owner</span>}
+        </div>
+        <p className="mt-2 text-[15px] text-muted">Your crew, search area, and places.</p>
+      </header>
       {loading ? (
-        <p className="mt-6 text-sm font-semibold text-stone-500">
-          Loading group settings…
-        </p>
+        <p className="mt-6 text-[15px] text-muted">Loading settings…</p>
       ) : error && !context ? (
         <EmptyState emoji="⚙️" title="Settings need a lunch group">
           {error}
@@ -774,25 +778,19 @@ export function SettingsScreen() {
           <>
             <SettingsTabs active={settingsTab} onChange={setSettingsTab} showOwnerTools={context.role === "owner"} />
             {settingsTab === "crew" && <>
-            <section className="mt-6 rounded-[var(--ll-radius-lg)] bg-surface p-5 shadow-[var(--ll-shadow-card)]">
+            <section className={cardClass}>
               <div className="flex items-end justify-between gap-3">
                 <div>
-                  <h2 className="text-[17px] font-semibold">{context.loopType === "occasion" ? "Occasion crew" : "Crew and pick order"}</h2>
-                  <p className="mt-1 text-sm leading-6 text-muted">
+                  <h2 className={h2Class}>{context.loopType === "occasion" ? "Occasion crew" : "Crew and pick order"}</h2>
+                  <p className={helpClass}>
                     {context.loopType === "occasion"
-                      ? `The owner makes the first occasion’s picks. After that, whoever starts an occasion makes that night’s picks. Each Lunch Loop supports up to six people (${members.length}/6).`
+                      ? `The owner makes the first occasion’s picks. After that, whoever starts an occasion makes that night’s picks. Up to six people (${members.length}/6).`
                       : `This order decides whose turn it is to pick. Up to six people (${members.length}/6).`}
                   </p>
                 </div>
-                {context.role === "owner" && (
-                  <span className="shrink-0 text-sm font-medium text-accent-strong">
-                    Owner controls
-                  </span>
-                )}
               </div>
-              <p className="mt-3 text-sm leading-6 text-subtle">
-                Names here are for this Lunch Loop only. The account under each
-                name identifies the real member; only the owner sees everyone’s.
+              <p className="mt-2 text-sm leading-6 text-subtle">
+                Names here are for this Lunch Loop only. Only the owner sees everyone’s account.
               </p>
               <ul className="mt-4 divide-y divide-line overflow-hidden rounded-[var(--ll-radius-md)] border border-line">
                 {members.map((member, index) => (
@@ -850,7 +848,7 @@ export function SettingsScreen() {
                             {member.user_id !== context.userId && (
                               <button
                                 onClick={() => removeMember(index)}
-                                className="min-h-10 rounded-[var(--ll-radius-md)] px-3 text-sm font-medium text-rose-700 hover:bg-rose-50"
+                                className="min-h-10 rounded-[var(--ll-radius-md)] px-3 text-sm font-medium text-danger hover:bg-danger-soft"
                               >
                                 Remove
                               </button>
@@ -863,91 +861,145 @@ export function SettingsScreen() {
                 ))}
               </ul>
               {context.role === "owner" && (
-                <button
-                  disabled={saving}
-                  onClick={saveRoster}
-                  className="mt-4 min-h-11 rounded-[var(--ll-radius-md)] bg-accent-strong px-4 text-[15px] font-semibold text-on-accent disabled:opacity-60"
-                >
+                <button disabled={saving} onClick={saveRoster} className={`mt-4 ${primaryButton}`}>
                   {saving ? "Saving…" : "Save roster"}
                 </button>
               )}
             </section>
-            <section className="ll-calm mt-4 overflow-hidden rounded-[var(--ll-radius-lg)] p-5">
-              <div className="flex items-start gap-3">
-                <span className="grid size-11 shrink-0 place-items-center rounded-2xl bg-white/20 text-2xl" aria-hidden="true">👋</span>
-                <div>
-                  <p className="text-xs font-bold text-orange-100">{context.groupName}</p>
-                  <h2 className="mt-1 text-xl font-black">Invite people</h2>
-                </div>
-              </div>
-              <p className="mt-3 max-w-3xl text-sm leading-6 text-orange-50">Invite by email, or make a short code to text. Each invite works once and expires after 14 days.</p>
+
+            <section className={cardClass}>
+              <h2 className={h2Class}>Invite people</h2>
+              <p className={helpClass}>Invite by email, or make a short code to text. Each invite works once and expires after 14 days.</p>
               {context.role === "owner" ? <>
-                {knownPeople.length > 0 && <div className="mt-5 rounded-2xl bg-white/95 p-4 text-stone-900 shadow-sm">
-                  <p className="text-sm font-black">Bring in someone from another Lunch Loop</p>
-                  <p className="mt-1 text-xs leading-5 text-stone-600">People you already share a Lunch Loop with. Adding one makes them a member right away and emails them. Finish any round underway first.</p>
-                  <input value={knownPeopleSearch} onChange={(event) => setKnownPeopleSearch(event.target.value)} placeholder="Search name, email, or current Lunch Loop" className="mt-3 w-full rounded-xl border border-orange-200 bg-white px-3 py-3 text-sm outline-none focus:ring-2 focus:ring-orange-300" />
-                  <div className="mt-3 max-h-64 space-y-2 overflow-y-auto pr-1">
-                    {visibleKnownPeople.map((person) => <div key={person.user_id} className="flex flex-wrap items-center justify-between gap-3 rounded-xl bg-orange-50 px-3 py-3"><div className="min-w-0"><p className="font-black">{person.display_name}</p>{person.google_full_name && person.google_full_name !== person.display_name && <p className="text-xs text-orange-800">Google name: {person.google_full_name}</p>}<p className="truncate text-xs text-stone-600">{person.account_email ?? "Email unavailable"}</p><p className="mt-1 text-xs font-semibold text-stone-500">Also in {person.shared_loop_names.join(", ")}</p></div><button type="button" disabled={saving || availableInvitationCount === 0} onClick={() => void addKnownPerson(person)} className="shrink-0 rounded-xl bg-orange-500 px-3 py-2 text-sm font-black text-white disabled:opacity-60">{availableInvitationCount === 0 ? "No open spots" : "Add to this loop"}</button></div>)}
-                    {!visibleKnownPeople.length && <p className="rounded-xl bg-stone-50 p-3 text-sm text-stone-500">No matching people from your other active Lunch Loops.</p>}
-                  </div>
+                <p className="mt-3 text-sm font-medium text-accent-ink">
+                  {members.length}/6 spots filled · {pendingInvitationCount} held by invitations · {availableInvitationCount > 0 ? `${availableInvitationCount} open` : "none open"}
+                </p>
+                {knownPeople.length > 0 && <div className={subCardClass}>
+                  <h3 className={h3Class}>Bring in someone from another Lunch Loop</h3>
+                  <p className={helpClass}>People you already share a loop with. Adding one makes them a member right away and emails them. Finish any round underway first.</p>
+                  <input value={knownPeopleSearch} onChange={(event) => setKnownPeopleSearch(event.target.value)} placeholder="Search name, email, or loop" className={inputClass} aria-label="Search people from your other Lunch Loops" />
+                  <ul className="mt-3 max-h-72 divide-y divide-line overflow-y-auto">
+                    {visibleKnownPeople.map((person) => (
+                      <li key={person.user_id} className="flex flex-wrap items-center justify-between gap-3 py-3">
+                        <div className="min-w-0">
+                          <p className="text-[15px] font-semibold">{person.display_name}</p>
+                          <p className="truncate text-sm text-subtle">
+                            {person.google_full_name && person.google_full_name !== person.display_name ? `${person.google_full_name} · ` : ""}
+                            {person.account_email ?? "Email unavailable"}
+                          </p>
+                          <p className="text-sm text-subtle">Also in {person.shared_loop_names.join(", ")}</p>
+                        </div>
+                        <button type="button" disabled={saving || availableInvitationCount === 0} onClick={() => void addKnownPerson(person)} className={secondaryButton}>
+                          {availableInvitationCount === 0 ? "No open spots" : "Add to this loop"}
+                        </button>
+                      </li>
+                    ))}
+                    {!visibleKnownPeople.length && <li className="py-3 text-sm text-muted">No matching people from your other active Lunch Loops.</li>}
+                  </ul>
                 </div>}
-                <form onSubmit={sendMemberInvite} className="mt-4 rounded-2xl bg-white/95 p-4 text-stone-900 shadow-sm">
-                  <label className="block text-sm font-black">Invite someone new to {context.groupName}
-                    <span className="mt-1 block text-xs font-normal text-stone-600">{members.length}/6 spots filled · {pendingInvitationCount} held by invitations. If a round is underway, they join after it closes.</span>
-                    <input required type="email" value={memberInviteEmail} onChange={(event) => setMemberInviteEmail(event.target.value)} placeholder="friend@example.com" className="mt-3 w-full rounded-xl bg-white px-3 py-3 text-sm font-normal text-stone-900 outline-none focus:ring-2 focus:ring-orange-300" />
+                <form onSubmit={sendMemberInvite} className={subCardClass}>
+                  <label className="block">
+                    <span className={h3Class}>Invite by email</span>
+                    <span className="block text-sm leading-6 text-muted">If a round is underway, they join after it closes.</span>
+                    <input required type="email" value={memberInviteEmail} onChange={(event) => setMemberInviteEmail(event.target.value)} placeholder="friend@example.com" className={inputClass} />
                   </label>
-                  <button disabled={saving || availableInvitationCount === 0} className="mt-3 rounded-xl bg-orange-500 px-4 py-3 text-sm font-black text-white disabled:opacity-60">{availableInvitationCount === 0 ? "No open crew spots" : saving ? "Creating invite…" : "Send one-time invite"}</button>
+                  <button disabled={saving || availableInvitationCount === 0} className={`mt-3 ${primaryButton}`}>
+                    {availableInvitationCount === 0 ? "No open crew spots" : saving ? "Creating invite…" : "Send invite"}
+                  </button>
                 </form>
-                <div className="mt-4 rounded-2xl border border-orange-200 bg-orange-50 p-4 text-stone-900 shadow-sm">
-                  <p className="text-sm font-black">No email handy?</p>
-                  <p className="mt-1 text-xs leading-5 text-stone-600">Make a one-time code and link to text. The first person to use it joins.</p>
-                  <label className="mt-3 block text-xs font-bold text-stone-700">Who is this for? <span className="font-normal text-stone-500">Optional—only the owner sees this note.</span>
-                    <input value={shareableInviteLabel} onChange={(event) => setShareableInviteLabel(event.target.value)} maxLength={80} placeholder="e.g. Jamie" className="mt-2 w-full rounded-xl border border-orange-200 bg-white px-3 py-3 text-sm font-normal text-stone-900 outline-none focus:ring-2 focus:ring-orange-300" />
+                <div className={subCardClass}>
+                  <h3 className={h3Class}>Or text a code</h3>
+                  <p className={helpClass}>Make a one-time code and link. The first person to use it joins.</p>
+                  <label className="mt-3 block text-sm font-medium">
+                    Who is this for? <span className="font-normal text-subtle">Optional, only you see it.</span>
+                    <input value={shareableInviteLabel} onChange={(event) => setShareableInviteLabel(event.target.value)} maxLength={80} placeholder="e.g. Jamie" className={inputClass} />
                   </label>
-                  <div className="mt-3 flex flex-wrap items-center justify-between gap-3"><p className="text-xs font-bold text-orange-800">{availableInvitationCount > 0 ? `${availableInvitationCount} invitation ${availableInvitationCount === 1 ? "spot" : "spots"} still available` : "No open invitation spots right now"}</p><button type="button" disabled={saving || availableInvitationCount === 0} onClick={() => void createShareableInvite()} className="rounded-xl bg-orange-500 px-4 py-3 text-sm font-black text-white disabled:opacity-60">{saving ? "Creating code…" : "Generate code and link"}</button></div>
+                  <button type="button" disabled={saving || availableInvitationCount === 0} onClick={() => void createShareableInvite()} className={`mt-3 ${secondaryButton}`}>
+                    {saving ? "Creating code…" : "Make a code and link"}
+                  </button>
                 </div>
-              </> : <p className="mt-4 rounded-2xl bg-white/15 p-4 text-sm text-white">Only the owner can add someone to this Lunch Loop. You can still refer a friend to start their own crew below.</p>}
-              <form onSubmit={sendNewLoopInvite} className="mt-4 rounded-2xl border border-white/30 bg-white/10 p-4">
-                <label className="block text-sm font-black">Know someone who needs their own Lunch Loop?
-                  <span className="mt-1 block text-xs font-normal text-orange-50">They become the owner of a completely separate crew, database, and history.</span>
-                  <input required type="email" value={newLoopInviteEmail} onChange={(event) => setNewLoopInviteEmail(event.target.value)} placeholder="friend@example.com" className="mt-3 w-full rounded-xl bg-white px-3 py-3 text-sm font-normal text-stone-900 outline-none focus:ring-2 focus:ring-orange-300" />
-                </label>
-                <button disabled={saving} className="mt-3 rounded-xl bg-white px-4 py-3 text-sm font-black text-orange-800 shadow-sm disabled:opacity-60">{saving ? "Creating invite…" : "Invite them to start a loop"}</button>
-              </form>
+              </> : <p className="mt-4 text-[15px] leading-6 text-muted">Only the owner can add someone to this Lunch Loop. You can still help a friend start their own crew below.</p>}
               {inviteShare && (
-                <div className="mt-4 rounded-2xl bg-emerald-50 p-4 text-stone-900">
-                  <p className="font-black">{inviteShare.kind === "share-code" ? `Shareable invite${inviteShare.label ? ` for ${inviteShare.label}` : ""} is ready` : inviteShare.emailSent ? `Sent to ${inviteShare.recipient}` : `Ready to share with ${inviteShare.recipient}`}</p>
-                  <p className="mt-1 text-sm text-stone-600">{inviteShare.kind === "share-code" ? "Text this link or short code to one person. Whoever signs in and redeems it first joins the crew." : inviteShare.kind === "member" ? "Email delivery is optional—copy the secure link and one-time code to text it instead." : "Copy this secure link if you’d rather text it yourself."}</p>
-                  <p className="mt-3 break-all rounded-xl bg-white px-3 py-2 text-xs font-bold">{inviteShare.url}</p>
-                  {inviteShare.code && <p className="mt-2 text-sm font-black">One-time code: <code className="tracking-widest">{inviteShare.code}</code></p>}
-                  <button type="button" onClick={copyInviteCode} className="mt-3 rounded-xl bg-orange-700 px-3 py-2 text-sm font-black text-white">Copy invite message</button>
+                <div className="mt-4 rounded-[var(--ll-radius-md)] bg-accent-soft p-4">
+                  <p className="text-[15px] font-semibold">{inviteShare.kind === "share-code" ? `Invite${inviteShare.label ? ` for ${inviteShare.label}` : ""} is ready` : inviteShare.emailSent ? `Sent to ${inviteShare.recipient}` : `Ready to share with ${inviteShare.recipient}`}</p>
+                  <p className={helpClass}>{inviteShare.kind === "share-code" ? "Text this link or code to one person. Whoever redeems it first joins the crew." : inviteShare.kind === "member" ? "Email is optional. Copy the link and code to text it instead." : "Copy this link if you’d rather text it yourself."}</p>
+                  <p className="mt-3 break-all rounded-[var(--ll-radius-sm)] bg-surface px-3 py-2 text-sm">{inviteShare.url}</p>
+                  {inviteShare.code && <p className="mt-2 text-[15px] font-semibold">One-time code: <code className="tracking-widest">{inviteShare.code}</code></p>}
+                  <button type="button" onClick={copyInviteCode} className={`mt-3 ${primaryButton}`}>Copy invite message</button>
                 </div>
               )}
-              {context.role === "owner" && (memberInvitations.length > 0 || shareableInvitations.length > 0) && <div className="mt-5 border-t border-white/25 pt-4"><h3 className="font-black">Crew invitations</h3><div className="mt-3 space-y-2">{shareableInvitations.slice(0, 6).map((invite) => <div key={invite.id} className="flex flex-wrap items-center justify-between gap-2 rounded-xl bg-white/15 px-3 py-2 text-sm"><span className="min-w-0 truncate"><strong>{invite.invite_label || "Unnamed friend"}</strong> · shareable code · <span className="font-bold">{invite.status}</span>{invite.status === "pending" ? ` · expires ${new Date(invite.expires_at).toLocaleDateString()}` : ""}</span>{invite.status === "pending" && <button disabled={saving} onClick={() => void revokeShareableInvite(invite)} className="font-bold text-white underline">Revoke</button>}</div>)}{memberInvitations.slice(0, 8).map((invite) => <div key={invite.id} className="flex flex-wrap items-center justify-between gap-2 rounded-xl bg-white/15 px-3 py-2 text-sm"><span className="min-w-0 truncate">{invite.recipient_email} · <span className="font-bold">{invite.status}</span></span>{invite.status === "pending" && <button disabled={saving} onClick={() => void revokeMemberInvite(invite)} className="font-bold text-white underline">Revoke</button>}</div>)}</div></div>}
+              {context.role === "owner" && (memberInvitations.length > 0 || shareableInvitations.length > 0) && (
+                <div className="mt-5">
+                  <h3 className={h3Class}>Sent invitations</h3>
+                  <ul className="mt-2 divide-y divide-line rounded-[var(--ll-radius-md)] border border-line">
+                    {shareableInvitations.slice(0, 6).map((invite) => (
+                      <li key={invite.id} className="flex flex-wrap items-center justify-between gap-2 px-4 py-2 text-sm">
+                        <span className="min-w-0 truncate"><span className="font-semibold">{invite.invite_label || "Unnamed friend"}</span> · code · {invite.status}{invite.status === "pending" ? ` · expires ${new Date(invite.expires_at).toLocaleDateString()}` : ""}</span>
+                        {invite.status === "pending" && <button disabled={saving} onClick={() => void revokeShareableInvite(invite)} className="min-h-10 px-2 font-medium text-danger">Revoke</button>}
+                      </li>
+                    ))}
+                    {memberInvitations.slice(0, 8).map((invite) => (
+                      <li key={invite.id} className="flex flex-wrap items-center justify-between gap-2 px-4 py-2 text-sm">
+                        <span className="min-w-0 truncate">{invite.recipient_email} · {invite.status}</span>
+                        {invite.status === "pending" && <button disabled={saving} onClick={() => void revokeMemberInvite(invite)} className="min-h-10 px-2 font-medium text-danger">Revoke</button>}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
             </section>
+
+            <form onSubmit={sendNewLoopInvite} className={cardClass}>
+              <label className="block">
+                <span className={h2Class}>Know someone who needs their own loop?</span>
+                <span className="mt-1 block text-sm leading-6 text-muted">They become the owner of a separate crew, list, and history.</span>
+                <input required type="email" value={newLoopInviteEmail} onChange={(event) => setNewLoopInviteEmail(event.target.value)} placeholder="friend@example.com" className={inputClass} />
+              </label>
+              <button disabled={saving} className={`mt-3 ${secondaryButton}`}>{saving ? "Creating invite…" : "Invite them to start a loop"}</button>
+            </form>
             </>}
+
             {settingsTab === "area" && <>
-            <section className="mt-7 rounded-3xl bg-white p-5 shadow-sm">
-              <div className="flex items-start gap-3"><span className="grid size-10 place-items-center rounded-2xl bg-orange-100 text-xl" aria-hidden="true">🌎</span><div><p className="text-xs font-bold text-orange-600">Your search area</p>
-              <h2 className="mt-1 text-xl font-black">Where does {context.groupName} eat?</h2></div></div>
-              <p className="mt-2 text-sm text-stone-600">Every Lunch Loop has its own home location and search radius. The shared restaurant database stays separate, even when another crew uses Lunch Loop in a different city.</p>
+            <section className={cardClass}>
+              <h2 className={h2Class}>Where does {context.groupName} eat?</h2>
+              <p className={helpClass}>Each Lunch Loop has its own home location, search radius, and time zone.</p>
               {context.role === "owner" ? <>
                 <div className="mt-4"><LoopAreaPicker value={homeArea} onChange={setHomeArea} disabled={saving} /></div>
-                <button type="button" disabled={saving || !homeArea.label || homeArea.lat === null || homeArea.lng === null || !homeArea.timeZone} onClick={() => void saveHomeArea()} className="mt-4 rounded-xl bg-orange-500 px-4 py-3 text-sm font-black text-white disabled:opacity-60">{saving ? "Saving…" : "Save search area and time zone"}</button>
-              </> : <div className="mt-4 rounded-2xl bg-orange-50 p-4 text-sm text-stone-700"><strong>{homeArea.label || "Home area not set yet"}</strong>{homeArea.label ? ` · ${homeArea.radiusMiles} mile search radius` : ". Ask the Lunch Loop owner to set it before adding places."}</div>}
-            </section>
-            {loops.length > 1 && <section className="mt-7 rounded-3xl bg-white p-5 shadow-sm"><div className="flex items-start gap-3"><span className="grid size-10 place-items-center rounded-2xl bg-orange-100 text-xl" aria-hidden="true">🧭</span><div><h2 className="text-lg font-black">Your Lunch Loops</h2><p className="mt-1 text-sm text-stone-500">Each loop keeps its own people, places, and stats. Choose which active loop you’re using now.</p></div></div><div className="mt-4 space-y-2">{loops.map((loop) => <div key={loop.group_id} className="flex flex-wrap items-center justify-between gap-3 rounded-2xl bg-stone-50 p-3"><div><p className="font-black">{loop.group_name} {loop.active && <span className="ml-1 text-xs text-orange-700">Current</span>}</p><p className="text-xs text-stone-500">{loop.role} · {loop.member_count}/6 people · {loop.status}</p></div>{loop.status === "active" && !loop.active && <button disabled={saving} onClick={() => void switchLoop(loop)} className="rounded-xl bg-orange-600 px-3 py-2 text-sm font-black text-white">Switch to this loop</button>}</div>)}</div></section>}
-            </>}
-            {settingsTab === "places" && <>
-            <section className="mt-7">
-              <div>
-                <h2 className="text-lg font-black">🍽️ Lunch database</h2>
-                <p className="mt-1 text-sm text-stone-500">
-                  {context.role === "owner"
-                    ? "Search, filter, and sort the same database the crew uses. You can also retire a place or remove an accidental entry."
-                    : "Search, filter, and sort the shared restaurant database. Only the owner can retire or remove places."}
+                <button type="button" disabled={saving || !homeArea.label || homeArea.lat === null || homeArea.lng === null || !homeArea.timeZone} onClick={() => void saveHomeArea()} className={`mt-4 ${primaryButton}`}>{saving ? "Saving…" : "Save area and time zone"}</button>
+              </> : (
+                <p className="mt-4 rounded-[var(--ll-radius-md)] bg-surface-muted p-4 text-[15px]">
+                  <span className="font-semibold">{homeArea.label || "Home area not set yet"}</span>
+                  {homeArea.label ? ` · ${homeArea.radiusMiles} mile search radius` : ". Ask the owner to set it before adding places."}
                 </p>
-              </div>
+              )}
+            </section>
+            {loops.length > 1 && (
+              <section className={cardClass}>
+                <h2 className={h2Class}>Your Lunch Loops</h2>
+                <p className={helpClass}>Each loop keeps its own people, places, and stats.</p>
+                <ul className="mt-3 divide-y divide-line rounded-[var(--ll-radius-md)] border border-line">
+                  {loops.map((loop) => (
+                    <li key={loop.group_id} className="flex flex-wrap items-center justify-between gap-3 px-4 py-3">
+                      <div className="min-w-0">
+                        <p className="text-[15px] font-semibold">{loop.group_name}{loop.active && <span className="ml-2 text-sm font-medium text-accent-strong">Current</span>}</p>
+                        <p className="text-sm text-subtle">{loop.role} · {loop.member_count}/6 people · {loop.status}</p>
+                      </div>
+                      {loop.status === "active" && !loop.active && <button disabled={saving} onClick={() => void switchLoop(loop)} className={secondaryButton}>Switch</button>}
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            )}
+            </>}
+
+            {settingsTab === "places" && <>
+            <section className="mt-6">
+              <h2 className={h2Class}>Lunch database</h2>
+              <p className={helpClass}>
+                {context.role === "owner"
+                  ? "Search, filter, and sort the list your crew uses. You can retire a place or remove an accidental entry."
+                  : "Search, filter, and sort your crew’s list. Only the owner can retire or remove places."}
+              </p>
               <RestaurantDatabaseBrowser
                 restaurants={restaurants}
                 timeZone={homeArea.timeZone}
@@ -955,18 +1007,10 @@ export function SettingsScreen() {
                   context.role === "owner"
                     ? (restaurant) => (
                         <div className="flex flex-wrap gap-2">
-                          <button
-                            type="button"
-                            onClick={() => void toggleNeverAgain(restaurant)}
-                            className={`rounded-lg px-3 py-2 text-sm font-bold ${restaurant.never_again ? "bg-emerald-50 text-emerald-700" : "bg-amber-50 text-amber-800"}`}
-                          >
+                          <button type="button" onClick={() => void toggleNeverAgain(restaurant)} className={secondaryButton}>
                             {restaurant.never_again ? "Restore" : "Never again"}
                           </button>
-                          <button
-                            type="button"
-                            onClick={() => void deleteRestaurant(restaurant)}
-                            className="rounded-lg bg-rose-50 px-3 py-2 text-sm font-bold text-rose-700"
-                          >
+                          <button type="button" onClick={() => void deleteRestaurant(restaurant)} className={dangerButton}>
                             Remove
                           </button>
                         </div>
@@ -976,175 +1020,107 @@ export function SettingsScreen() {
               />
             </section>
             </>}
+
             {settingsTab === "owner" && context.role === "owner" && <>
-            {context.role === "owner" && (
-              <section className="mt-7 rounded-3xl border border-indigo-100 bg-indigo-50/60 p-5 shadow-sm">
-                <p className="text-xs font-bold text-indigo-700">
-                  Optional integration
-                </p>
-                <h2 className="mt-1 text-xl font-black">
-                  💬 Discord notifications
-                </h2>
-                <p className="mt-2 text-sm text-stone-600">
-                  Send your Lunch Loop moments to one Discord channel. The
-                  webhook URL is kept private and is never shown here after you
-                  save it.
-                </p>
-                <div className="mt-5 rounded-2xl bg-white p-4">
-                  <h3 className="font-black">Set up a Discord webhook</h3>
-                  <ol className="mt-3 list-decimal space-y-2 pl-5 text-sm text-stone-600">
-                    <li>
-                      In Discord, choose the server and text channel for your
-                      Lunch Loop updates.
-                    </li>
-                    <li>
-                      Open{" "}
-                      <strong>Server Settings → Integrations → Webhooks</strong>
-                      , then choose <strong>New Webhook</strong>.
-                    </li>
-                    <li>
-                      Choose that channel, copy the webhook URL, and paste it
-                      below.
-                    </li>
-                  </ol>
-                  <p className="mt-3 text-xs font-semibold text-indigo-800">
-                    Only paste a webhook for a server you manage. Anyone with
-                    its URL can post to that channel.
-                  </p>
-                </div>
-                <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-2xl bg-white p-4">
-                  <div>
-                    <p className="font-black">Connection status</p>
-                    <p className="mt-1 text-sm text-stone-600">
-                      {discord.webhook_configured
-                        ? discord.enabled
-                          ? "Connected and sending selected notifications."
-                          : "Connected, but notifications are paused."
-                        : "Not connected yet."}
-                    </p>
-                  </div>
-                  {discord.webhook_configured && (
-                    <span
-                      className={`rounded-full px-3 py-1 text-xs font-bold ${discord.enabled ? "bg-emerald-100 text-emerald-800" : "bg-amber-100 text-amber-900"}`}
-                    >
-                      {discord.enabled ? "Connected" : "Paused"}
-                    </span>
-                  )}
-                </div>
-                <label className="mt-4 block text-sm font-bold">
-                  Discord webhook URL
-                  <input
-                    type="url"
-                    value={discordWebhook}
-                    onChange={(event) => setDiscordWebhook(event.target.value)}
-                    autoComplete="off"
-                    placeholder={
-                      discord.webhook_configured
-                        ? "Leave blank to keep the connected webhook"
-                        : "https://discord.com/api/webhooks/..."
-                    }
-                    className="mt-1 w-full rounded-xl border border-indigo-200 bg-white px-3 py-3 font-normal outline-none focus:ring-2 focus:ring-indigo-300"
-                  />
-                </label>
-                <label className="mt-4 flex items-center gap-3 rounded-2xl bg-white px-4 py-3 text-sm font-bold">
-                  <input
-                    type="checkbox"
-                    checked={discord.enabled}
-                    onChange={(event) =>
-                      setDiscord((current) => ({
-                        ...current,
-                        enabled: event.target.checked,
-                      }))
-                    }
-                    className="size-5 accent-indigo-600"
-                  />
-                  Send Discord notifications
-                </label>
-                <div className="mt-3 grid gap-2 sm:grid-cols-2">
-                  {discordEvents
-                    .filter((event) => context.loopType === "standing" || event.id !== "next_turn")
-                    .map((event) => (
-                    <label
-                      key={event.id}
-                      className="flex gap-3 rounded-2xl bg-white p-3 text-sm"
-                    >
-                      <input
-                        type="checkbox"
-                        checked={discord.enabled_events.includes(event.id)}
-                        onChange={() => toggleDiscordEvent(event.id)}
-                        className="mt-0.5 size-4 accent-indigo-600"
-                      />
-                      <span>
-                        <strong className="block">{event.label}</strong>
-                        <span className="mt-1 block text-xs text-stone-500">
-                          {event.description}
+            <section className={cardClass}>
+              <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+                <h2 className={h2Class}>Discord notifications</h2>
+                <span className={`rounded-full px-2.5 py-1 text-sm font-medium ${discord.webhook_configured ? (discord.enabled ? "bg-accent-soft text-accent-ink" : "bg-surface-muted text-muted") : "bg-surface-muted text-muted"}`}>
+                  {discord.webhook_configured ? (discord.enabled ? "Connected" : "Paused") : "Not connected"}
+                </span>
+              </div>
+              <p className={helpClass}>Optional. Send Lunch Loop moments to one Discord channel. The webhook URL stays private and is never shown again after you save it.</p>
+              <details className="mt-4 rounded-[var(--ll-radius-md)] border border-line px-4 py-3">
+                <summary className="cursor-pointer text-[15px] font-medium">How to get a webhook URL</summary>
+                <ol className="mt-3 list-decimal space-y-2 pl-5 text-[15px] leading-6 text-muted">
+                  <li>In Discord, choose the server and text channel for your updates.</li>
+                  <li>Open <span className="font-semibold text-ink">Server Settings → Integrations → Webhooks</span>, then choose <span className="font-semibold text-ink">New Webhook</span>.</li>
+                  <li>Choose that channel, copy the webhook URL, and paste it below.</li>
+                </ol>
+                <p className="mt-3 text-sm leading-6 text-muted">Only paste a webhook for a server you manage. Anyone with its URL can post to that channel.</p>
+              </details>
+              <label className="mt-4 block text-[15px] font-medium">
+                Webhook URL
+                <input
+                  type="url"
+                  value={discordWebhook}
+                  onChange={(event) => setDiscordWebhook(event.target.value)}
+                  autoComplete="off"
+                  placeholder={discord.webhook_configured ? "Leave blank to keep the connected webhook" : "https://discord.com/api/webhooks/..."}
+                  className={inputClass}
+                />
+              </label>
+              <label className="mt-4 flex min-h-11 items-center gap-3 text-[15px] font-medium">
+                <input
+                  type="checkbox"
+                  checked={discord.enabled}
+                  onChange={(event) => setDiscord((current) => ({ ...current, enabled: event.target.checked }))}
+                  className="size-5 accent-[var(--ll-accent-strong)]"
+                />
+                Send Discord notifications
+              </label>
+              <ul className="mt-2 divide-y divide-line rounded-[var(--ll-radius-md)] border border-line">
+                {discordEvents
+                  .filter((event) => context.loopType === "standing" || event.id !== "next_turn")
+                  .map((event) => (
+                    <li key={event.id}>
+                      <label className="flex gap-3 px-4 py-3">
+                        <input
+                          type="checkbox"
+                          checked={discord.enabled_events.includes(event.id)}
+                          onChange={() => toggleDiscordEvent(event.id)}
+                          className="mt-1 size-5 shrink-0 accent-[var(--ll-accent-strong)]"
+                        />
+                        <span>
+                          <span className="block text-[15px] font-medium">{event.label}</span>
+                          <span className="block text-sm leading-6 text-muted">{event.description}</span>
                         </span>
-                      </span>
-                    </label>
+                      </label>
+                    </li>
                   ))}
-                </div>
-                <div className="mt-5 flex flex-wrap gap-2">
-                  <button
-                    type="button"
-                    disabled={saving || discord.enabled_events.length === 0}
-                    onClick={() => void saveDiscordSettings()}
-                    className="rounded-xl bg-indigo-700 px-4 py-3 text-sm font-black text-white disabled:opacity-60"
-                  >
-                    {saving ? "Saving…" : "Save Discord settings"}
+              </ul>
+              <div className="mt-4 flex flex-wrap gap-2">
+                <button type="button" disabled={saving || discord.enabled_events.length === 0} onClick={() => void saveDiscordSettings()} className={primaryButton}>
+                  {saving ? "Saving…" : "Save Discord settings"}
+                </button>
+                <button type="button" disabled={saving || !discord.webhook_configured || !discord.enabled} onClick={() => void testDiscord()} className={secondaryButton}>
+                  Send test message
+                </button>
+                {discord.webhook_configured && (
+                  <button type="button" disabled={saving} onClick={() => void disconnectDiscord()} className={dangerButton}>
+                    Disconnect
                   </button>
-                  <button
-                    type="button"
-                    disabled={
-                      saving || !discord.webhook_configured || !discord.enabled
-                    }
-                    onClick={() => void testDiscord()}
-                    className="rounded-xl bg-white px-4 py-3 text-sm font-black text-indigo-800 ring-1 ring-indigo-200 disabled:opacity-50"
-                  >
-                    Send test message
-                  </button>
-                  {discord.webhook_configured && (
-                    <button
-                      type="button"
-                      disabled={saving}
-                      onClick={() => void disconnectDiscord()}
-                      className="rounded-xl bg-rose-50 px-4 py-3 text-sm font-black text-rose-700 disabled:opacity-50"
-                    >
-                      Disconnect
-                    </button>
-                  )}
-                </div>
-              </section>
-            )}
-            {context.role === "owner" && (
-              <section className="mt-7 rounded-3xl border border-amber-200 bg-amber-50 p-5">
-                <p className="text-xs font-bold text-amber-800">Owner safeguards</p>
-                <h2 className="mt-1 text-xl font-black">🛟 Your Lunch Loop, under your control</h2>
-                <p className="mt-2 text-sm leading-6 text-stone-600">Export a portable copy whenever you want. If this crew ends, archive it first—nothing is permanently removed for 30 days.</p>
-                <div className="mt-4 flex flex-wrap gap-2">
-                  <button type="button" disabled={saving} onClick={() => void exportLoop()} className="rounded-xl bg-white px-4 py-3 text-sm font-black text-stone-900 ring-1 ring-amber-200 disabled:opacity-60">Download data export</button>
-                  {members.length > 1 && <select defaultValue="" onChange={(event) => void transferOwnership(event.target.value)} disabled={saving} className="rounded-xl bg-white px-3 py-3 text-sm font-black text-stone-900 ring-1 ring-amber-200"><option value="">Transfer ownership…</option>{members.filter((member) => member.user_id !== context.userId).map((member) => <option key={member.user_id} value={member.user_id}>{member.display_name}</option>)}</select>}
-                  <button type="button" disabled={saving} onClick={() => void archiveLoop()} className="rounded-xl bg-rose-700 px-4 py-3 text-sm font-black text-white disabled:opacity-60">Archive this Lunch Loop</button>
-                </div>
-                <p className="mt-3 text-xs leading-5 text-amber-900">Archiving pauses access and starts a 30-day recovery window. Permanent deletion is deliberately unavailable until that window ends.</p>
-              </section>
-            )}
+                )}
+              </div>
+            </section>
+            <section className={cardClass}>
+              <h2 className={h2Class}>Your data and ownership</h2>
+              <p className={helpClass}>Download a copy whenever you want. If this crew ends, archive it: nothing is permanently removed for 30 days.</p>
+              <div className="mt-4 flex flex-wrap gap-2">
+                <button type="button" disabled={saving} onClick={() => void exportLoop()} className={secondaryButton}>Download data export</button>
+                {members.length > 1 && (
+                  <select defaultValue="" onChange={(event) => void transferOwnership(event.target.value)} disabled={saving} className={`${secondaryButton} pr-8`} aria-label="Transfer ownership">
+                    <option value="">Transfer ownership…</option>
+                    {members.filter((member) => member.user_id !== context.userId).map((member) => <option key={member.user_id} value={member.user_id}>{member.display_name}</option>)}
+                  </select>
+                )}
+              </div>
+              <div className="mt-5 border-t border-line pt-4">
+                <button type="button" disabled={saving} onClick={() => void archiveLoop()} className={`${dangerButton} -ml-4`}>Archive this Lunch Loop</button>
+                <p className="text-sm leading-6 text-muted">Archiving pauses access and starts a 30-day recovery window. Permanent deletion stays unavailable until that window ends.</p>
+              </div>
+            </section>
             </>}
           </>
         )
       )}
       {error && context && (
-        <p
-          role="alert"
-          className="mt-4 rounded-xl bg-rose-50 px-4 py-3 text-sm font-semibold text-rose-700"
-        >
+        <p role="alert" className="mt-4 rounded-[var(--ll-radius-md)] bg-danger-soft px-4 py-3 text-[15px] font-medium text-danger">
           {error}
         </p>
       )}
       {message && (
-        <p
-          role="status"
-          className="mt-4 rounded-xl bg-emerald-50 px-4 py-3 text-sm font-semibold text-emerald-700"
-        >
+        <p role="status" className="mt-4 rounded-[var(--ll-radius-md)] bg-accent-soft px-4 py-3 text-[15px] font-medium text-accent-ink">
           {message}
         </p>
       )}

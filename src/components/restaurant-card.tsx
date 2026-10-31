@@ -23,12 +23,12 @@ export function RestaurantCard({
     .filter(Boolean)
     .join(" · ");
   return (
-    <article className="flex items-center gap-3 rounded-[var(--ll-radius-lg)] bg-surface px-5 py-4 shadow-[var(--ll-shadow-card)]">
+    <article className="flex flex-wrap items-center gap-x-3 gap-y-2 rounded-[var(--ll-radius-lg)] bg-surface px-5 py-4 shadow-[var(--ll-shadow-card)]">
       <button
         type="button"
         onClick={() => onOpen?.(restaurant)}
         disabled={!onOpen}
-        className={`flex min-w-0 flex-1 items-center gap-3 text-left ${onOpen ? "cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-300" : "cursor-default"}`}
+        className={`flex min-w-[12rem] flex-1 basis-0 items-center gap-3 text-left ${onOpen ? "cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/40" : "cursor-default"}`}
       >
         <span className="min-w-0 flex-1">
           <span className="flex items-center gap-2">
@@ -41,7 +41,7 @@ export function RestaurantCard({
         </span>
         {onOpen && <span className="text-stone-300" aria-hidden="true">›</span>}
       </button>
-      {action && <div className="shrink-0">{action}</div>}
+      {action && <div className="ml-auto shrink-0">{action}</div>}
     </article>
   );
 }

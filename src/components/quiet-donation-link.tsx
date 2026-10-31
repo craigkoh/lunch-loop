@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import { fuelLinkLabel } from "@/lib/donation";
 import { createClient, hasSupabaseEnv } from "@/lib/supabase/client";
 
-export function FuelTheLoopLink() {
+export function FuelTheLoopLink({ className = "text-sm" }: { className?: string } = {}) {
   const pathname = usePathname();
   const [enabled, setEnabled] = useState(false);
   useEffect(() => {
@@ -26,7 +26,7 @@ export function FuelTheLoopLink() {
     <p>
       <Link
         href="/support"
-        className="inline-flex min-h-11 items-center text-sm font-medium text-accent-strong hover:underline"
+        className={`inline-flex min-h-11 items-center font-medium text-accent-strong hover:underline ${className}`}
       >
         {fuelLinkLabel}
       </Link>

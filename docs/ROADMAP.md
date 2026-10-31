@@ -51,11 +51,15 @@ rate limits and a hosted bot challenge.
 
 Items Craig has approved for the next batch. More may be added.
 
-- Build 2026.10.31.74 (PR from `ui-polish`): the activity-trigger EXECUTE
-  revoke, one type scale with no tiny text, the footer credit on every page,
-  the win-page reorder, and the calm style on Install, Support, sign-in,
-  invitations, History, Stats, and Settings. Still to build: the new
-  logged-out home page (mockups are in the PR description).
+- Build 2026.10.31.75 (PR from `pr17-home-settings`): the new logged-out
+  home page (built from the .74 mockup, simpler and shorter on phone), the
+  calm style on every Settings tab and the Loop report, and Settings tabs
+  that fit on a phone without scrolling sideways.
+- Build 2026.10.31.74 (PR #16, live Oct 31, 2026): the activity-trigger
+  EXECUTE revoke (production version `20261031055723`), one type scale with
+  no tiny text, the footer credit on every page, the win-page reorder, and
+  the calm style on Install, Support, sign-in, invitations, History, Stats,
+  and Settings (Crew tab).
 - Build 2026.10.31.73 (PR from `ui-refresh`) has the calm
   redesign (mockup D), milestone cards, the feedback progress line, and the
   private activity log. Build .72 had the “won” wording, the Loop report, the

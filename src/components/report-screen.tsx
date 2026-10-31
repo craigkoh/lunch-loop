@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRefreshOnFocus } from "@/lib/use-refresh-on-focus";
 import { useEffect, useMemo, useState } from "react";
 import { AppFrame, EmptyState } from "./app-frame";
+import { Card, ListCard, PageHeader, SectionTitle } from "./ui/card";
 import { RestaurantDetailsDialog } from "./restaurant-details-dialog";
 import type { Restaurant } from "@/lib/types";
 import { createClient } from "@/lib/supabase/client";
@@ -213,109 +214,113 @@ export function ReportScreen() {
 
   return (
     <AppFrame>
-      <p className="text-sm font-medium text-accent-strong">Loop report</p>
-      <h1 className="mt-1 text-[28px] font-bold leading-tight tracking-tight md:text-[36px]">{context?.groupName ?? "Your Lunch Loop"}</h1>
-      <p className="mt-2 text-stone-600">
+      <PageHeader eyebrow="Loop report" title={context?.groupName ?? "Your Lunch Loop"}>
         {report.firstDate
           ? `Your loop’s story since ${dateLabel(report.firstDate, timeZone)}.`
           : "A summary of your loop’s lunches, winners, and vetoes."}
-      </p>
+      </PageHeader>
       {loading ? (
-        <p className="mt-6 text-sm font-semibold text-stone-500">Loading your loop report…</p>
+        <p className="text-[15px] text-muted">Loading your loop report…</p>
       ) : error ? (
-        <div className="mt-6">
-          <EmptyState emoji="📋" title="The report is unavailable">{error}</EmptyState>
-        </div>
+        <EmptyState emoji="📋" title="The report is unavailable">{error}</EmptyState>
       ) : (
-        <>
+        <div className="space-y-8">
           {report.lunches === 0 ? (
-            <div className="mt-6">
-              <EmptyState emoji="📋" title="Your report fills in after the first lunch">
-                {report.places > 0
-                  ? `You have ${plural(report.places, "place", "places")} ready. Finish a lunch to see winners and vetoes here.`
-                  : "Add a few places, then finish a lunch to see winners and vetoes here."}
-              </EmptyState>
-            </div>
+            <EmptyState emoji="📋" title="Your report fills in after the first lunch">
+              {report.places > 0
+                ? `You have ${plural(report.places, "place", "places")} ready. Finish a lunch to see winners and vetoes here.`
+                : "Add a few places, then finish a lunch to see winners and vetoes here."}
+            </EmptyState>
           ) : (
             <>
-              <section className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
-                {[
-                  { show: true, value: report.lunches, label: report.lunches === 1 ? "lunch decided" : "lunches decided", accent: true },
-                  { show: report.places > 0, value: report.places, label: report.places === 1 ? "place on the list" : "places on the list" },
-                  // "1 different winner" reads oddly, so wait for a second lunch.
-                  { show: report.lunches >= 2, value: report.differentWinners, label: report.differentWinners === 1 ? "different winner" : "different winners" },
-                  { show: report.vetoCount > 0, value: report.vetoCount, label: report.vetoCount === 1 ? "veto cast" : "vetoes cast" },
-                ]
-                  .filter((card) => card.show)
-                  .map((card) => (
-                    <div key={card.label} className={card.accent ? "ll-calm rounded-2xl p-4 [&_p:first-child]:text-accent-strong" : "rounded-2xl bg-white p-4 shadow-sm"}>
-                      <p className="text-3xl font-black">{card.value}</p>
-                      <p className={card.accent ? "text-sm font-bold text-orange-50" : "text-sm text-stone-500"}>{card.label}</p>
-                    </div>
-                  ))}
-              </section>
+              <Card>
+                <dl className="grid grid-cols-2 gap-y-5 sm:grid-cols-4">
+                  {[
+                    { show: true, value: report.lunches, label: report.lunches === 1 ? "Lunch decided" : "Lunches decided" },
+                    { show: report.places > 0, value: report.places, label: report.places === 1 ? "Place on the list" : "Places on the list" },
+                    // "1 different winner" reads oddly, so wait for a second lunch.
+                    { show: report.lunches >= 2, value: report.differentWinners, label: report.differentWinners === 1 ? "Different winner" : "Different winners" },
+                    { show: report.vetoCount > 0, value: report.vetoCount, label: report.vetoCount === 1 ? "Veto cast" : "Vetoes cast" },
+                  ]
+                    .filter((item) => item.show)
+                    .map((item, index) => (
+                      <div key={item.label} className="flex flex-col-reverse">
+                        <dt className="text-sm text-muted">{item.label}</dt>
+                        <dd className={`text-[28px] font-bold leading-tight tracking-tight ${index === 0 ? "text-accent-strong" : ""}`}>{item.value}</dd>
+                      </div>
+                    ))}
+                </dl>
+              </Card>
 
-              <section className="mt-6 rounded-3xl bg-white p-5 shadow-sm">
-                <h2 className="text-lg font-black">🏆 {report.topPlaces.length === 1 ? "Winner so far" : "Top winners"}</h2>
-                <ol className="mt-3 space-y-2">
+              <section>
+                <SectionTitle title={report.topPlaces.length === 1 ? "Winner so far" : "Top winners"} className="mb-3" />
+                <ListCard>
                   {report.topPlaces.map((row, index) => (
                     <li key={row.restaurant.id}>
                       <button
                         type="button"
                         onClick={() => setDetail(row.restaurant)}
-                        className="flex w-full items-center gap-3 rounded-2xl bg-orange-50 p-3 text-left transition hover:bg-orange-100 focus:outline-none focus:ring-2 focus:ring-orange-300"
+                        className="flex min-h-14 w-full items-center gap-4 px-4 py-3 text-left transition hover:bg-surface-muted"
                       >
-                        <span className="w-6 shrink-0 text-center text-lg font-black text-orange-600">{index + 1}</span>
+                        <span className={`grid size-8 shrink-0 place-items-center rounded-full text-sm font-semibold ${index === 0 ? "bg-accent text-on-accent" : "bg-accent-soft text-accent-ink"}`}>{index + 1}</span>
                         <span className="min-w-0 flex-1">
-                          <span className="block break-words font-extrabold">{row.restaurant.name}</span>
-                          <span className="block text-xs text-stone-600">
-                            🏆 {plural(row.wins, "win", "wins")}
+                          <span className="block break-words text-[15px] font-semibold">{row.restaurant.name}</span>
+                          <span className="block text-sm text-subtle">
+                            {plural(row.wins, "win", "wins")}
                             {row.lastWon ? ` · last won ${dateLabel(row.lastWon, timeZone)}` : ""}
                           </span>
                         </span>
+                        <span aria-hidden="true" className="text-subtle">›</span>
                       </button>
                     </li>
                   ))}
-                </ol>
+                </ListCard>
               </section>
 
-              {report.suggesters.length > 0 && (
-                <section className="mt-6 rounded-3xl bg-white p-5 shadow-sm">
-                  <h2 className="text-lg font-black">🙋 Lunches suggested</h2>
-                  <p className="mt-1 text-sm text-stone-500">Whose picks were on the table for each lunch.</p>
-                  <div className="mt-3 space-y-3">
-                    {report.suggesters.map((row) => (
-                      <div key={row.name}>
-                        <div className="flex justify-between gap-3 text-sm font-bold">
-                          <span className="break-words">{row.name}</span>
-                          <span className="shrink-0 text-stone-500">{plural(row.count, "lunch", "lunches")}</span>
-                        </div>
-                        <div className="mt-1 h-2 overflow-hidden rounded-full bg-stone-100">
-                          <div className="h-full rounded-full bg-orange-500" style={{ width: `${(row.count / maxSuggester) * 100}%` }} />
-                        </div>
+              {(report.suggesters.length > 0 || report.vetoers.length > 0) && (
+                <section>
+                  <SectionTitle title="Who did what" className="mb-3" />
+                  <Card className="space-y-5">
+                    {report.suggesters.length > 0 && (
+                      <div>
+                        <h3 className="text-[15px] font-semibold">Lunches suggested</h3>
+                        <p className="text-sm text-muted">Whose picks were on the table.</p>
+                        <ul className="mt-3 space-y-3">
+                          {report.suggesters.map((row) => (
+                            <li key={row.name}>
+                              <div className="flex justify-between gap-3 text-[15px]">
+                                <span className="break-words">{row.name}</span>
+                                <span className="shrink-0 text-muted">{plural(row.count, "lunch", "lunches")}</span>
+                              </div>
+                              <div className="mt-1.5 h-1.5 overflow-hidden rounded-full bg-surface-muted">
+                                <div className="h-full rounded-full bg-accent" style={{ width: `${(row.count / maxSuggester) * 100}%` }} />
+                              </div>
+                            </li>
+                          ))}
+                        </ul>
                       </div>
-                    ))}
-                  </div>
-                </section>
-              )}
-
-              {report.vetoers.length > 0 && (
-                <section className="mt-6 rounded-3xl bg-white p-5 shadow-sm">
-                  <h2 className="text-lg font-black">✋ Vetoes by person</h2>
-                  <div className="mt-3 flex flex-wrap gap-2">
-                    {report.vetoers.map((row) => (
-                      <span key={row.name} className="rounded-full bg-rose-50 px-3 py-1 text-sm font-bold text-rose-800">
-                        {row.name}: {row.count}
-                      </span>
-                    ))}
-                  </div>
+                    )}
+                    {report.vetoers.length > 0 && (
+                      <div className={report.suggesters.length > 0 ? "border-t border-line pt-5" : ""}>
+                        <h3 className="text-[15px] font-semibold">Vetoes by person</h3>
+                        <ul className="mt-2 divide-y divide-line">
+                          {report.vetoers.map((row) => (
+                            <li key={row.name} className="flex justify-between gap-3 py-2 text-[15px]">
+                              <span className="break-words">{row.name}</span>
+                              <span className="shrink-0 text-muted">{plural(row.count, "veto", "vetoes")}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                  </Card>
                 </section>
               )}
 
               {report.facts.length > 0 && (
-                <section className="mt-6 rounded-3xl bg-amber-100 p-5">
-                  <p className="text-sm font-bold text-amber-800">Lunch lore</p>
-                  <ul className="mt-2 list-disc space-y-1 pl-5 text-stone-800">
+                <section className="rounded-[var(--ll-radius-lg)] bg-accent-soft p-5">
+                  <h2 className="text-[15px] font-semibold text-accent-ink">✨ Lunch lore</h2>
+                  <ul className="mt-2 space-y-2 text-[15px] leading-6">
                     {report.facts.map((fact) => (
                       <li key={fact}>{fact}</li>
                     ))}
@@ -325,33 +330,30 @@ export function ReportScreen() {
             </>
           )}
 
-          <section className="mt-6 rounded-3xl border border-orange-100 bg-white p-5">
-            <h2 className="text-lg font-black">⬇️ Download your loop data</h2>
-            <p className="mt-1 text-sm text-stone-600">
-              A CSV file of this loop’s lunches: dates, who suggested, the winner, vetoes, and win counts. Places are
-              listed by number with a Google Maps link. No email addresses. Only loop members can download it, up to 5
-              times a day.
+          <Card>
+            <h2 className="text-[17px] font-semibold">Download your loop data</h2>
+            <p className="mt-1 text-sm leading-6 text-muted">
+              A CSV of this loop’s lunches: dates, who suggested, the winner, vetoes, and win counts. Places come with a
+              Google Maps link. No email addresses. Members can download it up to 5 times a day.
             </p>
             <button
               type="button"
               onClick={() => void downloadCsv()}
               disabled={downloading || !context}
-              className="mt-3 rounded-xl bg-orange-500 px-4 py-2 text-sm font-black text-white transition hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-orange-300 disabled:opacity-50"
+              className="mt-4 inline-flex min-h-11 items-center rounded-[var(--ll-radius-md)] border border-line bg-surface px-4 text-[15px] font-semibold text-ink transition hover:bg-surface-muted disabled:opacity-50"
             >
               {downloading ? "Preparing…" : "Download CSV"}
             </button>
             {downloadMessage && (
-              <p role="status" className="mt-2 text-sm font-semibold text-stone-700">{downloadMessage}</p>
+              <p role="status" className="mt-2 text-sm text-muted">{downloadMessage}</p>
             )}
-          </section>
-          <p className="mt-6 text-sm">
-            <Link href="/stats" className="font-bold text-orange-700 hover:underline">📊 See all stats</Link>
-            {" · "}
-            <Link href="/history" className="font-bold text-orange-700 hover:underline">🗓️ Lunch history</Link>
-            {" · "}
-            <Link href="/feedback?page=/report" className="font-bold text-orange-700 hover:underline">💡 Ideas?</Link>
+          </Card>
+          <p className="flex flex-wrap gap-x-5 gap-y-1 text-[15px]">
+            <Link href="/stats" className="inline-flex min-h-11 items-center font-medium text-accent-strong hover:underline">Stats →</Link>
+            <Link href="/history" className="inline-flex min-h-11 items-center font-medium text-accent-strong hover:underline">History →</Link>
+            <Link href="/feedback?page=/report" className="inline-flex min-h-11 items-center font-medium text-accent-strong hover:underline">Ideas?</Link>
           </p>
-        </>
+        </div>
       )}
       <RestaurantDetailsDialog
         restaurant={detail}

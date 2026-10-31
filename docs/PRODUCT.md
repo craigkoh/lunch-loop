@@ -73,7 +73,7 @@ copy of their existing additions before inviting anyone else.
 | Lunch Database | Private search, contributor/cuisine filters, useful sorts, restaurant facts, map, and directions. |
 | History and Stats | Completed choices by month, vetoes, never-again places, who’s picked, cuisine popularity, veto habits (top five, then “Show all”), and recap facts. Both link to the Loop report. |
 | Loop report | `/report`: a one-page summary (lunches, places, different winners, vetoes, top winners, who suggested, vetoes by person, lunch lore). Stats that would read 0 or 1 awkwardly stay hidden for new loops. Any member can download the loop CSV here. |
-| Settings | Tabs: Crew, Area & loops, Places, and Owner tools. Owner controls for people, Standing rotation or Occasion crew, invitations, area/radius/time zone, cleanup, export/archive/transfer, and Discord. |
+| Settings | Tabs (one segmented row that fits a phone): Crew, Area, Places, and Owner. Owner controls for people, Standing rotation or Occasion crew, invitations, area/radius/time zone, cleanup, export/archive/transfer, and Discord. |
 | Account settings | Saved System, Light, or Dark appearance. The same theme is applied across signed-in, public, install, and legal pages. |
 | My Loops | Active-loop switcher and loop management. An account can own up to the site-wide configured number of active loops (initially four). |
 | Feedback | Signed-in bug, idea, question, and note submission. A Feedback / Report a bug button on signed-in pages opens the form with the current page and build filled in. After a decision is closed, a light prompt appears at most once every 14 days. |

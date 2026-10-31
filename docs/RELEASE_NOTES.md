@@ -1,16 +1,54 @@
 # Release Notes
 
+## Build 2026.10.31.75 (Saturday, October 31, 2026)
+
+Design only. No database changes.
+
+- New logged-out home page (`src/components/landing-page.tsx`), built from the
+  build .74 mockup and trimmed: hero (“Lunch, decided. No more “you pick.””)
+  with Start your crew and Sign in, real app screenshots in a phone frame
+  (phone) or laptop plus phone (desktop), a three-step progress line, one
+  “Every lunch, remembered.” section with five checks, a dark closing card,
+  and the footer. Three type sizes only: display 44/72px, title 30/44px, body
+  17/19px (footer included). On phone the screenshot is cropped and the
+  feature picture is hidden, so the page is about three and a half screens.
+  The old card trio and install section folded into the checklist; the
+  install guide stays one link away. Screenshots live in `public/landing/`
+  (WebP, about 160 KB total).
+- Settings tabs (Crew, Area, Places, Owner) now share the width of the screen
+  as one segmented control, so nothing scrolls sideways on a phone. “Area &
+  loops” is now “Area”, and the tab emoji are gone.
+- Every Settings tab uses the calm cards: white cards, hairline sub-cards,
+  one orange button per card, quiet secondary buttons, and danger in rose.
+  Invite: one card with a spots line, “Invite by email”, “Or text a code”,
+  and a “Sent invitations” list; “Start their own loop” is its own card.
+  Owner: Discord setup steps fold into “How to get a webhook URL”; the
+  status chip sits by the title. “Owner safeguards” is now “Your data and
+  ownership”, with Archive set apart at the bottom.
+- Loop report: page header, one numbers card, “Top winners” as rows, “Who did
+  what” (lunches suggested with bars, vetoes by person as rows), the Lunch
+  lore card (kept), the CSV download, and plain links.
+- Lunch database (Settings → Places and the Places page): calm search box,
+  sort pills that wrap instead of scrolling sideways, plain selects and a
+  plain pager. Place rows with buttons (Never again, Restore, Remove) drop the
+  buttons onto their own line when the screen is narrow, so names are no
+  longer cut to “Farme…”.
+- The area picker (Settings → Area and new-loop setup) drops its orange box
+  and uses the same inputs as the rest of Settings.
+- The unused `install-pulse` animation is removed.
+
 ## Build 2026.10.31.74 (Saturday, October 31, 2026; prepared Friday, October 30)
 
 Polish on top of build .73, plus one security fix.
 
 Security:
 
-- Migration `20261031050909_revoke_activity_trigger_execute.sql` revokes
+- Migration `20261031055723_revoke_activity_trigger_execute.sql` revokes
   EXECUTE on the five `log_*_activity` trigger functions from `public`,
-  `anon`, and `authenticated` (Supabase advisor warning). Tested on staging;
-  production gets it after merge (see
-  [Operations](OPERATIONS.md#activity-trigger-execute-revoke-build-74-pending-production)).
+  `anon`, and `authenticated` (Supabase advisor warning). Staging recorded
+  `20261031050909`; production applied it after merge on Oct 31, 2026 and
+  recorded `20261031055723`, the file's name now (see
+  [Operations](OPERATIONS.md#activity-trigger-execute-revoke-build-74-live)).
 
 Design and flow:
 

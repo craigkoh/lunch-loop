@@ -151,28 +151,6 @@ input {
   display: none;
 }
 
-@keyframes install-pulse {
-  0%,
-  100% {
-    transform: translateY(0) rotate(0deg);
-    box-shadow: 0 18px 32px rgb(251 146 60 / 0.25);
-  }
-  50% {
-    transform: translateY(-6px) rotate(2deg);
-    box-shadow: 0 26px 42px rgb(251 146 60 / 0.38);
-  }
-}
-
-.install-pulse {
-  animation: install-pulse 2.6s ease-in-out infinite;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .install-pulse {
-    animation: none;
-  }
-}
-
 .lunch-receipt-sheet {
   --receipt-paper: #fffdf8;
   --receipt-ink: #292524;

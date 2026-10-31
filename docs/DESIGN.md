@@ -263,7 +263,7 @@ Few sizes, used the same way everywhere. Nothing in the app is smaller than
 | Body, rows, buttons | 15px | `text-[15px]`, buttons `font-semibold` |
 | Card and section titles | 17–20px | `text-[17px]`–`text-[20px] font-semibold`, `SectionTitle` is `text-lg` |
 | Page title | 28px phone, 36px from `md` | `PageHeader`, `text-[28px] md:text-[36px] font-bold tracking-tight` |
-| Landing hero only | 44–76px | One per page, see the home mockup |
+| Landing page only | 3 sizes | See “Logged-out home” below |
 
 The tab-bar label (12px) and the small avatar initials (12px) are the floor.
 Eyebrows are `text-sm font-medium text-accent-strong`, sentence case, not
@@ -297,6 +297,37 @@ same everywhere. Sign-in, join, request-invite, the no-loop welcome, and the
 centered card, `max-w-md` or `max-w-xl`). Privacy, Terms, and What’s New use
 `LegalPage` (an article header and one calm card). The marketing landing page
 is the only page with its own shell.
+
+### Logged-out home (build .75)
+
+`src/components/landing-page.tsx`, one column of sections inside
+`max-w-6xl`, using exactly three type sizes (constants at the top of the
+file):
+
+| Role | Phone | From `md` |
+| --- | --- | --- |
+| Display (hero line only) | 44px | 72px |
+| Title (section headings) | 30px | 44px |
+| Body (everything else, buttons and footer too) | 17px | 19px |
+
+Order: nav (logo, “How it works” on desktop, “Sign in”), hero (headline,
+one line of copy, “Start your crew”, “Have an invite? Sign in →”), app
+screenshots in device frames (phone: one phone cropped with a fade so the
+page stays short; desktop: laptop plus phone), “Three steps” on a progress
+line (vertical on phone, horizontal on desktop), “Every lunch, remembered.”
+with five checks (the picture shows only on desktop), a dark closing card,
+and the footer credit. The screenshots are real app screens in
+`public/landing/` (WebP, light theme). Retake them from the mock app when the
+app’s look changes.
+
+### Settings tabs
+
+One segmented control across the full width (`flex-1` buttons, no emoji):
+Crew, Area, Places, and Owner (owners only). It never scrolls sideways. Each
+tab is a stack of calm cards: `text-[17px]` card title, `text-sm text-muted`
+help, hairline sub-cards (`border-line`) for each form, one
+`bg-accent-strong` button per form, bordered secondary buttons, and
+`text-danger` for Remove, Revoke, Disconnect, and Archive.
 
 ### Chosen-pick layout (the win page)
 
@@ -447,7 +478,7 @@ Every page ends with “Built by Craig Kohler with AI”, then
 “Build … · Privacy · Terms” (`FooterLine` in `app-frame.tsx`, 13px,
 `text-subtle`). On iPad and desktop with the sidebar, it sits at the bottom
 of the sidebar; otherwise it is centered under the page. The landing page has
-the same credit in its own footer. Exceptions: `/dev/receipt` (local
+the same credit in its own footer, at body size. Exceptions: `/dev/receipt` (local
 development only) and `/decide` (a redirect with no page).
 
 “Fuel the loop” appears only when `donations_enabled` is on, and never on
@@ -494,8 +525,9 @@ and the two buttons if it keeps failing. Not a spinner-only view.
 Flat shapes. Two or three colors from the palette. No drop shadows inside an
 icon, no gloss, no 3D plate, no photograph in the chrome.
 
-The landing page may use a large soft orange panel as a preview of the
-product. It is a layout sample, not an illustration set. Do not commission a
+The landing page shows real app screenshots in simple device frames (a dark
+rounded phone, a laptop with a grey base) on a soft orange glow. They are
+product pictures, not an illustration set. Do not commission a
 mascot.
 
 Restaurant photos, if a screen ever shows them, come from the place itself.

@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { AppFrame, EmptyState } from "./app-frame";
 import { RestaurantDetailsDialog } from "./restaurant-details-dialog";
@@ -166,6 +167,12 @@ export function StatsScreen() {
       <p className="mt-2 text-stone-600">
         A little friendly competition, a lot of lunch lore.
       </p>
+      <Link
+        href="/report"
+        className="mt-4 inline-flex rounded-xl bg-orange-500 px-4 py-2 text-sm font-black text-white transition hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-orange-300"
+      >
+        📋 View loop report
+      </Link>
       {loading ? (
         <p className="mt-6 text-sm font-semibold text-stone-500">
           Loading your group’s stats…
@@ -240,7 +247,7 @@ export function StatsScreen() {
                     }
                   </p>
                   <p className="mt-1 text-sm text-stone-500">
-                    waiting for a first visit
+                    waiting for a first win
                   </p>
                 </div>
               </section>
@@ -277,7 +284,7 @@ export function StatsScreen() {
               <section className="mt-8">
                 <h2 className="text-lg font-black">Suggester win rate</h2>
                 <p className="mt-1 text-sm text-stone-500">
-                  One of each suggester’s choices becomes the final pick.
+                  How often each suggester’s picks win the lunch.
                 </p>
                 <div className="mt-3 grid gap-3 sm:grid-cols-2">
                   {members.map((member) => {
@@ -306,7 +313,7 @@ export function StatsScreen() {
                           />
                         </div>
                         <p className="mt-2 text-sm text-stone-500">
-                          {wins} winning pick{wins === 1 ? "" : "s"} from{" "}
+                          {wins} {wins === 1 ? "win" : "wins"} from{" "}
                           {suggestions} suggestions
                         </p>
                       </div>
@@ -380,7 +387,7 @@ export function StatsScreen() {
                 </h2>
                 <p className="mt-2 text-stone-700">
                   {favorite
-                    ? `${favorite.name} leads the list with ${favorite.visit_count} ${favorite.visit_count === 1 ? "visit" : "visits"}.`
+                    ? `${favorite.name} leads the list with ${favorite.visit_count} ${favorite.visit_count === 1 ? "win" : "wins"}.`
                     : "Add a few places and let the crew decide."}
                 </p>
               </section>

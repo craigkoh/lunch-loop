@@ -17,7 +17,7 @@ export const metadata: Metadata = {
   },
 };
 
-const updated = "October 27, 2026";
+const updated = "October 30, 2026";
 
 export default function PrivacyPage() {
   return (
@@ -72,6 +72,7 @@ export default function PrivacyPage() {
 
       <LegalSection title="6. Who can see information">
         <p>Lunch Loop is intentionally collaborative. Members of the same loop can see the group’s display names, restaurant list, picks, vetoes, history, and related statistics. The loop owner can also see member account email addresses and authentication-provider labels in Settings so they can manage invitations and the roster.</p>
+        <p><strong>Loop CSV download.</strong> Any member of a loop can download that loop’s lunch data as a CSV file from the Loop report. It has lunch dates, who suggested each lunch (display names), the winning place, vetoes, and win counts. Places are listed by a Lunch Loop number with a Google Maps link. It does not include email addresses or Google place details such as names, addresses, ratings, phone numbers, or hours. Only current members of that loop can download it, up to 5 times per person per day. Once downloaded, the file is on your device, so share it only with people you trust.</p>
         <p>Craig Kohler, as the service administrator, may access information when reasonably necessary to operate, secure, support, investigate abuse, or improve Lunch Loop. We do not make one group’s information available to another ordinary group.</p>
         <p>If you check “Credit me by name in release notes,” the name you enter may appear in public What’s New notes when that report ships, for example “Fixed X (reported by Sam — thanks!)”. Your email address is not published there. Leave the box unchecked and the thank-you stays private. You can withdraw the credit later from the feedback screen.</p>
       </LegalSection>
@@ -98,7 +99,7 @@ export default function PrivacyPage() {
           restaurants. Your use of Google Maps features in Lunch Loop is also
           subject to the <a className="font-bold text-orange-700 underline" href="https://maps.google.com/policies/terms/" target="_blank" rel="noreferrer">Google Terms of Service</a>, the <a className="font-bold text-orange-700 underline" href="https://www.google.com/help/terms_maps/" target="_blank" rel="noreferrer">Google Maps Additional Terms of Service</a>, and the <a className="font-bold text-orange-700 underline" href="https://policies.google.com/privacy" target="_blank" rel="noreferrer">Google Privacy Policy</a>.
         </p>
-        <p>Google may receive information when you use Google Maps content, as described in Google’s policies. Google-provided restaurant information can change; we use and retain Google Maps Platform content subject to the applicable Google Maps Platform terms and policies.</p>
+        <p>Google may receive information when you use Google Maps content, as described in Google’s policies. Google-provided restaurant information can change; we use and retain Google Maps Platform content subject to the applicable Google Maps Platform terms and policies. The loop CSV download does not copy Google place details; it links to each place on Google Maps instead.</p>
       </LegalSection>
 
       <LegalSection title="9. Discord notifications">

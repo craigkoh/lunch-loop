@@ -60,8 +60,9 @@ export function RestaurantCard({
                 {restaurant.cuisine}
               </span>
               <span className="rounded-full bg-orange-50 px-2 py-1 text-orange-700">
-                {restaurant.visit_count}{" "}
-                {restaurant.visit_count === 1 ? "pick" : "picks"}
+                {restaurant.visit_count > 0
+                  ? `🏆 ${restaurant.visit_count} ${restaurant.visit_count === 1 ? "win" : "wins"}`
+                  : "No wins yet"}
               </span>
               {todayHours && (
                 <span className="rounded-full bg-stone-100 px-2 py-1 text-stone-600">
@@ -79,8 +80,8 @@ export function RestaurantCard({
         <div className="mt-3 grid gap-1 border-t border-stone-100 pt-3 text-xs text-stone-500 sm:grid-cols-2">
           <p>
             {restaurant.last_visited_at
-              ? `Last picked ${shortDate(restaurant.last_visited_at, timeZone)}`
-              : "Never picked"}
+              ? `Last won ${shortDate(restaurant.last_visited_at, timeZone)}`
+              : "No wins yet"}
           </p>
           <p>
             Added{addedBy ? ` by ${addedBy}` : ""}{" "}

@@ -110,7 +110,7 @@ export function receiptLines(facts: PickNudgeFacts): ReceiptLine[] {
         },
     facts.rating ? { label: "Rating", value: `${facts.rating.toFixed(1)} ★` } : null,
     facts.cuisine ? { label: "Cuisine", value: facts.cuisine } : null,
-    facts.pickedBy ? { label: "Picked by", value: facts.pickedBy } : null,
+    facts.pickedBy ? { label: "Suggested by", value: facts.pickedBy } : null,
     { label: "Ads shown", value: "0" },
   ];
   return lines.filter((line): line is ReceiptLine => line !== null);

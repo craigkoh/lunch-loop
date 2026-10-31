@@ -71,16 +71,37 @@ copy of their existing additions before inviting anyone else.
 | Home | Live decision, the next action, remaining vetoes, planned meal time, and list facts. |
 | Add Place | Google Places search and multi-select add flow. |
 | Lunch Database | Private search, contributor/cuisine filters, useful sorts, restaurant facts, map, and directions. |
-| History and Stats | Completed choices, vetoes, never-again places, win rates, popularity, heat map, and recap facts. |
+| History and Stats | Completed choices, vetoes, never-again places, win rates, popularity, heat map, and recap facts. Both link to the Loop report. |
+| Loop report | `/report`: a one-page summary (lunches, places, different winners, vetoes, top winners, who suggested, vetoes by person, lunch lore). Stats that would read 0 or 1 awkwardly stay hidden for new loops. Any member can download the loop CSV here. |
 | Settings | Tabs: Crew, Area & loops, Places, and Owner tools. Owner controls for people, Standing rotation or Occasion crew, invitations, area/radius/time zone, cleanup, export/archive/transfer, and Discord. |
 | Account settings | Saved System, Light, or Dark appearance. The same theme is applied across signed-in, public, install, and legal pages. |
 | My Loops | Active-loop switcher and loop management. An account can own up to the site-wide configured number of active loops (initially four). |
 | Feedback | Signed-in bug, idea, question, and note submission. A Feedback / Report a bug button on signed-in pages opens the form with the current page and build filled in. After a decision is closed, a light prompt appears at most once every 14 days. |
-| Value for Value | Optional, and a new database keeps `donations_enabled` off until Global Admin turns it on (production has it on). When it is on, the footer can show a small “Fuel the loop” link to `/support`, and a finished pick can show one dismissible note beside the restaurant result on a tablet or desktop, and under that result on a phone. It is random: about 1 in 4 picks show nothing; otherwise a paper receipt, a one-liner, or a tip jar, equally likely, never the same style twice in a row. “Not now” hides that note for that pick only. The receipt is headed “Tip the loop?”, prints real facts about that lunch (places in the running, vetoes, time to decide, distance, visit number, days since the last visit, rating, cuisine, who picked, ads shown 0), says “Lunch Loop is free. This is an optional tip.”, and has a “Tip the loop ($1–3)” button. The page explains the idea, says a couple of bucks is plenty, and opens Stripe in a new tab. It does not change restaurant selection or unlock features. When the switch is off, every note and the footer link stay hidden, and `/support` says support isn’t open. |
+| Value for Value | Optional, and a new database keeps `donations_enabled` off until Global Admin turns it on (production has it on). When it is on, the footer can show a small “Fuel the loop” link to `/support`, and a finished pick can show one dismissible note beside the restaurant result on a tablet or desktop, and under that result on a phone. It is random: about 1 in 4 picks show nothing; otherwise a paper receipt, a one-liner, or a tip jar, equally likely, never the same style twice in a row. “Not now” hides that note for that pick only. The receipt is headed “Tip the loop?”, prints real facts about that lunch (places in the running, vetoes, time to decide, distance, visit number, days since the last visit, rating, cuisine, who suggested it, ads shown 0), says “Lunch Loop is free. This is an optional tip.”, and has a “Tip the loop ($1–3)” button. The page explains the idea, says a couple of bucks is plenty, and opens Stripe in a new tab. It does not change restaurant selection or unlock features. When the switch is off, every note and the footer link stay hidden, and `/support` says support isn’t open. |
 
 Restaurant cards should be clickable. Their detail panel combines
 Google-provided information, required attribution, and group facts such as who
-added it, picks, vetoes, and last visit.
+added it, wins, vetoes, and when it last won.
+
+Wording: a place that won a lunch has “wins” (“🏆 2 wins · last won Oct 21”,
+“No wins yet”). “Picks” only means the suggester choosing the options for a
+round.
+
+## Loop CSV download
+
+Any current member of a loop can download its data from the Loop report,
+up to 5 times per person per day. The file has two sections:
+
+- Lunches: meal date and time in the loop’s time zone, status, who
+  suggested it (display name), the winning place number and its Google Maps
+  link, places in the running, vetoes, and which places were vetoed.
+- Places: place number (P1, P2, … in the order they were added), Google
+  Maps link, wins, last won, times vetoed, never again, added by, added on.
+
+It never includes email addresses or Google place details such as names,
+addresses, ratings, phone numbers, or hours (Google Maps Platform terms).
+Spreadsheet formulas are escaped. This is separate from the owner’s JSON
+export in Settings.
 
 ## Roles and boundaries
 

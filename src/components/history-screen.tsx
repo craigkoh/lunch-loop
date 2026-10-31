@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import { AppFrame, EmptyState } from "./app-frame";
 import { RestaurantCard } from "./restaurant-card";
@@ -133,8 +134,14 @@ export function HistoryScreen() {
       </p>
       <h1 className="mt-1 text-3xl font-black tracking-tight">Lunch history</h1>
       <p className="mt-2 text-stone-600">
-        Every final pick, suggester, and friendly veto in one spot.
+        Every winner, suggester, and friendly veto in one spot.
       </p>
+      <Link
+        href="/report"
+        className="mt-4 inline-flex rounded-xl bg-orange-500 px-4 py-2 text-sm font-black text-white transition hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-orange-300"
+      >
+        📋 View loop report
+      </Link>
       {loading ? (
         <p className="mt-6 text-sm font-semibold text-stone-500">
           Loading lunch history…

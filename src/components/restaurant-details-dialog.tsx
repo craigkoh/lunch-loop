@@ -186,12 +186,10 @@ export function RestaurantDetailsDialog({
             Lunch Loop facts
           </p>
           <p className="mt-2 text-sm text-stone-700">
-            <strong className="text-stone-900">Picked:</strong>{" "}
-            {restaurant.visit_count}{" "}
-            {restaurant.visit_count === 1 ? "time" : "times"}
-            {restaurant.last_visited_at
-              ? ` · most recently ${dateLabel(restaurant.last_visited_at, timeZone)}`
-              : " · still waiting for its first win"}
+            <strong className="text-stone-900">Wins:</strong>{" "}
+            {restaurant.visit_count > 0
+              ? `🏆 ${restaurant.visit_count} ${restaurant.visit_count === 1 ? "win" : "wins"}${restaurant.last_visited_at ? ` · last won ${dateLabel(restaurant.last_visited_at, timeZone)}` : ""}`
+              : "No wins yet"}
           </p>
           <p className="mt-1 text-sm text-stone-700">
             <strong className="text-stone-900">Added:</strong>{" "}

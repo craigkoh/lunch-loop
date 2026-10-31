@@ -331,16 +331,29 @@ help, hairline sub-cards (`border-line`) for each form, one
 
 ### Chosen-pick layout (the win page)
 
-One column at every width, in this order:
+One column at every width, in this order (build .76):
 
 1. Page header (“Lunch is decided”, “<place> wins! 🎉”).
-2. Winner card: the Picks → Vetoes → Winner line, a “🎉 Today’s winner”
-   chip, the name (20px), address, wins line, and “Details & map →”.
-3. Milestone card, when there is one (a celebration belongs with the win).
-4. “What’s next”: one grouped card with the lunch time (one line, “Change”
-   opens the editor) and the hand-off row (“Close the loop”, with “Opens
-   after …” in the helper text while the button is disabled).
-5. The tip receipt, centered, at most 22rem wide.
+2. One win card: the “🎉 Today’s winner” chip, the name (20px), address,
+   wins line, and “Details & map →”; then the lunch time (“Change” opens the
+   editor); then a full-width “Close the loop” (or “Finish occasion”) with a
+   one-line help (“Opens after …. Records the visit and hands the picks to the
+   next person.”); then the progress line with everyone at the finish.
+3. Milestone card, when there is one.
+4. The tip (receipt, one-liner, or tip jar), on calm tokens.
+5. “This round”: who picked and who vetoed what, only for crews of six or
+   fewer (always today, but the cap keeps it short).
+
+### Progress line with initials (`ui/round-track.tsx`)
+
+A rounded track with initials dots. Waiting people sit at the start (gray
+dots); people who are done sit at the finish (ink dots; the suggester is the
+orange dot). The suggester reaches the finish once the picks are in, each
+vetoer moves there as they veto, and everyone is there once a winner is
+decided. The orange fill is the share who are done. One caption line under
+it (“2 of 4 in. Waiting on you and Dana.”). The math is
+`src/lib/round-progress.ts` (unit-tested). The older `ui/progress-line.tsx`
+(dots and labels) remains only on the Feedback page.
 
 No places list, lore line, or report link on the win page. The old
 two-column `.pick-layout` grid is gone because it squeezed the result into
@@ -351,21 +364,24 @@ receipt slot.
 
 ### Buttons
 
-Primary: `inline-flex min-h-11 items-center justify-center rounded-xl bg-orange-500 px-4 py-3 text-sm font-black text-white`.
+Use `buttonClass` / `Button` / `ButtonLink` from `ui/button.tsx` (or the
+same classes in Settings’ `primaryButton` / `secondaryButton`).
 
-- Height is at least 44px (`min-h-11`), including the landing Sign in link.
-- Radius is `rounded-xl` (12px). Not `rounded-2xl`, and not a hover that
-  lifts the button.
-- Hover is `hover:bg-orange-600`. Disabled is `disabled:opacity-60`.
-- One primary button per cluster. A second action is the secondary style.
-
-Secondary: white or cream fill, `text-orange-800` or `text-stone-700`,
-`rounded-xl`, `ring-1 ring-orange-100` or `border border-orange-200`, also
-`min-h-11`.
-
-Text button: `font-bold text-orange-700 underline` or `text-orange-800`. Use
-for “Not now”, “Use a different email”, and legal links. Still give a tappable
-row at least 44px tall when it is the only action in that row (`min-h-11`).
+- Primary: `bg-accent-strong text-on-accent`, `rounded-[var(--ll-radius-md)]`,
+  `min-h-11`, `font-semibold`. Hover is a slight fade, never a lift.
+- **One primary per card** (the rule, build .76). The action that moves the
+  person forward is primary (“Make a code and link”, “Invite them to start a
+  loop”, “Close the loop”); follow-ups like “Copy invite message” are
+  secondary.
+- Secondary: `bg-surface text-ink ring-1 ring-line`.
+- Disabled must look inactive, not like a faded primary: use
+  `disabled:bg-surface-muted disabled:text-subtle` on primary buttons that
+  are often disabled (Close the loop before lunch time).
+- Selected chips (sort order, theme choice, filters) are soft:
+  `bg-accent-soft text-accent-ink`. Solid orange is only for buttons.
+- Text button: `font-medium text-accent-strong` (or `text-subtle` for “Not
+  now”). Still give a tappable row at least 44px tall when it is the only
+  action in that row (`min-h-11`).
 
 Destructive: `bg-rose-600` or `bg-rose-700`, white label, same radius and
 height. Never orange.
@@ -474,7 +490,8 @@ separate “🏠 Home” button anywhere.
 
 ### Footer
 
-Every page ends with “Built by Craig Kohler with AI”, then
+Every page ends with “An idea by Craig Kohler, brought to life with new
+tools” (the name links to the public `/about` page), then
 “Build … · Privacy · Terms” (`FooterLine` in `app-frame.tsx`, 13px,
 `text-subtle`). On iPad and desktop with the sidebar, it sits at the bottom
 of the sidebar; otherwise it is centered under the page. The landing page has

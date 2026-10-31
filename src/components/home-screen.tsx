@@ -13,7 +13,9 @@ import { AppFrame } from "./app-frame";
 import { cn } from "@/lib/cn";
 import { Avatar } from "./ui/avatar";
 import { Card, ListCard, SectionTitle } from "./ui/card";
-import { ProgressLine } from "./ui/progress-line";
+import { RoundTrack } from "./ui/round-track";
+import { roundPositions, waitingOnText } from "@/lib/round-progress";
+import { firstNameOf } from "@/lib/initials";
 import { MilestoneCard } from "./milestone-card";
 import { winsLine } from "@/lib/wins";
 import { GroupSetup } from "./group-setup";
@@ -600,7 +602,7 @@ export function HomeScreen() {
     ...(freshPlaceCount > 0
       ? [{ text: `🌱 Lunch lore: ${freshPlaceCount} ${freshPlaceCount === 1 ? "place is" : "places are"} still waiting for a first win.`, href: "/database?sort=never-visited" }]
       : []),
-    ...(cuisineCount > 1 ? [{ text: `🍽️ Lunch lore: ${cuisineCount} different cuisines on your list.`, href: "/stats#cuisine-popularity" }] : []),
+    ...(cuisineCount > 1 ? [{ text: `🍽️ Lunch lore: ${cuisineCount} different cuisines on your list.`, href: "/stats" }] : []),
     ...(newestRestaurant ? [{ text: `✨ Lunch lore: newest on the list is ${newestRestaurant.name}.` }] : []),
     ...(favorite && favorite.visit_count > 1 ? [{ text: `🏆 Lunch lore: ${favorite.name} has won ${favorite.visit_count} times.` }] : []),
     ...(lastLunch ? [{ text: `🗓️ Lunch lore: last time, the crew went to ${lastLunch.restaurant.name}.` }] : []),
@@ -621,6 +623,19 @@ export function HomeScreen() {
   const pendingVetoers = eligibleVoters.filter(
     (member) => !vetoes.some((veto) => veto.user_id === member.user_id),
   );
+  const trackPeople = members.map((member) => ({ id: member.user_id, name: member.display_name }));
+  const positions = roundPositions({
+    memberIds: members.map((member) => member.user_id),
+    suggesterId: current?.suggester_id,
+    vetoerIds: vetoes.map((veto) => veto.user_id),
+    picksMade: candidates.length > 0,
+    decided: current?.status === "chosen",
+  });
+  const friendlyName = (userId: string) =>
+    userId === context?.userId ? "you" : firstNameOf(memberNameById.get(userId));
+  const suggesterFirst = firstNameOf(suggester?.display_name ?? "The suggester");
+  const restaurantForCandidate = (candidateId: string) =>
+    restaurants.find((restaurant) => restaurant.id === candidates.find((candidate) => candidate.id === candidateId)?.restaurant_id) ?? null;
   const cuisines = useMemo(
     () =>
       [
@@ -1255,7 +1270,7 @@ export function HomeScreen() {
       <section className="mt-4 rounded-[var(--ll-radius-lg)] bg-surface p-5 shadow-[var(--ll-shadow-card)]">
         <div className="flex flex-wrap items-center justify-between gap-2">
           <div>
-            <p className="text-xs font-medium text-stone-500">
+            <p className="text-sm text-muted">
               The {mealName} decision, live
             </p>
             <h2 className="mt-1 text-[17px] font-semibold">
@@ -1263,43 +1278,16 @@ export function HomeScreen() {
             </h2>
           </div>
         </div>
-        <p className="mt-2 text-sm text-stone-500">
+        <p className="mt-2 text-sm text-muted">
           Still standing:{" "}
           {survivorRestaurants.map((restaurant, index) => (
             <span key={restaurant.id}>
               {index > 0 ? " · " : ""}
-              <button type="button" onClick={() => setDetailRestaurant(restaurant)} className="font-medium text-stone-900 hover:underline">
+              <button type="button" onClick={() => setDetailRestaurant(restaurant)} className="font-medium text-ink hover:underline">
                 {restaurant.name}
               </button>
             </span>
           ))}
-        </p>
-        <div className="mt-4 border-t border-stone-200 pt-3">
-          <p className="text-sm font-bold">
-            {pendingVetoers.length
-              ? `Still holding a veto: ${pendingVetoers.map((member) => member.display_name).join(", ")}`
-              : "Every eligible veto is in — the final choice is being revealed."}
-          </p>
-          <div className="mt-2 flex flex-wrap gap-2">
-            {eligibleVoters.map((member) => {
-              const used = vetoes.some(
-                (veto) => veto.user_id === member.user_id,
-              );
-              return (
-                <span
-                  key={member.user_id}
-                  className={`rounded-full px-3 py-1 text-xs font-bold ${used ? "bg-stone-100 text-stone-600" : "bg-orange-50 text-orange-800"}`}
-                >
-                  {used ? "✓" : "⏳"} {member.display_name}{" "}
-                  {used ? "vetoed" : "is up"}
-                </span>
-              );
-            })}
-          </div>
-        </div>
-        <p className="mt-3 text-xs text-stone-500">
-          {suggester?.display_name ?? "The suggester"} made the original picks.
-          Each other friend gets one veto; the last restaurant standing wins.
         </p>
       </section>
     ) : null;
@@ -1349,38 +1337,6 @@ export function HomeScreen() {
         </div>
       </details>
     ) : null;
-  /** After a win: one grouped card with the lunch time and the hand-off. */
-  const renderWhatsNext = () =>
-    current?.status === "chosen" ? (
-      <section className="mt-4">
-        <SectionTitle title="What’s next" />
-        <ListCard className="mt-3">
-          <li>{renderScheduleEditor(true)}</li>
-          <li className="flex flex-col gap-3 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
-            <div className="min-w-0">
-              <p className="text-[15px] font-semibold">
-                {isOccasion ? "Wrap up this occasion" : "Hand off the next round"}
-              </p>
-              <p className="mt-0.5 text-sm leading-6 text-muted">
-                {isOccasion
-                  ? "Closing records this visit. Anyone can start the next occasion."
-                  : "Closing records this visit and passes the picks along."}
-                {!scheduleHasPassed ? ` Opens after ${formatShortLunchTime(current.scheduled_for, timeZone)}.` : ""}
-              </p>
-            </div>
-            <button
-              type="button"
-              disabled={busy || !scheduleHasPassed}
-              onClick={() => void closeLoop()}
-              className="min-h-11 shrink-0 whitespace-nowrap rounded-[var(--ll-radius-md)] bg-accent-strong px-5 text-[15px] font-semibold text-on-accent disabled:cursor-not-allowed disabled:opacity-45"
-            >
-              {isOccasion ? "Finish occasion" : "Close the loop"}
-            </button>
-          </li>
-        </ListCard>
-      </section>
-    ) : null;
-
   let heroEyebrow =
     mealName === "dinner" ? "It’s dinner time" : "It’s lunch o’clock";
   let heroTitle = "Where are we going today?";
@@ -1540,18 +1496,11 @@ export function HomeScreen() {
       ? `Enjoy ${mealName}, then finish this occasion. Any crew member can start another one whenever the next night out comes around.`
       : `Enjoy ${mealName}, then close the loop so the next person can make the next set of picks.`;
     heroAction = (
-      <section className="mb-4 rounded-[var(--ll-radius-lg)] bg-surface text-ink shadow-[var(--ll-shadow-card)]">
-        <div className="px-5 pt-5">
-          <ProgressLine
-            steps={["Picks", "Vetoes", "Winner"]}
-            current={3}
-            label={`${mealNameTitle} progress`}
-          />
-        </div>
+      <section className="mb-4 overflow-hidden rounded-[var(--ll-radius-lg)] bg-surface text-ink shadow-[var(--ll-shadow-card)]">
         <button
           type="button"
           onClick={() => winner && setDetailRestaurant(winner)}
-          className="block w-full rounded-b-[var(--ll-radius-lg)] px-5 pb-5 pt-4 text-left transition hover:bg-surface-muted focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-300"
+          className="block w-full px-5 pb-4 pt-5 text-left transition hover:bg-surface-muted focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/40"
           aria-label={winner ? `View details for ${winner.name}` : undefined}
         >
           <span className="inline-flex items-center gap-1.5 rounded-full bg-accent-soft px-3 py-1 text-sm font-medium text-accent-ink">
@@ -1564,6 +1513,43 @@ export function HomeScreen() {
           {winner && restaurantFacts(winner)}
           <span className="mt-3 block text-sm font-medium text-accent-strong">Details &amp; map →</span>
         </button>
+        <div className="border-t border-line">{renderScheduleEditor(true)}</div>
+        <div className="px-5 pb-5">
+          <button
+            type="button"
+            disabled={busy || !scheduleHasPassed}
+            onClick={() => void closeLoop()}
+            className="min-h-12 w-full rounded-[var(--ll-radius-md)] bg-accent-strong px-5 text-[16px] font-semibold text-on-accent disabled:cursor-not-allowed disabled:bg-surface-muted disabled:text-subtle"
+          >
+            {isOccasion ? "Finish occasion" : "Close the loop"}
+          </button>
+          <p className="mt-2 text-center text-sm leading-6 text-muted">
+            {!scheduleHasPassed
+              ? `Opens after ${formatShortLunchTime(current.scheduled_for, timeZone)}. `
+              : "After lunch. "}
+            {isOccasion
+              ? "Records the visit. Anyone can start the next occasion."
+              : "Records the visit and hands the picks to the next person."}
+          </p>
+        </div>
+        <div className="border-t border-line px-5 py-4">
+          <RoundTrack
+            people={trackPeople}
+            suggesterId={current.suggester_id}
+            done={positions.done}
+            waiting={positions.waiting}
+            share={positions.share}
+            startLabel="Picks"
+            endLabel="Winner"
+            label={`${mealNameTitle} progress`}
+            caption={
+              <>
+                <strong className="font-semibold text-ink">Everyone’s in.</strong>{" "}
+                {suggesterFirst} picked, {vetoes.length} {vetoes.length === 1 ? "veto" : "vetoes"}, one place left standing.
+              </>
+            }
+          />
+        </div>
       </section>
     );
   }
@@ -1587,31 +1573,32 @@ export function HomeScreen() {
             <span className="shrink-0 font-medium">{isOccasion ? "This occasion" : `${mealNameTitle} round`}</span>
             <span className="truncate text-subtle">{formatShortLunchTime(current.scheduled_for, timeZone)}</span>
           </div>
-          <div className="mt-4 flex items-center gap-3">
-            <div className="flex -space-x-2">
-              {members.slice(0, 6).map((member) => (
-                <Avatar
-                  key={member.user_id}
-                  name={member.display_name}
-                  highlight={member.user_id === current.suggester_id}
-                  className="ring-2 ring-[var(--ll-surface)]"
-                />
-              ))}
-            </div>
-            <ProgressLine
-              className="flex-1"
-              steps={["Picks", "Vetoes", "Winner"]}
-              current={vetoes.length > 0 ? 2 : candidates.length > 0 ? 1 : 0}
-              label={`${mealNameTitle} progress`}
-            />
-          </div>
+          <RoundTrack
+            className="mt-3"
+            people={trackPeople}
+            suggesterId={current.suggester_id}
+            done={positions.done}
+            waiting={positions.waiting}
+            share={positions.share}
+            startLabel="Waiting"
+            endLabel="Done"
+            label={`${mealNameTitle} progress`}
+            caption={
+              candidates.length === 0 ? (
+                <><strong className="font-semibold text-ink">{suggesterFirst} is choosing the picks.</strong> Vetoes open next.</>
+              ) : pendingVetoers.length ? (
+                <><strong className="font-semibold text-ink">{positions.done.length} of {memberCount} in.</strong> Waiting on {waitingOnText(pendingVetoers.map((member) => friendlyName(member.user_id)))}.</>
+              ) : (
+                <strong className="font-semibold text-ink">Every veto is in.</strong>
+              )
+            }
+          />
         </Card>
       )}
       {heroAction}
       {chosen && context ? (
         <>
           <MilestoneCard groupId={context.groupId} userId={context.userId} refreshKey={completedCount} />
-          {renderWhatsNext()}
           {context.userId && current?.id ? (
             <div className="pick-nudge mx-auto mt-8 w-full max-w-[22rem]">
               <PickValueNudge
@@ -1635,6 +1622,32 @@ export function HomeScreen() {
                 }}
               />
             </div>
+          ) : null}
+          {current && suggester && candidates.length > 0 && members.length <= 6 ? (
+            <section className="mt-8">
+              <SectionTitle title="This round" />
+              <ListCard className="mt-3">
+                <li className="flex items-center gap-3 px-5 py-3">
+                  <Avatar name={suggester.display_name} highlight size="sm" />
+                  <p className="min-w-0 text-[15px]">
+                    <span className="font-semibold">{friendlyName(suggester.user_id) === "you" ? "You" : suggesterFirst}</span>{" "}
+                    picked {candidates.length} {candidates.length === 1 ? "place" : "places"}
+                  </p>
+                </li>
+                {vetoes.map((veto) => {
+                  const who = friendlyName(veto.user_id);
+                  const place = restaurantForCandidate(veto.candidate_id);
+                  return (
+                    <li key={veto.user_id + veto.candidate_id} className="flex items-center gap-3 px-5 py-3">
+                      <Avatar name={memberNameById.get(veto.user_id) ?? "?"} size="sm" />
+                      <p className="min-w-0 truncate text-[15px]">
+                        <span className="font-semibold">{who === "you" ? "You" : who}</span> vetoed {place?.name ?? "a place"}
+                      </p>
+                    </li>
+                  );
+                })}
+              </ListCard>
+            </section>
           ) : null}
         </>
       ) : current ? (

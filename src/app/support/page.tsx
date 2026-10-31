@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { AppFrame } from "@/components/app-frame";
 import { OperatorCredit } from "@/components/quiet-donation-link";
 import { donationUrl } from "@/lib/donation";
@@ -63,7 +64,7 @@ function SupportOpen() {
       <section>
         <h2 className="text-[19px] font-semibold tracking-tight">Built while learning</h2>
         <p className="mt-2 text-[15px] leading-7 text-muted">
-          Craig learned to build the software with AI coding tools. The product is still a small tool for real friend groups, not a restaurant advertiser.
+          Lunch Loop is Craig’s idea, brought to life with new tools while he learned along the way. It is still a small tool for real friend groups, not a restaurant advertiser. <Link href="/about" className="font-medium text-accent-strong">More about Craig →</Link>
         </p>
       </section>
       <section>

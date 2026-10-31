@@ -28,6 +28,15 @@ function changeText(change: ReleaseChange) {
 
 const releases: { build: string; changes: ReleaseChange[] }[] = [
   {
+    build: "2026.10.31.76",
+    changes: [
+      "The win page puts first things first: the winner, the time, then Close the loop. A new progress line shows everyone’s initials moving to the finish as vetoes come in.",
+      "Stats is all new: places tried, how fast you decide, your lunch streak, the favorites you keep going back to, and a few little facts.",
+      "Meet the maker: a new About page, linked from the bottom of every page.",
+      "“Add to home screen” is now in the menu, and Occasion loops get a small label in the loop switcher.",
+    ],
+  },
+  {
     build: "2026.10.31.75",
     changes: [
       "A brand-new home page for people who aren’t signed in yet: big, simple, and quick to read on a phone.",

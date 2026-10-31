@@ -139,10 +139,10 @@ export function PickNudgeView({
   if (style === "jar") return <TipJarNote onDismiss={onDismiss} />;
   const line = oneLiners[variant % oneLiners.length];
   return (
-    <div className="flex w-full flex-wrap items-center justify-between gap-x-3 gap-y-1 rounded-2xl bg-white px-3 py-2 text-sm leading-5 text-stone-800 shadow-sm">
+    <div className="flex w-full flex-wrap items-center justify-between gap-x-3 gap-y-1 rounded-[var(--ll-radius-lg)] bg-surface px-4 py-3 text-[15px] leading-6 text-ink shadow-[var(--ll-shadow-card)]">
       <p className="min-w-0 flex-1">
         {line.before}
-        <Link href="/support" className="font-black text-orange-800 underline decoration-orange-400 underline-offset-2">
+        <Link href="/support" className="font-semibold text-accent-strong hover:underline">
           {line.link}
         </Link>
         {line.after}
@@ -206,13 +206,13 @@ function LunchReceipt({
 
 function TipJarNote({ onDismiss }: { onDismiss: () => void }) {
   return (
-    <div className="flex w-full items-center gap-3 rounded-2xl bg-white px-3 py-2 text-sm text-stone-800 shadow-sm">
+    <div className="flex w-full items-center gap-3 rounded-[var(--ll-radius-lg)] bg-surface px-4 py-3 text-[15px] text-ink shadow-[var(--ll-shadow-card)]">
       <TipJarIcon />
       <p className="min-w-0 flex-1">
-        <Link href="/support" className="font-black text-orange-800 underline decoration-orange-400 underline-offset-2">
+        <Link href="/support" className="font-semibold text-accent-strong hover:underline">
           Tip the loop?
         </Link>
-        <span className="mt-0.5 block text-xs text-stone-600">{tipFreeNote}</span>
+        <span className="mt-0.5 block text-sm text-muted">{tipFreeNote}</span>
       </p>
       <DismissButton onDismiss={onDismiss} />
     </div>
@@ -241,7 +241,7 @@ function DismissButton({ onDismiss, tone = "chip" }: { onDismiss: () => void; to
   const className =
     tone === "receipt"
       ? "mt-1 inline-flex min-h-11 items-center justify-center px-2 text-xs font-bold underline"
-      : "inline-flex min-h-11 shrink-0 items-center px-1 text-xs font-bold text-stone-600 underline";
+      : "inline-flex min-h-11 shrink-0 items-center px-1 text-sm font-medium text-subtle hover:text-ink";
   return (
     <button
       type="button"
